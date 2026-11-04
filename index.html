@@ -931,9 +931,6 @@ input[type="range"][data-target-slider]{
  <div class="dashboard-heading approved-overview-heading">
   <div class="overview-title"><span class="overview-calendar" aria-hidden="true">▦</span><h2>Monthly Payroll Overview</h2></div>
   <div class="dashboard-month"><label for="dashboardMonth">Payroll Month</label><input type="month" id="dashboardMonth" aria-label="Edit payroll month"><button type="button" class="primary" id="saveDashboardMonth">Save</button>
-  <label class="perfect-attendance-toggle"><input type="checkbox" id="perfectAttendanceQualified"> Confirm Perfect Attendance eligibility</label>
-  <label class="perfect-attendance-toggle"><input type="checkbox" id="midYearPayPaid"> Mid-Year Pay received this month</label>
-  <label class="perfect-attendance-toggle"><input type="checkbox" id="13thMonthPayPaid"> 13th Month Pay received this month</label>
  </div>
  </div>
  <div class="dashboard-cutoffs" id="dashboardCutoffs"></div>
@@ -955,7 +952,7 @@ input[type="range"][data-target-slider]{
    <div class="field"><label for="residenceZone">Residence zone for Emerson transportation allowance</label>
     <select id="residenceZone" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
      <option value="1">Zone 1 · 0–4 km · ₱125</option><option value="2">Zone 2 · 4–8 km · ₱175</option><option value="3">Zone 3 · 8–13 km · ₱300</option><option value="4" selected>Zone 4 · 13 km beyond · ₱350</option>
-    </select><p class="sub">Used for approved OT transportation. Confirm your declared zone with HR.</p>
+    </select><p class="sub">Added to the ₱60 OT meal allowance for each supervisor-approved OT day of at least 3 hours. Holiday premium is calculated and shown separately. Confirm your declared zone with HR.</p>
    </div>
    <div class="field"><div class="fieldhead"><label for="basicSalary">Monthly basic salary</label><span class="val" id="basicSalaryVal">₱0</span></div><input id="basicSalary" type="number" min="0" max="1000000" step="500" value="0"></div>
 
@@ -1060,7 +1057,7 @@ let customExpenseDefs=[];try{customExpenseDefs=JSON.parse(localStorage.getItem('
 const expenseRoot=document.getElementById('expenses');
 function renderExpenseRows(){expenseRoot.innerHTML=expenseDefs.map(([id,label,def,max,step])=>`<div class="expense-row" data-expense-row="${id}"><div class="fieldhead"><label for="${id}">${label.replace(/^\d+\. /,'')}</label><span class="val" id="${id}Val">${fmt(def)}</span><div class="expense-actions"><button type="button" data-edit-expense="${id}">Edit</button><button type="button" data-delete-expense="${id}">−</button></div></div><input id="${id}" type="range" min="0" max="${max}" step="${step}" value="${def}"><div class="ends"><span>₱0</span><span>${fmt(max)}</span></div><input type="hidden" id="${id}Cutoff" value="eom"></div>`).join('');}
 renderExpenseRows();
-const ids=['employmentStatus','basicSalary','workPosition','dutyStart','dutyEnd','residenceZone','perfectAttendanceQualified','midYearPayPaid','13thMonthPayPaid',...expenseDefs.map(x=>x[0])];
+const ids=['employmentStatus','basicSalary','workPosition','dutyStart','dutyEnd','residenceZone',...expenseDefs.map(x=>x[0])];
 const get=id=>document.getElementById(id);
 const WEEK_DAYS=[{n:'Monday',s:'Mon',v:1},{n:'Tuesday',s:'Tue',v:2},{n:'Wednesday',s:'Wed',v:3},{n:'Thursday',s:'Thu',v:4},{n:'Friday',s:'Fri',v:5},{n:'Saturday',s:'Sat',v:6},{n:'Sunday',s:'Sun',v:0}];
 let weeklySchedule={1:{working:true,start:'09:00',end:'18:00'},2:{working:true,start:'09:00',end:'18:00'},3:{working:true,start:'09:00',end:'18:00'},4:{working:true,start:'09:00',end:'18:00'},5:{working:true,start:'09:00',end:'18:00'},6:{working:false,start:'09:00',end:'18:00'},0:{working:false,start:'09:00',end:'18:00'}};
@@ -1111,29 +1108,9 @@ function recommendOtForTarget(target,nightHours,otDays,isRegular){
 
 function zoneAllowance(){return ({1:125,2:175,3:300,4:350})[Number(get('residenceZone')?.value)||4]||350;}
 function syncZonePill(){const el=get('zonePill');if(el)el.textContent='Zone '+(get('residenceZone')?.value||4)+' · PHP';}
-function syncPerfectAttendanceControl(){
- const month=get('dashboardMonth')?.value;if(!month)return;
- const r=monthlyHistory.find(x=>x.month===month);
- const cb=get('perfectAttendanceQualified');if(cb)cb.checked=!!r?.perfectAttendanceQualified;
- const mid=get('midYearPayPaid'),thirteen=get('13thMonthPayPaid');
- if(mid)mid.checked=!!r?.midYearPayPaid;if(thirteen)thirteen.checked=!!r?.thirteenthMonthPayPaid;
-}
+function syncPerfectAttendanceControl(){ /* Eligibility and scheduled bonus payments are calculated automatically. */ }
 get('residenceZone')?.addEventListener('change',()=>{syncZonePill();monthlyHistory.forEach(recalcSavedRecord);renderMonthlyDashboard();});
-get('perfectAttendanceQualified')?.addEventListener('change',()=>{
- const month=get('dashboardMonth')?.value;if(!month)return;
- let r=monthlyHistory.find(x=>x.month===month);
- if(!r){r={month,first:currentCutoffPlan('15',month),second:currentCutoffPlan('eom',month)};monthlyHistory.push(r);}
- r.perfectAttendanceQualified=get('perfectAttendanceQualified').checked;
- recalcSavedRecord(r);saveMonthlyHistoryData();renderMonthlyDashboard();renderMonthlyHistory();
-});
 get('dashboardMonth')?.addEventListener('change',syncPerfectAttendanceControl);
-['midYearPayPaid','13thMonthPayPaid'].forEach(id=>get(id)?.addEventListener('change',()=>{
- const month=get('dashboardMonth')?.value;if(!month)return;
- let r=monthlyHistory.find(x=>x.month===month);
- if(!r){r={month,first:currentCutoffPlan('15',month),second:currentCutoffPlan('eom',month)};monthlyHistory.push(r);}
- if(id==='midYearPayPaid')r.midYearPayPaid=get(id).checked;else r.thirteenthMonthPayPaid=get(id).checked;
- recalcSavedRecord(r);saveMonthlyHistoryData();renderMonthlyDashboard();renderMonthlyHistory();
-}));
 syncZonePill();
 function calculate(){
  const basic=basicPay(),isRegular=get('employmentStatus')?.value==='regular';
@@ -1241,6 +1218,21 @@ function detailMarkup(record,which){
  <dialog class="pay-breakdown-dialog" data-cutoff-summary="${which}"><div class="picker-head"><div><h3>Estimated Cutoff Take-home</h3><p class="sub">${which==='first'?'1st':'2nd'} cutoff · ${monthLabel(record.month)}</p></div><button type="button" data-breakdown-close aria-label="Close">✕</button></div><div class="breakdown-content" data-cutoff-summary-content="${which}"></div></dialog>
  <dialog class="pay-breakdown-dialog" data-deduction-dialog="${which}"><div class="picker-head"><div><h3>Payroll Deduction Computation</h3><p class="sub">${which==='first'?'1st':'2nd'} cutoff · ${monthLabel(record.month)}</p></div><button type="button" data-breakdown-close aria-label="Close">✕</button></div><div class="breakdown-content" data-deduction-content="${which}"></div></dialog></div>`;
 }
+function automaticPerfectAttendance(record){
+ const absences=new Set(['first','second'].flatMap(k=>record[k]?.absenceDates||[]));
+ if(absences.size>0)return false;
+ const worked=new Set(['first','second'].flatMap(k=>(record[k]?.otEntries||[]).map(e=>e.date)));
+ // An entry with zero OT still records a worked day.
+ for(const which of ['first','second']){
+  const period=cutoffPeriod(record.month,which);
+  const [sy,sm,sd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);
+  for(let d=new Date(sy,sm-1,sd);d<=new Date(ey,em-1,ed);d.setDate(d.getDate()+1)){
+   const date=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+   if(scheduleForDate(date).working&&!worked.has(date))return false;
+  }
+ }
+ return true;
+}
 function recalcSavedRecord(record){
  const basic=basicPay(),hourly=basic/(22*8),riceHalf=1167/2,regular=get('employmentStatus')?.value==='regular',regularHalf=regular?2000/2:0,zone=zoneAllowance();
  ['first','second'].forEach(k=>{
@@ -1267,12 +1259,12 @@ function recalcSavedRecord(record){
   x.riceAllowance=riceHalf;x.regularBenefit=regularHalf;
   const monthNumber=Number(String(record.month).slice(5,7));
   x.clothingAllowance=regular&&[3,6,9,12].includes(monthNumber)?750:0; // ₱3,000/year, ₱750 per quarter.
-  x.midYearPay=regular&&record.midYearPayPaid&&k==='second'?basic*.5:0;
-  x.thirteenthMonthPay=record.thirteenthMonthPayPaid&&k==='second'?basic/12:0;
+  x.midYearPay=regular&&monthNumber===6&&k==='second'?basic*.5:0;
+  x.thirteenthMonthPay=monthNumber===12&&k==='second'?basic/12:0;
   x.perfectAttendanceAward=0;
  });
  const d=monthlyPayrollDeductionTotals(record),halfBasic=basic/2;
- const award=record.perfectAttendanceQualified?Math.max(basic/22,1200):0;
+ const award=automaticPerfectAttendance(record)?Math.max(basic/22,1200):0;
  record.perfectAttendanceAward=award;
  ['first','second'].forEach(k=>{
   const x=record[k],gross=halfBasic+riceHalf+regularHalf+(Number(x.otPay)||0)+(Number(x.otTransport)||0)+(Number(x.nightTransportAllowance)||0)+(Number(x.clothingAllowance)||0)+(Number(x.holiday)||0)+(k==='second'?award:0)+(Number(x.midYearPay)||0)+(Number(x.thirteenthMonthPay)||0);
@@ -1424,11 +1416,32 @@ function buildOtPayBreakdown(record,which){
  ${details.map(e=>`<div class="breakdown-row"><div><b>${e.date?new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'OT entry'} · ${e.isWeekend?'Weekend':'Weekday'}</b><small>${e.hours.toFixed(1)} OT hrs · ${e.night.toFixed(1)} night OT hrs + ${e.shiftNight.toFixed(1)} scheduled night hrs</small></div><strong>${fmt(e.otAmount+e.ndAmount)}</strong></div>`).join('')}
  <div class="breakdown-total"><span>Total OT pay + night differential</span><b>${fmt(x.otPay||0)}</b></div>`;
 }
+function cutoffGrossComponents(record,which){
+ const x=record[which],basic=basicPay(),halfBasic=basic/2;
+ const rice=1167/2,regularBenefit=(get('employmentStatus')?.value==='regular'?2000:0)/2;
+ const award=which==='second'?(Number(record.perfectAttendanceAward)||0):0;
+ const rows=[
+  ['Half-month basic salary',halfBasic,'Monthly basic salary ÷ 2'],
+  ['Rice subsidy',rice,'₱1,167 monthly ÷ 2'],
+  ['Regularization transportation allowance',regularBenefit,'₱2,000 monthly ÷ 2, regular employees only'],
+  ['Recorded OT pay',Number(x.otBasePay)||0,'Recorded OT hours × hourly rate × 1.25'],
+  ['Night differential',Number(x.nightPay)||0,'10% of hourly rate for eligible hours from 10 PM to 6 AM'],
+  ['OT meal allowance',Number(x.otMealAllowance)||0,'₱60 per day with at least 3 hours of supervisor-approved OT'],
+  ['OT transportation allowance',Number(x.otTravelAllowance)||0,'Residence-zone amount for each day with at least 3 hours of supervisor-approved OT'],
+  ['Night-shift transportation subsidy',Number(x.nightTransportAllowance)||0,'Eligible dates confirmed in attendance records'],
+  ['Clothing allowance',Number(x.clothingAllowance)||0,'Quarterly payment, regular employees only'],
+  ['Perfect attendance award',award,'Automatic only when all scheduled workdays in the payroll cycle are recorded as worked, with no absences'],
+  ['Mid-year pay',Number(x.midYearPay)||0,'Automatically included in June for regular employees'],
+  ['13th month pay',Number(x.thirteenthMonthPay)||0,'Automatically included in December'],
+  ['Holiday premium',Number(x.holiday)||0,'Separate holiday premium. This remains payable/displayed independently of the 3-hour OT allowances.']
+ ];
+ return {rows,total:rows.reduce((sum,row)=>sum+(Number(row[1])||0),0)};
+}
 function buildCutoffSummary(record,which){
- const x=record[which],basic=basicPay(),halfBasic=basic/2,ot=Number(x.otPay)||0,holiday=Number(x.holiday)||0,absence=Number(x.absenceDeduction)||0;
- const gross=halfBasic+ot+holiday,d=monthlyPayrollDeductionTotals(record),deductions=which==='second'?d.total:0;
- const net=Number(x.paySuggested)||Math.max(0,gross-deductions-absence);
- return `<div class="breakdown-formula">The 1st cutoff is paid without statutory deductions. All monthly statutory deductions and withholding tax are consolidated in the 2nd cutoff.</div>
+ const x=record[which],components=cutoffGrossComponents(record,which),gross=components.total,absence=Number(x.absenceDeduction)||0;
+ const d=monthlyPayrollDeductionTotals(record),deductions=which==='second'?d.total:0;
+ const net=Math.max(0,gross-deductions-absence);
+ return `<div class="breakdown-formula">The 3-hour approved OT allowances are added separately. Holiday premium is also retained as a separate gross-pay item and is not replaced by OT meal or transportation allowances.</div>
  <button type="button" class="computation-link" data-open-gross="${which}"><span>Gross pay</span><b>${fmt(gross)} <span class="info-mark">i</span></b></button>
  ${which==='second'?`<button type="button" class="computation-link" data-open-deductions="second"><span>Payroll deductions · monthly total</span><b>− ${fmt(deductions)} <span class="info-mark">i</span></b></button>`:`<div class="computation-link"><span>Payroll deductions · charged on 2nd cutoff</span><b>${fmt(0)}</b></div>`}
  <div class="breakdown-row"><div><b>Absence deduction</b><small>${x.absenceDays||0} absent day(s) × daily absence rate</small></div><strong>${fmt(absence)}</strong></div>
@@ -1450,12 +1463,14 @@ function buildHolidayPremiumBreakdown(record,which){
  return `<div class="breakdown-formula">Hours are taken from the employee's saved weekly schedule for each holiday date, not a fixed 8-hour day. Hourly rate in this estimate = monthly basic salary ÷ 22 ÷ 8. The premium shown is the additional premium above the regular monthly salary.</div>${parts}<div class="breakdown-total"><span>Holiday premium total</span><b>${fmt(total)}</b></div>`;
 }
 function buildGrossBreakdown(record,which){
- const x=record[which],basic=basicPay(),half=basic/2,ot=Number(x.otPay)||0,holiday=Number(x.holiday)||0;
- return `<div class="breakdown-formula">Gross pay before statutory contributions, withholding tax, and absence deduction.</div>
- <div class="breakdown-row"><div><b>Half-month basic salary</b><small>Monthly basic salary ÷ 2</small></div><strong>${fmt(half)}</strong></div>
- <div class="breakdown-row"><div><b>OT + night differential</b><small>From recorded weekday/weekend OT and eligible night hours</small></div><strong>${fmt(ot)}</strong></div>
- <button type="button" class="computation-link" data-open-holiday="${which}"><span>Holiday premium</span><b>${fmt(holiday)} <span class="info-mark">i</span></b></button>
- <div class="breakdown-total"><span>Gross pay</span><b>${fmt(half+ot+holiday)}</b></div>`;
+ const components=cutoffGrossComponents(record,which);
+ const rows=components.rows.map(([label,value,formula])=>{
+  const isHoliday=label==='Holiday premium';
+  const isOtAllowance=label==='OT meal allowance'||label==='OT transportation allowance';
+  const content=`<div><b>${label}</b><small>${formula}</small></div><strong>${fmt(value)}</strong>`;
+  return isHoliday?`<button type="button" class="computation-link" data-open-holiday="${which}">${content}</button>`:`<div class="breakdown-row ${isOtAllowance?'ot-allowance-row':''}">${content}</div>`;
+ }).join('');
+ return `<div class="breakdown-formula">Gross pay before statutory contributions, withholding tax, and absence deduction. Approved OT of at least 3 hours adds the ₱60 meal allowance plus the selected residence-zone transportation allowance. Holiday premium remains a separate item.</div>${rows}<div class="breakdown-total"><span>Gross pay</span><b>${fmt(components.total)}</b></div>`;
 }
 function monthlyPayrollDeductionTotals(record){
  const basic=basicPay(),sss=1750,philhealth=1200,pagibig=200;
@@ -1502,9 +1517,9 @@ function buildCutoffPayBreakdown(record,which){
   ['OT transportation allowance',Number(x.otTravelAllowance)||0,'Approved OT of at least 3 hours × selected residence-zone rate'],
   ['Night-shift transportation subsidy',Number(x.nightTransportAllowance)||0,'Eligible dates confirmed by user × selected zone rate; confirm exact HR rule'],
   ['Clothing allowance',Number(x.clothingAllowance)||0,'₱3,000/year paid quarterly: ₱750 in Mar, Jun, Sep and Dec, regular employees only'],
-  ['Perfect attendance award',which==='second'?(Number(record.perfectAttendanceAward)||0):0,'When eligibility is confirmed: higher of one day base pay (basic ÷ 22) or ₱1,200'],
-  ['Mid-year pay',Number(x.midYearPay)||0,'50% of monthly basic salary when marked received; regular employees only'],
-  ['13th month pay',Number(x.thirteenthMonthPay)||0,'Monthly basic salary ÷ 12 when marked received'],
+  ['Perfect attendance award',which==='second'?(Number(record.perfectAttendanceAward)||0):0,'Automatic when every scheduled workday is recorded as worked and there are no absences: higher of basic ÷ 22 or ₱1,200'],
+  ['Mid-year pay',Number(x.midYearPay)||0,'Automatically included in June; 50% of monthly basic salary for regular employees'],
+  ['13th month pay',Number(x.thirteenthMonthPay)||0,'Automatically included in December; monthly basic salary ÷ 12'],
   ['Holiday premium',Number(x.holiday)||0,'Emerson holiday multipliers, including rest-day and OT tiers'],
   ['SSS',-((which==='second')?d.sss:0),'₱1,750 monthly planning assumption, deducted in 2nd cutoff'],
   ['PhilHealth',-((which==='second')?d.philhealth:0),'₱1,200 monthly planning assumption, deducted in 2nd cutoff'],
