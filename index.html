@@ -1,0 +1,2451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#12231f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Salary Planner">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Salary & Budget Planner</title>
+<style>
+:root{--bg:#f4f6f4;--card:#fff;--ink:#18231f;--muted:#68746e;--line:#e0e7e2;--green:#176b4d;--greenbg:#e7f4ed;--red:#b33b3b;--shadow:0 6px 22px #152d2010}
+*{box-sizing:border-box}html{overscroll-behavior-y:none}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:#12231f;color:#fff;padding:22px 18px 20px;border-radius:0 0 24px 24px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#b8d9ca;font-weight:700}h1{font-size:23px;line-height:1.15;margin:7px 0 5px}header p{margin:0;color:#d0ddd6;font-size:13px}.pill{background:#254b3d;color:#dff5e8;border-radius:999px;padding:6px 9px;font-size:11px;white-space:nowrap}
+main{max-width:1120px;margin:auto;padding:calc(var(--sticky-height, 220px) + 14px) 12px 40px}.sticky-shell{position:fixed;top:0;left:0;right:0;width:100%;z-index:100;background:var(--bg);box-shadow:0 5px 16px #152d200c;padding-top:env(safe-area-inset-top, 0px);transform:translateZ(0);will-change:transform}.hero{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:-2px auto 0;max-width:1120px;padding:8px 12px;background:var(--bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}.metric{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px 10px;box-shadow:var(--shadow);min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.metric small{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;font-size:clamp(15px,3.5vw,21px);margin-top:4px;overflow-wrap:anywhere;text-align:center}.positive{color:var(--green)}.negative{color:var(--red)}
+.columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}.panel{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:var(--shadow);min-width:0}.panel h2{font-size:16px;margin:0 0 3px}.sub{font-size:12px;color:var(--muted);margin:0 0 14px}.section{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.section h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 10px}.field{margin:13px 0}.fieldhead{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:6px}.field label{font-size:13px;font-weight:600}.val{font-size:13px;font-weight:750;white-space:nowrap;font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--green);margin:4px 0;cursor:pointer}input[type=number]{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;background:#fff;color:var(--ink)}.ends{display:flex;justify-content:space-between;color:#8a948f;font-size:10px}.benefit{display:flex;gap:9px;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef1ee}.benefit:last-child{border-bottom:0}.benefit b{font-size:13px;display:block}.benefit small{display:block;color:var(--muted);font-size:11px}.benefit strong{font-size:13px;white-space:nowrap}.switchrow{display:flex;align-items:center;gap:8px;font-size:12px;margin-top:10px}.switchrow input{accent-color:var(--green)}.lineitem{display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-size:13px;border-bottom:1px solid #eef1ee}.lineitem span:first-child{color:var(--muted)}.lineitem b{font-variant-numeric:tabular-nums;text-align:right}.highlight{background:var(--greenbg);border-radius:13px;padding:13px;margin:10px 0}.highlight small{color:#416b59;display:block}.highlight strong{font-size:25px;color:var(--green);display:block;margin-top:3px;font-variant-numeric:tabular-nums}.callout{font-size:12px;color:var(--muted);background:#f7f9f7;border-radius:10px;padding:10px;margin-top:10px}.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}button{border:1px solid var(--line);background:white;border-radius:10px;padding:10px 12px;font-weight:650;color:var(--ink);cursor:pointer}button.primary{background:var(--green);color:white;border-color:var(--green)}.foot{font-size:11px;color:var(--muted);padding:16px 3px 0}.savehint{font-size:11px;color:var(--green);margin-top:8px}
+details>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;min-height:44px}
+details>summary::-webkit-details-marker{display:none}
+.summary-title{font-size:16px;font-weight:800}
+.summary-preview{font-size:11px;color:var(--muted);grid-column:1;grid-row:2}
+.chevron{grid-column:2;grid-row:1 / span 2;font-size:24px;color:var(--green);transition:transform .15s ease}
+details[open]>summary .chevron{transform:rotate(180deg)}
+.accordion-content{padding-top:12px}
+.accordion-panel{padding:7px 12px}
+.tabbar{display:flex;gap:7px;overflow-x:auto;padding:8px 12px 10px;max-width:1120px;margin:0 auto;background:var(--bg)}.tabbtn{flex:1;min-width:max-content;padding:10px 12px;font-size:12px}.tabbtn.active{background:var(--green);color:#fff;border-color:var(--green)}.tabpage{display:block}.tabpage.active{display:block}.widepanel{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;box-shadow:var(--shadow);margin-top:12px}.compgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.compcard{border:1px solid var(--line);border-radius:13px;padding:13px;min-width:0}.formula{background:#f7f9f7;border-radius:10px;padding:11px;margin:8px 0;font-size:12px;overflow-wrap:anywhere}.formula b{display:block;margin-bottom:3px}.tag{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.tabpage h2{font-size:17px;margin:0 0 5px}.tabpage h3{font-size:13px;margin:14px 0 7px}#cutoffPlanner .compcard{margin-top:10px;background:#fbfcfb}#cutoffPlanner{scroll-margin-top:12px}#holidayWorkEntries .lineitem{align-items:center}#holidayWorkEntries button{padding:5px 8px;font-size:11px}#cutoffPlanner .highlight strong{font-size:23px}#cutoffPlanner .sub{margin-bottom:8px}#cutoffRecordsList .lineitem{align-items:flex-start}#cutoffRecordsList .lineitem span{min-width:0}#cutoffRecordsList .record-actions button{padding:5px 8px;font-size:11px}
+@media(max-width:760px){.compgrid{grid-template-columns:1fr}.tabbtn{font-size:11px;padding:10px 8px}}
+.accordion-panel details[open]>summary{padding-bottom:10px;border-bottom:1px solid var(--line)}
+@media(min-width:761px){.columns{align-items:start}.accordion-panel{min-height:80px}}
+@media(max-width:760px){.columns{grid-template-columns:1fr}.panel{padding:16px}.columns .panel{scroll-margin-top:10px}.hero{gap:5px;padding:5px 10px}.metric{padding:6px 5px;border-radius:10px}.metric small{font-size:10px}.metric strong{font-size:15px}header{padding:12px 16px 11px;border-radius:0 0 16px 16px}.eyebrow{font-size:10px}h1{font-size:20px;margin:4px 0 3px}header p{font-size:11px}.pill{padding:5px 7px;font-size:10px}.panel h2{font-size:17px}}
+@media(min-width:761px){header{padding-left:max(22px,calc((100% - 1080px)/2));padding-right:max(22px,calc((100% - 1080px)/2))}}
+
+.deduction-detail{border-bottom:1px solid #eef1ee;padding:2px 0}.deduction-detail>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;font-size:13px}.deduction-detail>summary>span:first-child{color:var(--muted);flex:1}.deduction-detail>summary b{font-variant-numeric:tabular-nums}.deduction-detail .chevron{font-size:18px;flex:0 0 auto}.deduction-detail .formula{margin:6px 0 10px}.cutoff-pickers{margin-top:10px}.cutoff-pick{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:5px;cursor:pointer}.cutoff-pick strong{font-size:15px;color:var(--green)}.cutoff-pick small{font-size:11px;color:var(--muted)}#billPickerDialog{width:min(92vw,480px);max-height:80vh;border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 20px 60px #0003}#billPickerDialog::backdrop{background:#0b1712a6}.picker-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.picker-head h2{margin:0 0 4px;font-size:17px}.picker-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid #eef1ee;font-size:13px}.picker-row label{display:flex;gap:9px;align-items:center;flex:1}.picker-row input{accent-color:var(--green);width:18px;height:18px}.picker-row b{white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.target-bill-button{padding:6px 9px;color:var(--ink);font-weight:800;background:#fff;border-color:var(--line);white-space:nowrap}.detail-row td{padding:0 8px 9px;border-bottom:1px solid var(--line)}.detail-row details{background:transparent;border-radius:0;padding:8px 0}.detail-row summary{font-weight:700;color:var(--green);font-size:11px;cursor:pointer}.record-detail{padding:5px 0}.delete-row{text-align:right;padding:8px;border-bottom:1px solid var(--line)}.delete-row button{font-size:10px;padding:5px 8px;color:var(--red)}#monthlyHistoryTable{font-size:10px}#monthlyHistoryTable table{min-width:0!important;table-layout:fixed}#monthlyHistoryTable th{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:9px}#monthlyHistoryTable td{padding:6px 4px;vertical-align:middle;border-bottom:1px solid var(--line);font-size:10px}#monthlyHistoryTable th:nth-child(1),#monthlyHistoryTable td:nth-child(1){width:23%}#monthlyHistoryTable th:nth-child(2),#monthlyHistoryTable td:nth-child(2){width:20%}#monthlyHistoryTable th:nth-child(3),#monthlyHistoryTable td:nth-child(3){width:29%}#monthlyHistoryTable th:nth-child(4),#monthlyHistoryTable td:nth-child(4){width:28%}.cutoff-open-button{padding:4px 6px;font-size:10px;color:var(--ink);background:#fff;border-color:var(--line);white-space:nowrap}.cutoff-row:active{background:transparent}.record-detail .field{margin:9px 0}.record-detail .sub{display:block;margin:5px 0 0;font-size:10px}
+.daily-editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 9px;padding:8px;background:#f8faf8;border-radius:10px}.daily-editor .field{margin:3px 0}.daily-editor label{font-size:11px!important}.daily-editor input[type=date],.daily-editor select,.daily-editor input[type=number]{width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;padding:7px;font:12px inherit;background:#fff;color:var(--ink)}.daily-editor [data-work-controls]{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}.daily-editor [data-save-day]{grid-column:1/-1;padding:7px 10px;font-size:11px}.pay-computation{margin-top:10px;border-top:1px solid var(--line);padding-top:7px}.pay-computation summary{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer}.pay-computation[open]{padding-bottom:5px}@media(max-width:520px){.daily-editor{grid-template-columns:1fr}.daily-editor [data-work-controls]{grid-template-columns:1fr 1fr}}
+.attendance-day{min-width:0;padding:6px 2px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px}
+.attendance-day small{font-size:8px;color:var(--muted);white-space:nowrap}
+.attendance-day.worked{border-color:#7ba88b;background:#edf7f0}.attendance-day.absent{border-color:#d49a9a;background:#fff0f0}
+.attendance-dialog{border:0;border-radius:14px;padding:16px;width:min(92vw,380px);box-shadow:0 18px 55px #0003}
+.attendance-dialog::backdrop{background:#17251fcc}
+.attendance-dialog .btnrow{display:flex;gap:8px;flex-wrap:wrap}.attendance-dialog button{font-size:12px;padding:8px 10px}
+@media(max-width:420px){.attendance-day{padding:5px 0}.attendance-day small{font-size:7px}}
+
+
+.tabpage{display:none!important}.tabpage.active{display:block!important}
+.sticky-shell{position:fixed!important;top:0!important;z-index:100!important}
+.tabbar{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-width:1100px;width:calc(100% - 28px);margin:10px auto 0;padding:0 0 10px}
+.tabbar .tabbtn{min-width:0;white-space:normal;line-height:1.2;font-size:12px;padding:10px 8px;border-radius:10px}
+@media(max-width:520px){.tabbar{gap:4px;width:calc(100% - 16px)}.tabbar .tabbtn{font-size:10px;padding:8px 4px}}
+
+#cloudAccountBar{position:static!important;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:16px auto 12px;text-align:center;width:min(1100px,calc(100% - 28px));background:transparent!important;color:var(--muted)!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding:8px 0!important;font-size:10px!important}
+#cloudAccountBar button{color:var(--ink)!important;border:1px solid var(--line)!important}
+#cloudSyncStatus{opacity:1!important}
+
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.calendar-cell{min-height:62px;border-radius:9px;padding:6px 3px;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;border:1px solid transparent}
+.calendar-cell b{font-size:13px}.calendar-cell small{font-size:8px;line-height:1.1}
+.calendar-workday{background:#e9f2ff;border-color:#b7cdee;color:#294d79}
+.calendar-rest{background:#f0f1f2;border-color:#d9dcdf;color:#69717a}
+.calendar-regular{background:#ffebeb;border-color:#edb8b8;color:#963b3b}
+.calendar-special{background:#fff3d9;border-color:#efd39a;color:#8a6217}
+.calendar-legend{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 12px;font-size:10px}
+.calendar-legend span{display:flex;align-items:center;gap:5px}
+.legend-dot{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid #0001}
+@media(max-width:520px){.calendar-cell{min-height:48px}.calendar-cell small{font-size:7px}}
+
+.remove-month{float:right;border:0;background:transparent;color:var(--red);font-size:16px;padding:0 5px;line-height:1}
+
+.estimate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.estimate-card{min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.estimate-card .tag{display:block;font-size:9px;line-height:1.25;white-space:normal}
+.estimate-card strong{display:block;font-size:17px;line-height:1.25;margin-top:5px;overflow-wrap:anywhere}
+@media(max-width:420px){.estimate-card{padding:7px}.estimate-card strong{font-size:15px}.estimate-card .tag{font-size:8px}}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.section-head .sub{margin:0;flex:1}.small-action{padding:6px 10px!important;font-size:11px!important;white-space:nowrap;border-radius:8px!important}.expense-row{position:relative;border-bottom:1px solid var(--line);padding:7px 0 9px}.expense-row .fieldhead{gap:8px}.expense-actions{display:flex;gap:5px;align-items:center}.expense-actions button{font-size:10px;padding:4px 7px}.benefit-editor-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}.benefit-editor-row small{display:block;color:var(--muted);font-size:10px}.benefit-editor-row button{font-size:10px;padding:4px 7px}.tabbar{margin:0 auto!important;padding:5px 0 7px!important}.content-main{padding-top:3px!important;padding-bottom:76px!important}.tabpage>.widepanel{margin-top:3px!important}.sticky-shell{position:sticky!important;top:0!important;z-index:1000!important;background:var(--bg)!important;box-shadow:0 3px 10px #0000000a}.calendar-legend{margin:6px 0 9px!important}.attendance-calendar{margin-top:2px}
+#cloudAccountBar{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:9500!important;display:flex;gap:8px!important;justify-content:center!important;align-items:center!important;text-align:center!important;width:100%!important;margin:0!important;padding:8px 12px calc(8px + env(safe-area-inset-bottom))!important;background:var(--card)!important;border-top:1px solid var(--line)!important;box-shadow:0 -3px 14px #00000012!important;color:var(--muted)!important;border-radius:0!important}
+@media(max-width:520px){.tabbar .tabbtn{font-size:9px!important;padding:8px 3px!important}.content-main{padding-top:4px!important}.section-head{align-items:flex-start}}
+
+
+/* Compact weekly schedule selector */
+.work-schedule-section{padding:9px 0}.work-schedule-section .section-head{align-items:center;margin:0 0 8px}
+.schedule-tag{font-size:9px;font-weight:700;letter-spacing:.03em;color:var(--green);background:var(--greenbg);padding:4px 7px;border-radius:999px;white-space:nowrap}
+.week-schedule-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.weekday-schedule-btn{min-width:0;padding:7px 2px 6px;border-radius:9px;background:#f7f9f7;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:3px}
+.weekday-schedule-btn b{font-size:10px;line-height:1.2}.weekday-schedule-btn small{font-size:8px;color:var(--muted);white-space:nowrap;line-height:1.2}
+.weekday-schedule-btn.is-working{background:#edf6f0;border-color:#cfe3d6}.weekday-schedule-btn.is-working small{color:var(--green);font-weight:700}.weekday-schedule-btn.is-rest{background:#f5f5f5;color:#77817b}
+.schedule-footnote{font-size:10px;color:var(--muted);margin:6px 0 0}
+.day-schedule-dialog{width:min(90vw,360px);border:1px solid var(--line);border-radius:16px;padding:15px;box-shadow:0 20px 60px #0003}.day-schedule-dialog::backdrop{background:#0b1712a6}.day-schedule-dialog form{margin:0}.schedule-working-toggle{display:flex;align-items:center;gap:8px;padding:10px 0;font-size:13px;font-weight:650}.schedule-working-toggle input{accent-color:var(--green);width:17px;height:17px}.schedule-dialog-times{display:grid;grid-template-columns:1fr 1fr;gap:10px}.schedule-dialog-times .field{margin:8px 0}.schedule-dialog-times input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit;color:var(--ink)}.schedule-dialog-times.is-disabled{opacity:.4;pointer-events:none}
+@media(max-width:420px){.week-schedule-grid{gap:3px}.weekday-schedule-btn{padding:7px 0 6px}.weekday-schedule-btn b{font-size:9px}.weekday-schedule-btn small{font-size:7px}}
+
+/* Compact weekly schedule controls */
+.work-schedule-section{margin-top:12px!important;margin-bottom:12px!important;padding-top:12px!important;padding-bottom:12px!important}
+.work-schedule-section .section-head{margin-bottom:7px!important;gap:8px}
+.work-schedule-section .section-head h3{font-size:12px!important;letter-spacing:.08em}
+.schedule-tag{font-size:9px!important;padding:4px 7px!important}
+.week-schedule-grid{gap:4px!important}
+.weekday-schedule-btn{min-height:48px!important;padding:5px 1px 4px!important;border-radius:8px!important;gap:2px!important}
+.weekday-schedule-btn b{font-size:10px!important}
+.weekday-schedule-btn small{font-size:8px!important;letter-spacing:-.02em}
+.schedule-footnote{font-size:10px!important;margin:5px 0 0!important;line-height:1.3}
+.day-schedule-dialog{width:min(84vw,320px)!important;max-width:320px!important;padding:12px!important;border-radius:14px!important}
+.day-schedule-dialog .picker-head{margin-bottom:6px!important;gap:8px}
+.day-schedule-dialog .picker-head h2{font-size:18px!important;margin:0!important}
+.day-schedule-dialog .picker-head .sub{font-size:12px!important;margin:3px 0 0!important}
+.day-schedule-dialog .picker-head button{width:32px!important;height:32px!important;min-width:32px!important;padding:0!important;font-size:15px!important}
+.schedule-working-toggle{gap:7px!important;padding:7px 0!important;font-size:12px!important}
+.schedule-working-toggle input{width:15px!important;height:15px!important}
+.schedule-dialog-times{gap:8px!important}
+.schedule-dialog-times .field{margin:5px 0!important}
+.schedule-dialog-times .field label{font-size:12px!important;margin-bottom:4px!important}
+.schedule-dialog-times input{padding:8px!important;font-size:14px!important;border-radius:8px!important;min-height:38px!important}
+.day-schedule-dialog .btnrow{gap:7px!important;margin-top:9px!important}
+.day-schedule-dialog .btnrow button{padding:8px 12px!important;font-size:12px!important;min-height:36px!important;border-radius:9px!important}
+@media(max-width:420px){
+ .week-schedule-grid{gap:3px!important}
+ .weekday-schedule-btn{min-height:44px!important;padding:4px 0!important}
+ .weekday-schedule-btn b{font-size:9px!important}
+ .weekday-schedule-btn small{font-size:7px!important}
+ .day-schedule-dialog{width:min(88vw,310px)!important}
+}
+
+/* Monthly payroll dashboard */
+.hero{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important;padding:12px 16px 10px!important}
+.hero .metric{min-height:78px!important;padding:12px 8px!important;display:flex;flex-direction:column;justify-content:space-between}
+.hero .metric small{font-size:11px!important;line-height:1.25}
+.hero .metric strong{font-size:clamp(17px,4.8vw,25px)!important;line-height:1.1;white-space:nowrap}
+.monthly-dashboard{margin:8px 16px 10px!important;padding:14px!important;background:var(--card,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 3px 14px #00000008}
+.dashboard-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.dashboard-kicker{font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--muted);margin-bottom:3px}
+.dashboard-heading h2{font-size:18px;line-height:1.15;margin:0 0 4px}
+.dashboard-heading .sub{font-size:11px;line-height:1.35;margin:0;max-width:240px}
+.dashboard-month{min-width:118px;max-width:145px}\n.dashboard-schedule-readout{font-size:9px!important;color:var(--muted);margin:5px 0 0!important;font-weight:650}
+.dashboard-month label{display:block;font-size:10px;font-weight:700;margin:0 0 4px}
+.dashboard-month input{width:100%;min-width:0;padding:7px 6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:11px}
+.dashboard-cutoffs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.cutoff-dashboard-card{min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg)}
+.cutoff-dashboard-card h3{font-size:12px;margin:0 0 2px}
+.cutoff-dashboard-card .cutoff-date{font-size:9px;color:var(--muted);margin-bottom:8px}
+.cutoff-dashboard-card .cutoff-amount{font-size:19px;font-weight:800;line-height:1.1;margin-bottom:2px}
+.cutoff-dashboard-card .amount-label{font-size:9px;color:var(--muted)}
+.cutoff-dashboard-card .cutoff-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:9px 0}
+.cutoff-dashboard-card .cutoff-stat{background:var(--card,#fff);border-radius:7px;padding:6px}
+.cutoff-dashboard-card .cutoff-stat small{display:block;font-size:8px;color:var(--muted);line-height:1.2}
+.cutoff-dashboard-card .cutoff-stat b{display:block;font-size:11px;margin-top:2px;line-height:1.2}
+.cutoff-dashboard-card .ot-recommendation{font-size:10px;line-height:1.35;padding:7px;border-radius:8px;background:#edf6f0;margin:7px 0;color:#185c43}
+.cutoff-dashboard-card .ot-recommendation.short{background:#fff2e8;color:#8b4b16}
+.cutoff-dashboard-card .cutoff-balance{font-size:11px;font-weight:750;margin:7px 0}
+.cutoff-dashboard-card .cutoff-balance.negative{color:#b4433d}
+.cutoff-dashboard-card .cutoff-balance.positive{color:#187451}
+.cutoff-dashboard-card .bill-assign-btn{width:100%;padding:7px 8px!important;font-size:10px!important;border-radius:8px!important}
+.dashboard-footnote{font-size:9px;color:var(--muted);line-height:1.35;margin-top:9px}
+@media(max-width:390px){
+ .monthly-dashboard{margin:7px 10px 9px!important;padding:10px!important}
+ .dashboard-heading{gap:6px}
+ .dashboard-heading h2{font-size:16px}
+ .dashboard-heading .sub{font-size:10px}
+ .dashboard-month{min-width:105px;max-width:118px}
+ .dashboard-cutoffs{gap:6px}
+ .cutoff-dashboard-card{padding:8px}
+ .cutoff-dashboard-card .cutoff-amount{font-size:16px}
+ .cutoff-dashboard-card .cutoff-stats{gap:4px}
+ .cutoff-dashboard-card .cutoff-stat{padding:5px}
+}
+
+
+/* Compact dashboard, with navigation retained in the fixed shell */
+.monthly-dashboard{margin:8px 0 12px!important;padding:11px!important;border-radius:13px!important}
+.dashboard-heading{align-items:center!important;margin-bottom:8px!important}
+.dashboard-kicker{display:none!important}
+.dashboard-heading h2{font-size:15px!important;margin:0!important}
+.dashboard-heading .sub{display:none!important}
+.dashboard-month{min-width:112px!important;max-width:128px!important}
+.dashboard-month label{font-size:9px!important}
+.dashboard-month input{padding:6px!important;font-size:10px!important}
+.dashboard-cutoffs{gap:7px!important}
+.cutoff-dashboard-card{padding:8px!important;border-radius:10px!important}
+.cutoff-dashboard-card h3{font-size:11px!important;margin:0 0 6px!important}
+.cutoff-dashboard-card .cutoff-date,.cutoff-dashboard-card .cutoff-stats,.cutoff-dashboard-card .amount-label{display:none!important}
+.cutoff-dashboard-card .cutoff-amount{font-size:17px!important;margin:0 0 5px!important}
+.cutoff-dashboard-card .ot-recommendation{font-size:9px!important;line-height:1.25!important;padding:5px!important;margin:5px 0!important}
+.cutoff-dashboard-card .cutoff-balance{font-size:10px!important;margin:5px 0!important}
+.cutoff-dashboard-card .bill-assign-btn{padding:6px!important;font-size:9px!important}
+.cutoff-dashboard-card .cutoff-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.cutoff-dashboard-card .attendance-toggle{width:100%;padding:6px!important;font-size:9px!important;border-radius:8px!important}
+.cutoff-dashboard-card details.dashboard-attendance{margin-top:6px;border-top:1px solid var(--line);padding-top:5px}
+.cutoff-dashboard-card details.dashboard-attendance summary{font-size:9px;font-weight:700;cursor:pointer}
+.cutoff-dashboard-card .record-detail{padding-top:7px}
+.cutoff-dashboard-card .attendance-calendar{gap:2px!important}
+.cutoff-dashboard-card .attendance-day{min-height:36px!important;padding:3px 0!important}
+.cutoff-dashboard-card .attendance-day small{font-size:7px!important}
+.cutoff-dashboard-card .record-detail .sub,.cutoff-dashboard-card .calendar-legend{font-size:8px!important}
+#billPickerDialog{max-width:min(90vw,380px);width:calc(100% - 28px);border:1px solid var(--line);border-radius:16px;padding:14px;max-height:80vh;overflow:auto}
+#billPickerDialog::backdrop{background:#10251fcc}
+#billPickerList{max-height:55vh;overflow:auto}
+#billPickerList .picker-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:12px}
+#billPickerList .picker-row label{display:flex;align-items:center;gap:8px;min-width:0}
+#billPickerList .picker-row input{width:17px;height:17px;flex:none}
+@media(max-width:390px){
+ .monthly-dashboard{padding:8px!important}
+ .cutoff-dashboard-card{padding:7px!important}
+ .cutoff-dashboard-card .cutoff-amount{font-size:15px!important}
+}
+
+
+/* User-requested dashboard layout and unselected navigation state */
+.dashboard-cutoffs{display:flex!important;flex-direction:column!important;gap:12px!important}
+.cutoff-dashboard-card{width:100%!important;box-sizing:border-box!important;padding:12px!important}
+.cutoff-dashboard-card h3{font-size:14px!important;margin-bottom:8px!important}
+.cutoff-dashboard-card .cutoff-amount{font-size:20px!important}
+.cutoff-dashboard-card .cutoff-actions{grid-template-columns:1fr 1fr!important;gap:8px!important}
+.cutoff-dashboard-card .bill-assign-btn,.cutoff-dashboard-card .attendance-toggle{font-size:11px!important;padding:9px!important}
+.cutoff-dashboard-card details.dashboard-attendance[open]{margin-top:10px!important;padding-top:9px!important}
+.cutoff-dashboard-card .record-detail{padding-top:10px!important}
+.cutoff-dashboard-card .attendance-calendar{gap:5px!important}
+.cutoff-dashboard-card .attendance-day{min-height:52px!important;padding:6px 2px!important;border-radius:8px!important}
+.cutoff-dashboard-card .attendance-day b{font-size:12px!important}
+.cutoff-dashboard-card .attendance-day small{font-size:9px!important;line-height:1.2!important}
+.tabbtn{background:var(--card)!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+.tabbtn.active{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important}
+.tabpage{display:none!important}
+.tabpage.active{display:block!important}
+@media(max-width:520px){
+ .dashboard-cutoffs{gap:10px!important}
+ .cutoff-dashboard-card{padding:10px!important}
+ .cutoff-dashboard-card .attendance-day{min-height:48px!important}
+ .cutoff-dashboard-card .attendance-day small{font-size:8px!important}
+}
+
+
+/* Balanced cutoff financial summary */
+.cutoff-dashboard-card{padding:12px!important;border-radius:12px!important}
+.cutoff-dashboard-card h3{font-size:13px!important;margin:0 0 9px!important;letter-spacing:.01em}
+.cutoff-finance-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:stretch}
+.finance-cell{box-sizing:border-box;min-width:0;min-height:68px;border:1px solid var(--line);border-radius:9px;padding:8px 6px;background:var(--card);display:flex;flex-direction:column;justify-content:center;gap:4px;text-align:left;color:var(--ink);font:inherit}
+.finance-cell small{font-size:8px;letter-spacing:.07em;font-weight:800;color:var(--muted);line-height:1.1}
+.finance-cell b{font-size:clamp(12px,3.4vw,16px);line-height:1.1;font-weight:800;white-space:nowrap;letter-spacing:-.03em}
+.finance-cell span{font-size:8px;color:var(--muted);line-height:1.1}
+.bills-cell{cursor:pointer;border-style:dashed}
+.bills-cell:active{transform:scale(.985)}
+.finance-cell.remaining{background:#f0f7f2;border-color:#d8e8dc}
+.target-control{margin-top:11px;padding:0 2px}
+.target-label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;color:var(--muted);margin-bottom:3px}
+.target-label b{font-size:12px;color:var(--ink);font-weight:750}
+.target-control input[type=range]{width:100%;height:20px;margin:0;accent-color:var(--green);cursor:pointer}
+.target-range{display:flex;justify-content:space-between;font-size:8px;color:var(--muted);margin-top:-2px}
+.cutoff-dashboard-card .ot-recommendation{margin:8px 0 2px!important;padding:6px 8px!important;font-size:10px!important;line-height:1.2!important;border-radius:7px!important}
+.cutoff-dashboard-card details.dashboard-attendance{margin-top:8px!important;padding-top:6px!important}
+.cutoff-dashboard-card details.dashboard-attendance summary{font-size:10px!important}
+@media(max-width:380px){
+ .cutoff-finance-grid{gap:4px}
+ .finance-cell{min-height:62px;padding:6px 4px}
+ .finance-cell small{font-size:7px}
+ .finance-cell b{font-size:12px}
+}
+
+
+/* Final compact alignment pass */
+.cutoff-dashboard-card{padding:9px!important}
+.cutoff-dashboard-card>h3{margin:0 0 7px!important;line-height:1.2}
+.cutoff-finance-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px!important;align-items:stretch}
+.finance-cell{min-height:60px!important;padding:7px 6px!important;gap:4px!important;align-items:flex-start;justify-content:center}
+.finance-cell small{font-size:8px!important;line-height:1.15;white-space:nowrap}
+.finance-cell b{font-size:clamp(11px,2.8vw,15px)!important;line-height:1.15;max-width:100%;font-variant-numeric:tabular-nums}
+.finance-cell span{font-size:7px!important;line-height:1.1}
+.target-control{margin-top:8px!important;padding:0!important}
+.target-label{font-size:9px!important;margin-bottom:2px!important;align-items:center}
+.target-label b{font-size:11px!important;font-variant-numeric:tabular-nums}
+.target-control input[type=range]{height:17px!important}
+.target-range{font-size:8px!important;line-height:1.1}
+.cutoff-dashboard-card .ot-recommendation{margin:6px 0 0!important;padding:6px 7px!important;text-align:center;font-variant-numeric:tabular-nums}
+.cutoff-dashboard-card details.dashboard-attendance{margin-top:6px!important;padding-top:5px!important}
+.attendance-calendar{gap:3px!important}
+.attendance-calendar>button.attendance-day{min-height:34px!important;height:34px!important;padding:2px!important;border-radius:6px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.attendance-day b{font-size:11px!important;line-height:1!important}
+.attendance-day small{display:none!important}
+.calendar-legend{gap:8px!important;font-size:9px!important;align-items:center}
+.legend-dot{width:9px!important;height:9px!important;flex:0 0 9px}
+@media(max-width:420px){
+ .cutoff-dashboard-card{padding:7px!important}
+ .cutoff-finance-grid{gap:4px!important}
+ .finance-cell{min-height:55px!important;padding:6px 4px!important}
+ .finance-cell small{font-size:7px!important;letter-spacing:.03em}
+ .finance-cell b{font-size:clamp(10px,3vw,13px)!important}
+ .finance-cell span{font-size:7px!important}
+ .attendance-calendar{gap:2px!important}
+ .attendance-calendar>button.attendance-day{height:31px!important;min-height:31px!important}
+}
+
+
+/* Three-box financial summary inspired by the reference layout */
+.cutoff-finance-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px!important}
+.finance-cell{min-height:82px!important;padding:10px 7px!important;align-items:center!important;text-align:center!important;justify-content:center!important;border-radius:13px!important;background:#fff!important}
+.finance-cell small{font-size:clamp(7px,1.9vw,10px)!important;letter-spacing:.015em!important;white-space:normal!important;min-height:2.2em;display:flex;align-items:center;justify-content:center}
+.finance-cell b{font-size:clamp(14px,4.2vw,21px)!important;line-height:1.12!important;letter-spacing:-.025em!important;white-space:nowrap}
+.finance-cell span{font-size:8px!important;text-align:center!important}
+.finance-cell.remaining{background:#f4f8f5!important}
+.finance-cell.remaining b{color:#1c6548}
+.finance-cell.remaining b[data-negative="true"]{color:#b4433d}
+.bills-cell{border-style:solid!important;border-color:var(--line)!important}
+@media(max-width:420px){
+ .cutoff-finance-grid{gap:5px!important}
+ .finance-cell{min-height:74px!important;padding:8px 4px!important}
+ .finance-cell small{font-size:7px!important;min-height:2.4em}
+ .finance-cell b{font-size:clamp(12px,3.8vw,17px)!important}
+ .finance-cell span{font-size:7px!important}
+}
+
+
+/* Keep attendance dropdown expanded after saving and show saved OT below its date */
+.attendance-day.has-ot{gap:2px!important;padding-top:3px!important;padding-bottom:3px!important}
+.attendance-day.has-ot small{display:block!important;font-size:8px!important;font-weight:750!important;line-height:1!important;color:inherit!important;white-space:nowrap!important}
+@media(max-width:420px){
+ .attendance-day.has-ot small{font-size:7px!important}
+}
+
+
+/* Mobile dashboard spacing and alignment refinement */
+.monthly-dashboard{padding:10px!important}
+.dashboard-heading{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) auto!important;
+ align-items:center!important;
+ gap:5px 10px!important;
+ margin-bottom:8px!important;
+}
+.dashboard-heading>div:first-child{min-width:0}
+.dashboard-kicker{display:none!important}
+.dashboard-heading h2{font-size:16px!important;line-height:1.18!important;margin:0!important}
+.dashboard-heading .sub{display:none!important}
+.dashboard-month{
+ min-width:0!important;
+ width:132px!important;
+ max-width:132px!important;
+ justify-self:end!important;
+}
+.dashboard-month label{font-size:9px!important;margin:0 0 3px!important}
+.dashboard-month input{
+ display:block!important;
+ box-sizing:border-box!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ padding:7px 6px!important;
+ font-size:11px!important;
+}
+.dashboard-cutoffs{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+.cutoff-dashboard-card{min-width:0!important;width:100%!important;box-sizing:border-box!important;padding:8px!important}
+.cutoff-dashboard-card>h3{margin:0 0 6px!important;font-size:13px!important}
+.cutoff-finance-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;width:100%!important}
+.finance-cell{
+ min-width:0!important;
+ width:100%!important;
+ min-height:70px!important;
+ box-sizing:border-box!important;
+ padding:7px 4px!important;
+ align-items:center!important;
+ justify-content:center!important;
+ text-align:center!important;
+}
+.finance-cell small{
+ width:100%!important;
+ min-height:2.4em!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ text-align:center!important;
+ white-space:normal!important;
+ overflow-wrap:anywhere!important;
+ font-size:clamp(7px,1.8vw,9px)!important;
+ line-height:1.15!important;
+}
+.finance-cell b{
+ width:100%!important;
+ display:block!important;
+ text-align:center!important;
+ font-size:clamp(12px,3.5vw,17px)!important;
+ line-height:1.15!important;
+ white-space:nowrap!important;
+ font-variant-numeric:tabular-nums!important;
+}
+.finance-cell span{display:none!important}
+.target-control{margin-top:7px!important}
+.cutoff-dashboard-card .ot-recommendation{margin:6px 0 0!important}
+@media(max-width:520px){
+ .monthly-dashboard{margin:6px 8px 9px!important;padding:9px!important}
+ .dashboard-heading{grid-template-columns:minmax(0,1fr)!important;gap:7px!important;margin-bottom:8px!important}
+ .dashboard-month{width:100%!important;max-width:none!important;display:grid!important;grid-template-columns:90px minmax(0,1fr)!important;align-items:center!important;gap:8px!important}
+ .dashboard-month label{margin:0!important}
+ .dashboard-month input{width:100%!important;max-width:100%!important}
+ .finance-cell{min-height:66px!important;padding:6px 3px!important}
+ .finance-cell small{font-size:7px!important;letter-spacing:0!important}
+ .finance-cell b{font-size:clamp(11px,3.5vw,15px)!important}
+}
+
+
+/* iPhone 15 Pro optimized layout (393 × 852 CSS px), with safe-area support */
+:root{--phone-gutter:12px}
+html{
+ width:100%;
+ min-height:100%;
+ overflow-x:hidden;
+ -webkit-text-size-adjust:100%;
+}
+body{
+ width:100%;
+ min-width:0;
+ max-width:100%;
+ overflow-x:hidden;
+ padding-bottom:env(safe-area-inset-bottom,0px);
+}
+button,input,select,textarea{font-family:inherit}
+button{touch-action:manipulation}
+.sticky-shell{
+ padding-top:env(safe-area-inset-top,0px)!important;
+}
+header{
+ padding:15px var(--phone-gutter) 14px!important;
+ border-radius:0 0 20px 20px!important;
+}
+.topline{align-items:center!important;gap:8px!important}
+.eyebrow{font-size:9px!important;letter-spacing:.12em!important}
+h1{font-size:clamp(20px,5.4vw,23px)!important;line-height:1.12!important;margin:5px 0 4px!important}
+header p{font-size:12px!important;line-height:1.25!important}
+.pill{font-size:10px!important;padding:6px 8px!important}
+.tabbar{
+ width:calc(100% - 2*var(--phone-gutter))!important;
+ max-width:none!important;
+ gap:5px!important;
+ margin:0 auto!important;
+ padding:6px 0 7px!important;
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+.tabbar .tabbtn{
+ min-width:0!important;
+ min-height:42px!important;
+ padding:7px 4px!important;
+ font-size:10px!important;
+ line-height:1.15!important;
+ overflow-wrap:anywhere!important;
+ border-radius:10px!important;
+}
+.content-main{
+ width:100%!important;
+ max-width:100%!important;
+ padding:8px var(--phone-gutter) calc(72px + env(safe-area-inset-bottom,0px))!important;
+ margin:0 auto!important;
+}
+.monthly-dashboard{
+ width:100%!important;
+ max-width:100%!important;
+ margin:0 auto 10px!important;
+ padding:9px!important;
+ border-radius:14px!important;
+}
+.dashboard-heading{
+ grid-template-columns:minmax(0,1fr)!important;
+ gap:7px!important;
+ margin-bottom:8px!important;
+}
+.dashboard-heading h2{font-size:16px!important}
+.dashboard-month{
+ width:100%!important;
+ max-width:none!important;
+ display:grid!important;
+ grid-template-columns:88px minmax(0,1fr)!important;
+ gap:8px!important;
+ align-items:center!important;
+}
+.dashboard-month label{font-size:10px!important}
+.dashboard-month input{
+ width:100%!important;
+ min-height:40px!important;
+ font-size:16px!important;
+ padding:7px 9px!important;
+}
+.dashboard-cutoffs{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+.cutoff-dashboard-card{
+ width:100%!important;
+ padding:8px!important;
+ border-radius:12px!important;
+}
+.cutoff-dashboard-card>h3{font-size:13px!important;margin-bottom:6px!important}
+.cutoff-finance-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+.finance-cell{
+ min-width:0!important;
+ min-height:68px!important;
+ padding:7px 3px!important;
+ border-radius:10px!important;
+}
+.finance-cell small{font-size:7px!important;min-height:2.5em!important;letter-spacing:0!important}
+.finance-cell b{font-size:clamp(11px,3.55vw,15px)!important}
+.target-control{margin-top:7px!important}
+.target-control input[type=range]{height:28px!important}
+.target-label{font-size:10px!important}
+.target-label b{font-size:12px!important}
+.target-range{font-size:8px!important}
+.cutoff-dashboard-card .ot-recommendation{
+ min-height:38px!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ text-align:center!important;
+ font-size:11px!important;
+ padding:7px!important;
+}
+.cutoff-dashboard-card details.dashboard-attendance summary{
+ min-height:42px!important;
+ display:flex!important;
+ align-items:center!important;
+ font-size:11px!important;
+}
+.attendance-calendar{gap:3px!important}
+.attendance-day{min-height:38px!important}
+.attendance-day.has-ot{min-height:40px!important}
+.attendance-day.has-ot small{font-size:8px!important}
+.panel,.widepanel,.section,.accordion-panel{min-width:0!important;max-width:100%!important}
+input:not([type=range]):not([type=checkbox]),select,textarea{
+ max-width:100%;
+ font-size:16px;
+}
+#cloudAccountBar{
+ padding:7px 10px calc(8px + env(safe-area-inset-bottom,0px))!important;
+ gap:6px!important;
+}
+#cloudAccountBar button{min-height:36px!important;font-size:10px!important}
+dialog{
+ max-width:calc(100vw - 28px)!important;
+ max-height:calc(100dvh - 40px - env(safe-area-inset-top,0px))!important;
+ overflow:auto!important;
+ overscroll-behavior:contain;
+}
+@media(max-width:374px){
+ :root{--phone-gutter:9px}
+ .tabbar .tabbtn{font-size:9px!important}
+ .finance-cell b{font-size:11px!important}
+ .finance-cell small{font-size:6.5px!important}
+}
+@media(min-width:394px) and (max-width:520px){
+ :root{--phone-gutter:14px}
+}
+@supports(height:100dvh){
+ body{min-height:100dvh}
+}
+
+
+/* Approved iPhone 15 Pro visual direction */
+@media(max-width:600px){
+ :root{--phone-gutter:10px}
+ .content-main{padding:7px var(--phone-gutter) calc(76px + env(safe-area-inset-bottom,0px))!important}
+ .monthly-dashboard{padding:9px!important;border-radius:15px!important}
+ .dashboard-heading{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(126px,42%)!important;
+  align-items:center!important;
+  gap:8px!important;
+  margin:0 0 9px!important;
+ }
+ .dashboard-heading h2{font-size:clamp(14px,4.1vw,17px)!important;line-height:1.12!important}
+ .dashboard-month{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  gap:3px!important;
+ }
+ .dashboard-month label{font-size:9px!important;font-weight:750!important}
+ .dashboard-month input{min-height:38px!important;font-size:14px!important;padding:6px 7px!important}
+ .dashboard-cutoffs{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
+ .cutoff-dashboard-card{padding:0!important;overflow:hidden!important;border-radius:13px!important;background:#fff!important}
+ .cutoff-card-heading{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  min-height:43px!important;padding:8px 11px!important;
+  background:#e7f4ed!important;color:#18231f!important;
+ }
+ .cutoff-card-heading h3{font-size:14px!important;font-weight:800!important;margin:0!important}
+ .cutoff-card-heading span{font-size:22px!important;line-height:1!important}
+ .cutoff-finance-grid{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:5px!important;padding:7px 7px 0!important;
+ }
+ .finance-cell{
+  min-width:0!important;width:100%!important;min-height:72px!important;
+  padding:7px 3px!important;border-radius:11px!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  justify-content:center!important;text-align:center!important;background:#fff!important;
+ }
+ .finance-cell small{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;min-height:2.35em!important;text-align:center!important;
+  white-space:normal!important;overflow-wrap:anywhere!important;
+  font-size:clamp(7px,1.8vw,9px)!important;line-height:1.15!important;letter-spacing:.015em!important;
+ }
+ .finance-cell b{
+  display:block!important;width:100%!important;text-align:center!important;
+  font-size:clamp(11px,3.5vw,16px)!important;line-height:1.15!important;
+  white-space:nowrap!important;font-variant-numeric:tabular-nums!important;
+ }
+ .finance-cell span{display:none!important}
+ .finance-cell.remaining{background:#f3f8f4!important}
+ .target-control{margin:8px 10px 0!important;padding:0!important}
+ .target-label{font-size:11px!important;margin-bottom:4px!important}
+ .target-label b{font-size:13px!important}
+ .target-control input[type=range]{height:27px!important}
+ .target-range{font-size:9px!important;margin-top:0!important}
+ .cutoff-dashboard-card .ot-recommendation{
+  margin:8px 9px 9px!important;min-height:39px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  text-align:center!important;font-size:11px!important;padding:7px!important;border-radius:9px!important;
+ }
+ .cutoff-dashboard-card details.dashboard-attendance{
+  margin:0 9px 9px!important;padding:0!important;border-top:1px solid var(--line)!important;
+ }
+ .cutoff-dashboard-card details.dashboard-attendance summary{
+  min-height:43px!important;display:flex!important;align-items:center!important;
+  font-size:11px!important;font-weight:750!important;
+ }
+}
+@media(max-width:374px){
+ .dashboard-heading{grid-template-columns:minmax(0,1fr) minmax(116px,42%)!important}
+ .dashboard-heading h2{font-size:14px!important}
+ .finance-cell{min-height:67px!important}
+ .finance-cell b{font-size:11px!important}
+}
+
+
+/* Approved overview header, compact sticky navigation and paycheck interactions */
+.sticky-shell{
+ position:sticky!important;top:0!important;z-index:1200!important;
+ padding-top:env(safe-area-inset-top,0px)!important;
+ background:var(--bg)!important;
+ box-shadow:0 3px 12px #152d2012!important;
+}
+.sticky-shell header{
+ padding:12px 14px 10px!important;
+ border-radius:0 0 16px 16px!important;
+}
+.sticky-shell .eyebrow{font-size:9px!important;line-height:1.2!important}
+.sticky-shell h1{font-size:20px!important;line-height:1.12!important;margin:4px 0 2px!important}
+.sticky-shell header p{font-size:11px!important;line-height:1.2!important}
+.sticky-shell .pill{font-size:9px!important;padding:5px 7px!important}
+.sticky-shell .tabbar{
+ width:calc(100% - 20px)!important;
+ gap:5px!important;margin:0 auto!important;padding:5px 0 6px!important;
+}
+.sticky-shell .tabbar .tabbtn{
+ min-height:37px!important;padding:6px 4px!important;
+ font-size:10px!important;line-height:1.12!important;border-radius:9px!important;
+}
+.content-main{padding-top:8px!important}
+.approved-overview-heading{
+ display:grid!important;
+ grid-template-columns:minmax(0,1.12fr) 1px minmax(132px,.88fr)!important;
+ align-items:center!important;gap:10px!important;
+ padding:9px 10px!important;margin:0 0 9px!important;
+ border:1px solid var(--line)!important;border-radius:13px!important;
+ background:#fff!important;
+}
+.approved-overview-heading .overview-title{
+ display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;
+}
+.overview-calendar{font-size:24px!important;line-height:1!important;color:var(--green)!important;flex:0 0 auto}
+.approved-overview-heading h2{
+ min-width:0!important;font-size:clamp(13px,3.7vw,17px)!important;
+ line-height:1.15!important;margin:0!important;letter-spacing:-.025em!important;
+}
+.overview-divider{height:44px;background:var(--line);width:1px}
+.approved-overview-heading .dashboard-month{
+ display:flex!important;flex-direction:column!important;
+ width:100%!important;max-width:none!important;min-width:0!important;gap:3px!important;
+}
+.approved-overview-heading .dashboard-month label{
+ font-size:9px!important;font-weight:750!important;margin:0!important;
+}
+.approved-overview-heading .dashboard-month input{
+ box-sizing:border-box!important;width:100%!important;min-width:0!important;
+ min-height:38px!important;padding:6px 7px!important;
+ font-size:13px!important;border-radius:9px!important;
+}
+.cutoff-dashboard-card{overflow:hidden!important}
+.finance-cell{
+ min-height:65px!important;padding:6px 4px!important;
+ align-items:center!important;justify-content:center!important;text-align:center!important;
+}
+.finance-cell small{
+ min-height:2.2em!important;display:flex!important;align-items:center!important;
+ justify-content:center!important;text-align:center!important;width:100%!important;
+}
+.finance-cell b{width:100%!important;text-align:center!important}
+.finance-cell.takehome,.finance-cell.remaining,.finance-cell.bills-cell{
+ cursor:pointer!important;font:inherit!important;
+}
+.finance-cell.takehome:focus-visible,.finance-cell.remaining:focus-visible,.finance-cell.bills-cell:focus-visible{
+ outline:2px solid var(--green)!important;outline-offset:2px!important;
+}
+.info-mark{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:13px;height:13px;border:1px solid currentColor;border-radius:50%;
+ font-size:8px!important;font-weight:800!important;line-height:1!important;margin-left:3px;
+}
+.finance-cell.remaining.negative{
+ background:#fff0f0!important;border-color:#f0c7c7!important;color:#b42318!important;
+}
+.finance-cell.remaining.negative b{color:#b42318!important}
+.finance-cell.remaining:not(.negative) b{color:#187451!important}
+.attendance-day.absent{
+ background:#ffe8e8!important;border-color:#df8f8f!important;color:#a52b2b!important;
+}
+.calendar-absent{background:#ffe8e8!important;border-color:#df8f8f!important}
+.calendar-legend{gap:7px 10px!important}
+.pay-breakdown-dialog{
+ width:min(92vw,430px)!important;max-width:calc(100vw - 28px)!important;
+ max-height:82dvh!important;overflow:auto!important;
+ border:1px solid var(--line)!important;border-radius:15px!important;
+ padding:15px!important;box-shadow:0 18px 55px #0003!important;
+}
+.pay-breakdown-dialog::backdrop{background:#12231f99}
+.pay-breakdown-dialog .picker-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.pay-breakdown-dialog .picker-head h3{font-size:16px;margin:0 0 3px}
+.pay-breakdown-dialog .picker-head button{flex:0 0 auto}
+.breakdown-formula{font-size:10px;line-height:1.4;color:var(--muted);background:#f2f6f3;border-radius:8px;padding:8px;margin-bottom:8px}
+.breakdown-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.breakdown-row>div{min-width:0}
+.breakdown-row b{display:block;font-size:11px}
+.breakdown-row small{display:block;font-size:9px;line-height:1.3;color:var(--muted);margin-top:2px}
+.breakdown-row strong{font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.breakdown-total{display:flex;justify-content:space-between;gap:10px;padding:10px 0 5px;margin-top:4px;border-top:1px solid var(--line);font-weight:800}
+.breakdown-total b{font-size:15px}
+#monthlyHistoryTable{overflow-x:auto}
+#monthlyHistoryTable table{min-width:520px}
+#monthlyHistoryTable th,#monthlyHistoryTable td{padding:9px 7px;border-bottom:1px solid var(--line);text-align:right;font-size:11px;white-space:nowrap}
+#monthlyHistoryTable th:first-child,#monthlyHistoryTable td:first-child{text-align:left}
+#monthlyHistoryTable th{font-size:10px;color:var(--muted);font-weight:800}
+#monthlyHistoryTable .negative{color:#b42318;font-weight:800}
+#monthlyHistoryTable .positive{color:#187451;font-weight:800}
+@media(max-width:520px){
+ .sticky-shell header{padding:10px 11px 9px!important}
+ .sticky-shell h1{font-size:18px!important}
+ .sticky-shell header p{font-size:10px!important}
+ .sticky-shell .tabbar{width:calc(100% - 16px)!important;gap:4px!important}
+ .sticky-shell .tabbar .tabbtn{font-size:9px!important;min-height:35px!important;padding:5px 3px!important}
+ .approved-overview-heading{
+  grid-template-columns:minmax(0,1.08fr) 1px minmax(125px,.92fr)!important;
+  gap:7px!important;padding:8px!important;
+ }
+ .overview-calendar{font-size:20px!important}
+ .approved-overview-heading h2{font-size:clamp(12px,3.5vw,15px)!important}
+ .approved-overview-heading .dashboard-month label{font-size:8px!important}
+ .approved-overview-heading .dashboard-month input{font-size:12px!important;min-height:35px!important;padding:5px!important}
+ .overview-divider{height:38px}
+ .finance-cell{min-height:62px!important;padding:5px 2px!important}
+ .finance-cell small{font-size:7px!important}
+ .finance-cell b{font-size:clamp(10px,3.35vw,14px)!important}
+}
+
+
+/* Compact month selector and tighter financial tiles */
+@media(max-width:600px){
+ .approved-overview-heading{grid-template-columns:minmax(0,1.2fr) 1px minmax(104px,.8fr)!important;gap:6px!important;padding:7px 8px!important}
+ .approved-overview-heading .dashboard-month{max-width:116px!important;justify-self:end!important}
+ .approved-overview-heading .dashboard-month input{min-height:32px!important;height:32px!important;font-size:11px!important;padding:4px 5px!important}
+ .approved-overview-heading .dashboard-month label{font-size:8px!important}
+ .approved-overview-heading h2{font-size:clamp(11px,3.2vw,14px)!important}
+ .overview-calendar{font-size:18px!important}
+ .overview-divider{height:34px!important}
+ .finance-cell{min-height:52px!important;height:52px!important;padding:4px 2px!important;border-radius:9px!important}
+ .cutoff-finance-grid{gap:4px!important;padding:6px 6px 0!important}
+ .finance-cell small{min-height:2em!important;font-size:6.5px!important;line-height:1.05!important}
+ .finance-cell b{font-size:clamp(10px,3.1vw,13px)!important;line-height:1.05!important}
+}
+.computation-link{
+ width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;
+ border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);
+ padding:8px 2px;text-align:left;font:inherit;cursor:pointer;
+}
+.computation-link>span{font-size:11px}
+.computation-link>b{font-size:11px;white-space:nowrap}
+.computation-link .info-mark{display:inline-flex}
+@media(max-width:380px){
+ .approved-overview-heading{grid-template-columns:minmax(0,1fr) 1px minmax(98px,.8fr)!important}
+ .approved-overview-heading .dashboard-month{max-width:108px!important}
+ .finance-cell{min-height:49px!important;height:49px!important}
+}
+
+
+/* Compact monthly overview and accessible attendance choices */
+.approved-overview-heading{min-height:0!important;padding-top:6px!important;padding-bottom:6px!important;margin-bottom:6px!important}
+.approved-overview-heading .overview-title{gap:6px!important}
+.overview-calendar{font-size:19px!important}
+.overview-divider{height:30px!important}
+.approved-overview-heading .dashboard-month{gap:2px!important}
+.approved-overview-heading .dashboard-month input{min-height:30px!important;height:30px!important;font-size:11px!important}
+.attendance-choice{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;width:100%!important}
+.attendance-choice button{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ min-height:42px!important;width:100%!important;margin:0!important;
+ position:relative!important;z-index:2!important;pointer-events:auto!important;
+ border:1px solid var(--line)!important;border-radius:10px!important;
+ background:#fff!important;color:var(--ink)!important;
+ font-size:12px!important;font-weight:700!important;cursor:pointer!important;
+ touch-action:manipulation!important;
+}
+.attendance-choice button[aria-pressed="true"]{
+ background:#e7f3ec!important;border-color:#76a88b!important;color:#205c40!important;
+ box-shadow:inset 0 0 0 1px #76a88b!important;
+}
+.attendance-choice button[data-work-no][aria-pressed="true"]{
+ background:#fff0f0!important;border-color:#d98d8d!important;color:#a52b2b!important;
+}
+.attendance-dialog .field{position:relative!important;z-index:1!important}
+.attendance-dialog [data-dialog-save]{min-height:40px!important;min-width:100px!important}
+.attendance-day.absent{background:#ffe5e5!important;border:1px solid #d77d7d!important;color:#a52b2b!important;box-shadow:inset 0 0 0 1px #efc1c1!important}
+
+
+/* Sticky planner masthead + navigation as a single compact unit */
+.sticky-shell{
+ position:sticky!important;top:0!important;z-index:1500!important;
+ display:flex!important;flex-direction:column!important;
+ padding-top:env(safe-area-inset-top,0px)!important;
+ background:var(--bg)!important;
+ isolation:isolate!important;
+}
+.sticky-shell header{flex:0 0 auto!important}
+.sticky-shell .tabbar{flex:0 0 auto!important;position:relative!important;z-index:2!important}
+.cutoff-dashboard-card{position:relative!important;overflow:visible!important}
+.cutoff-card-heading{
+ position:sticky!important;top:var(--planner-sticky-offset,145px)!important;
+ z-index:20!important;
+ border-radius:12px 12px 0 0!important;
+ box-shadow:0 2px 5px #17342612!important;
+}
+
+
+/* Reliable pinned masthead/navigation in Safari and iOS Home Screen mode */
+.sticky-shell{
+ position:fixed!important;top:0!important;left:0!important;right:0!important;
+ width:100%!important;z-index:9999!important;
+ display:flex!important;flex-direction:column!important;
+ background:var(--bg)!important;isolation:isolate!important;
+ padding-top:env(safe-area-inset-top,0px)!important;
+ box-shadow:0 3px 12px #152d2018!important;
+}
+.sticky-shell header,.sticky-shell .tabbar{flex:0 0 auto!important}
+.sticky-shell .tabbar{position:relative!important;z-index:1!important}
+.content-main{
+ padding-top:calc(var(--sticky-height, 150px) + 8px)!important;
+}
+@supports(height:100dvh){
+ .content-main{scroll-margin-top:calc(var(--sticky-height, 150px) + 8px)}
+}
+
+
+input[type="range"][data-target-slider]{
+ display:block!important;width:100%!important;min-width:0!important;
+ min-height:34px!important;height:34px!important;
+ margin:2px 0!important;padding:0!important;
+ -webkit-appearance:auto!important;appearance:auto!important;
+ touch-action:pan-y!important;
+ -webkit-tap-highlight-color:transparent!important;
+ pointer-events:auto!important;
+ position:relative!important;z-index:5!important;
+}
+.target-control{position:relative!important;z-index:3!important}
+
+
+/* Cutoff identity and independent target panels */
+.cutoff-dashboard-card .ot-recommendation{display:none!important}
+.cutoff-dashboard-card.cutoff-first{border:1.5px solid #b9d8fb!important;background:#fff!important}
+.cutoff-dashboard-card.cutoff-second{border:1.5px solid #d8c5fa!important;background:#fff!important}
+.cutoff-dashboard-card.cutoff-first .cutoff-card-heading{background:#e5f1ff!important;color:#174a83!important}
+.cutoff-dashboard-card.cutoff-second .cutoff-card-heading{background:#f0e9ff!important;color:#59338b!important}
+.cutoff-period-tag{font-size:9px!important;font-weight:750!important;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.72);border:1px solid currentColor}
+.cutoff-dashboard-card.cutoff-first .finance-cell.takehome{background:#f0f7ff!important;border-color:#d4e6fb!important}
+.cutoff-dashboard-card.cutoff-second .finance-cell.takehome{background:#f7f2ff!important;border-color:#e5d9fa!important}
+.cutoff-dashboard-card.cutoff-first .target-panel{background:#f3f8ff;border:1px solid #d5e7fb;border-radius:11px;padding:9px;margin-top:10px}
+.cutoff-dashboard-card.cutoff-second .target-panel{background:#f8f4ff;border:1px solid #e5d9fa;border-radius:11px;padding:9px;margin-top:10px}
+.target-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:9px;font-weight:800;letter-spacing:.045em;margin-bottom:5px}
+.target-panel-heading b{font-size:15px;letter-spacing:0;font-variant-numeric:tabular-nums}
+.cutoff-first .target-panel-heading{color:#174a83}
+.cutoff-second .target-panel-heading{color:#59338b}
+.cutoff-first .target-control input[type=range]{accent-color:#2879ce!important}
+.cutoff-second .target-control input[type=range]{accent-color:#8252c7!important}
+.cutoff-first input[type=range][data-target-slider]{accent-color:#2879ce!important}
+.cutoff-second input[type=range][data-target-slider]{accent-color:#8252c7!important}
+.target-control{margin-top:0!important}
+.target-label{display:none!important}
+.target-result-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 7px;margin-top:5px;border-radius:7px;background:rgba(255,255,255,.78);font-size:9px;color:var(--muted)}
+.target-result-row b{font-size:11px;color:var(--ink);font-variant-numeric:tabular-nums}
+.target-result-row.ot-result-row{margin-top:4px}
+.cutoff-first .target-result-row b{color:#174a83}
+.cutoff-second .target-result-row b{color:#59338b}
+.history-cutoff-label{display:inline-flex;align-items:center;justify-content:center;min-width:48px;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:750}
+.history-first{background:#e5f1ff;color:#174a83}
+.history-second{background:#f0e9ff;color:#59338b}
+@media(max-width:380px){
+ .target-panel{padding:7px!important}
+ .target-panel-heading b{font-size:13px}
+ .target-result-row{font-size:8px}
+ .target-result-row b{font-size:10px}
+}
+
+</style>
+<style>
+.approved-overview-heading .dashboard-month #saveDashboardMonth{
+  width:100%!important;min-height:25px!important;height:25px!important;
+  margin-top:3px!important;padding:2px 8px!important;font-size:10px!important;
+  line-height:1!important;border-radius:7px!important;
+}
+</style>
+</head>
+<body>
+<div class="sticky-shell">
+<header>
+ <div class="topline"><div><div class="eyebrow">Personal pay & budget simulator</div><h1 id="plannerTitle">Salary & Budget Planner</h1><p id="plannerPositionLabel">Senior Analyst · Sales & Operations Planning</p></div><span class="pill" id="zonePill">Zone 4 · PHP</span></div>
+</header>
+ 
+
+
+
+<nav class="tabbar" aria-label="Planner sections">
+ <button class="tabbtn" data-tab="plannerTab">Benefits · Expenses</button>
+ <button class="tabbtn" data-tab="recordsTab">Payroll History</button>
+ <button class="tabbtn" data-tab="holidaysTab">Holiday & Pay Settings</button>
+</nav>
+</div>
+<main class="content-main">
+<section class="monthly-dashboard" id="monthlyDashboard">
+ <div class="dashboard-heading approved-overview-heading">
+  <div class="overview-title"><span class="overview-calendar" aria-hidden="true">▦</span><h2>Monthly Payroll Overview</h2></div>
+  <div class="dashboard-month"><label for="dashboardMonth">Payroll Month</label><input type="month" id="dashboardMonth" aria-label="Edit payroll month"><button type="button" class="primary" id="saveDashboardMonth">Save</button>
+  <label class="perfect-attendance-toggle"><input type="checkbox" id="perfectAttendanceQualified"> Confirm Perfect Attendance eligibility</label>
+  <label class="perfect-attendance-toggle"><input type="checkbox" id="midYearPayPaid"> Mid-Year Pay received this month</label>
+  <label class="perfect-attendance-toggle"><input type="checkbox" id="13thMonthPayPaid"> 13th Month Pay received this month</label>
+ </div>
+ </div>
+ <div class="dashboard-cutoffs" id="dashboardCutoffs"></div>
+ 
+</section>
+ <div class="tabpage" id="plannerTab">
+
+ <section class="columns">
+  <article class="panel accordion-panel">
+   <details id="salaryDetails">
+    <summary><span class="summary-title">1 · Benefits</span><span class="summary-preview">Editable basic salary · Probationary / Regular</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <div class="accordion-content">
+   <div class="field"><label for="workPosition">Work position / role</label><input id="workPosition" type="text" value="" maxlength="90" placeholder="e.g. Engineer, Analyst, Supervisor"></div><p class="sub">Set your role, salary and employment status. Add the benefits offered by your employer and manage them at any time.</p>
+   <div class="field"><div class="fieldhead"><label for="employmentStatus">Employment status</label><span class="val" id="statusVal">Probi</span></div>
+    <select id="employmentStatus" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit">
+     <option value="probationary">Probationary</option><option value="regular">Regular</option>
+    </select>
+   </div>
+   <div class="field"><label for="residenceZone">Residence zone for Emerson transportation allowance</label>
+    <select id="residenceZone" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
+     <option value="1">Zone 1 · 0–4 km · ₱125</option><option value="2">Zone 2 · 4–8 km · ₱175</option><option value="3">Zone 3 · 8–13 km · ₱300</option><option value="4" selected>Zone 4 · 13 km beyond · ₱350</option>
+    </select><p class="sub">Used for approved OT transportation. Confirm your declared zone with HR.</p>
+   </div>
+   <div class="field"><div class="fieldhead"><label for="basicSalary">Monthly basic salary</label><span class="val" id="basicSalaryVal">₱0</span></div><input id="basicSalary" type="number" min="0" max="1000000" step="500" value="0"></div>
+
+   <div class="section work-schedule-section">
+      <div class="section-head"><h3>Weekly work schedule</h3><span class="schedule-tag">Tap a day to edit</span></div>
+      <div class="week-schedule-grid" id="weekScheduleGrid" aria-label="Weekly work schedule"></div>
+      <p class="schedule-footnote">Set different duty hours for each day, or mark a day as a rest day.</p>
+      <input id="dutyStart" type="hidden" value="09:00"><input id="dutyEnd" type="hidden" value="18:00">
+    </div>
+   <div class="section benefit-group"><div class="section-head"><h3>Current Benefits</h3><button type="button" class="small-action" id="addCurrentBenefit">＋ Add</button></div><p class="sub">Benefits you receive under your current employment status, including probationary benefits.</p><div id="currentBenefits"></div></div>
+   <div class="section benefit-group"><div class="section-head"><h3>Regularization Benefits</h3><button type="button" class="small-action" id="addRegularBenefit">＋ Add</button></div><p class="sub">Benefits that become available only after regularization.</p><div id="regularBenefits"></div></div>
+   <p class="callout">Overtime and night differential are recorded by date inside each cutoff under Payroll History.</p>
+   <p class="callout">Payroll estimates only. Confirm contribution tables, tax treatment, OT divisor, and benefit eligibility with your company HR/payroll.</p>
+    </div>
+   </details>
+  </article>
+  <article class="panel accordion-panel">
+   <details id="expensesDetails">
+    <summary><span class="summary-title">2 · Monthly expenses</span><span class="summary-preview">Adjust your priority-based budget</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <div class="accordion-content">
+   <div class="section-head"><p class="sub">Ordered by your chosen budgeting priorities. Change each slider or edit the expense names.</p><button type="button" class="small-action" id="addExpense">＋ Add</button></div>
+   <div id="expenses"></div>
+   <div class="section"><div class="lineitem"><span><b>Total monthly expenses</b></span><b id="totalExpenses">₱0</b></div></div>
+   <p class="callout">Rent/house payment and utilities are separate. Avoid double-counting if utilities are included in rent.</p>
+    </div>
+   </details>
+  </article>
+  <article class="panel accordion-panel" id="monthlySummaryPanel" hidden>
+   <details id="summaryDetails">
+    <summary><span class="summary-title">3 · Monthly summary</span><span class="summary-preview">Take-home pay · Expenses · Money left</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <div class="accordion-content">
+   <p class="sub">The numbers recalculate as you adjust the sliders.</p>
+   <div class="highlight"><small>Estimated take-home pay</small><strong id="net">₱0</strong></div>
+   <div class="lineitem"><span>Basic salary</span><b id="basicLine">₱48,000</b></div>
+   <div class="lineitem"><span>Estimated OT pay</span><b id="otPay">₱0</b></div>
+   <div class="lineitem"><span>Night differential</span><b id="nightPay">₱0</b></div>
+   <div class="lineitem"><span>Estimated gross</span><b id="gross">₱0</b></div>
+   <div class="lineitem"><span>Total deductions</span><b id="deductSummary">₱0</b></div>
+   <div class="highlight"><small>Money left after expenses</small><strong id="left">₱0</strong><small id="leftPct"></small></div>
+   <div class="btnrow"><button class="primary" id="saveBtn" type="button" style="display:none">Save this budget</button><button id="resetBtn">Reset baseline</button></div>
+   <p class="savehint" id="saveStatus">Your settings are saved automatically on this device.</p>
+    </div>
+   </details>
+  </article>
+ </section>
+ </div>
+ <section class="tabpage" id="recordsTab">
+  <article class="widepanel">
+   <h2>Work & pay records</h2>
+   <p class="sub">Saved payroll records appear here by month and cutoff. Select a month in Monthly Payroll Overview, then tap Save to record or update it.</p>
+   <p class="savehint" id="monthlyHistoryStatus" aria-live="polite">Changes are not added to Payroll History until you tap Save.</p>
+   <div id="monthlyHistoryTable"><p class="callout">No monthly records saved yet. Save the current plan to start your history.</p></div>
+   <p class="callout">Assign each monthly bill to one cutoff from the Monthly Payroll Overview. Attendance, OT and absences update the selected month’s cutoff estimates. Data stays on this device.</p>
+   
+  </article>
+ </section>
+ <section class="tabpage" id="holidaysTab">
+  <article class="widepanel">
+   <h2>Holiday & Pay Settings</h2><p class="sub">Choose a month to review holidays, scheduled workdays and estimated pay scenarios. Verify official holiday proclamations and actual attendance.</p><div class="field"><label for="payCalendarMonth">Calendar month</label><input type="month" id="payCalendarMonth" value="2026-11"></div><div id="payCalendar" class="compgrid"></div><div id="payHolidayInfo" class="holiday-info" hidden></div><div class="estimate-grid"><div class="estimate-card"><span class="tag">Minimum · No OT</span><strong id="minimumPay">₱0</strong></div><div class="estimate-card"><span class="tag">Maximum · 3h OT × 3 days/week</span><strong id="maximumPay">₱0</strong></div></div>
+   <h3>Automatic holiday integration</h3>
+   <p class="sub">Set your normal workdays once. Holiday premiums are estimated automatically for each saved month when a holiday falls on a scheduled workday.</p>
+   <p class="sub">Holiday calculations use the weekly schedule set in the Salary & Benefits section above.</p>
+   <div id="legacyWorkdayFlags" hidden><input class="workday" type="checkbox" value="1" checked><input class="workday" type="checkbox" value="2" checked><input class="workday" type="checkbox" value="3" checked><input class="workday" type="checkbox" value="4" checked><input class="workday" type="checkbox" value="5" checked><input class="workday" type="checkbox" value="6"><input class="workday" type="checkbox" value="0"></div>
+   <input id="holidayHoursPerDay" type="hidden" value="8"><input id="holidayNightPerDay" type="hidden" value="0">
+   <label class="switchrow"><input id="assumeHolidayWorked" type="checkbox" checked> Assume I work when a holiday falls on my scheduled workday</label>
+   <div class="highlight"><small>Holiday premiums</small><strong>Automatic per month</strong><small>Included in the corresponding 15th or month-end cutoff calculation.</small></div>
+   <div class="formula"><b>Multipliers used</b>Holiday estimates use the scheduled hours from your Weekly Work Schedule for each holiday date. Regular holiday: 200% total rate; regular holiday on rest day: 260%; special non-working day: 130%; special non-working day on rest day: 150%. The planner shows the additional premium above regular monthly salary. Night differential adds 10% of the applicable hourly rate for hours from 10 PM to 6 AM. Special working days have no statutory holiday premium. For monthly-paid employees, this calculator adds the premium portion on top of the ordinary monthly salary, not the ordinary day's base pay again.</div>
+   <p class="callout">Holiday pay is estimated only when the automatic holiday-work assumption is enabled and a holiday falls on one of your selected scheduled workdays. Actual attendance, rest-day status, special proclamations and company payroll rules can change the result.</p>
+   <p class="callout">Unpaid absences are recorded separately inside each cutoff's expanded details. Paid leave should not be entered as an unpaid absence.</p>
+  </article>
+ </section>
+ <p class="foot">Planning tool only, not an official payslip. Estimates use your editable basic salary, Emerson planning assumptions: ₱1,167 rice subsidy, ₱2,000 regularization benefit, ₱350 travel and ₱60 meal per OT day, 1.25× OT rate, 10% night differential, and monthly deductions of ₱1,750 SSS, ₱1,200 PhilHealth and ₱200 Pag-IBIG. User-added benefits are tracked separately. Tax and payroll treatment can vary by employer. Saved settings stay on this browser/device.</p>
+</main>
+<dialog id="dayScheduleDialog" class="day-schedule-dialog">
+ <form method="dialog" id="dayScheduleForm">
+  <div class="picker-head"><div><h2 id="dayScheduleTitle">Monday</h2><p class="sub">Daily duty hours</p></div><button type="button" id="closeDaySchedule" aria-label="Close">✕</button></div>
+  <label class="schedule-working-toggle"><input type="checkbox" id="dayIsWorking" checked> Working day</label>
+  <div class="schedule-dialog-times" id="scheduleDialogTimes">
+   <div class="field"><label for="dayDutyStart">Starts at</label><input type="time" id="dayDutyStart" value="09:00"></div>
+   <div class="field"><label for="dayDutyEnd">Ends at</label><input type="time" id="dayDutyEnd" value="18:00"></div>
+  </div>
+  <div class="btnrow"><button type="button" id="cancelDaySchedule">Cancel</button><button type="button" class="primary" id="saveDaySchedule">Save schedule</button></div>
+ </form>
+</dialog>
+<dialog id="billPickerDialog"><div class="picker-head"><div><h2 id="billPickerTitle">Select bills</h2><p class="sub" id="billPickerSubtitle">Check the bills to assign to this payday.</p></div><button type="button" id="closeBillPicker" aria-label="Close">✕</button></div><div id="billPickerList"></div><div class="btnrow"><button class="primary" type="button" id="doneBillPicker">Done</button></div></dialog>
+<script>
+const fmt=n=>'₱'+Math.round(n).toLocaleString('en-PH');
+const basicPay=()=>Math.max(0,Number(document.getElementById('basicSalary')?.value)||0);
+const expenseDefs=[
+ ['investment','1. Savings & investments',5000,20000,500],
+ ['jowa','2. Personal commitments',3000,10000,500],
+ ['house','3. House payment / rent',5000,15000,500],
+ ['mama','4. Family support',10000,15000,500],
+ ['utilities','5. Utilities',1500,5000,250],
+ ['food','6. Food & groceries',6000,15000,500],
+ ['transport','7. Transport',1500,10000,250],
+ ['wifi','8. Wi-Fi',1000,3000,100],
+ ['personal','9. Personal expenses',2000,10000,250],
+ ['other','10. Other expenses',1000,10000,250]
+];
+let customExpenseDefs=[];try{customExpenseDefs=JSON.parse(localStorage.getItem('payPlannerCustomExpenseDefs')||'[]')||[]}catch(e){customExpenseDefs=[]}customExpenseDefs.forEach(x=>{if(Array.isArray(x)&&x.length===5)expenseDefs.push(x)});
+const expenseRoot=document.getElementById('expenses');
+function renderExpenseRows(){expenseRoot.innerHTML=expenseDefs.map(([id,label,def,max,step])=>`<div class="expense-row" data-expense-row="${id}"><div class="fieldhead"><label for="${id}">${label.replace(/^\d+\. /,'')}</label><span class="val" id="${id}Val">${fmt(def)}</span><div class="expense-actions"><button type="button" data-edit-expense="${id}">Edit</button><button type="button" data-delete-expense="${id}">−</button></div></div><input id="${id}" type="range" min="0" max="${max}" step="${step}" value="${def}"><div class="ends"><span>₱0</span><span>${fmt(max)}</span></div><input type="hidden" id="${id}Cutoff" value="eom"></div>`).join('');}
+renderExpenseRows();
+const ids=['employmentStatus','basicSalary','workPosition','dutyStart','dutyEnd','residenceZone','perfectAttendanceQualified','midYearPayPaid','13thMonthPayPaid',...expenseDefs.map(x=>x[0])];
+const get=id=>document.getElementById(id);
+const WEEK_DAYS=[{n:'Monday',s:'Mon',v:1},{n:'Tuesday',s:'Tue',v:2},{n:'Wednesday',s:'Wed',v:3},{n:'Thursday',s:'Thu',v:4},{n:'Friday',s:'Fri',v:5},{n:'Saturday',s:'Sat',v:6},{n:'Sunday',s:'Sun',v:0}];
+let weeklySchedule={1:{working:true,start:'09:00',end:'18:00'},2:{working:true,start:'09:00',end:'18:00'},3:{working:true,start:'09:00',end:'18:00'},4:{working:true,start:'09:00',end:'18:00'},5:{working:true,start:'09:00',end:'18:00'},6:{working:false,start:'09:00',end:'18:00'},0:{working:false,start:'09:00',end:'18:00'}};
+let editingScheduleDay=null;
+function scheduleForDay(day){return weeklySchedule[Number(day)]||{working:false,start:'09:00',end:'18:00'};}
+function compactTime(value){const [hh,mm]=String(value||'09:00').split(':').map(Number),h=hh%12||12;return h+(mm?':'+String(mm).padStart(2,'0'):'')+(hh>=12?'p':'a');}
+function scheduleForDate(date){return scheduleForDay(new Date(date+'T00:00:00').getDay());}
+function syncLegacyWorkdays(){document.querySelectorAll('.workday').forEach(el=>el.checked=!!scheduleForDay(el.value).working);}
+function renderWeeklySchedule(){const root=get('weekScheduleGrid');if(!root)return;root.innerHTML=WEEK_DAYS.map(d=>{const x=scheduleForDay(d.v),label=x.working?`${compactTime(x.start)}–${compactTime(x.end)}`:'Rest';return `<button type="button" class="weekday-schedule-btn ${x.working?'is-working':'is-rest'}" data-schedule-day="${d.v}"><b>${d.s}</b><small>${label}</small></button>`}).join('');root.querySelectorAll('[data-schedule-day]').forEach(btn=>btn.addEventListener('click',()=>openDaySchedule(Number(btn.dataset.scheduleDay))));syncLegacyWorkdays();}
+function openDaySchedule(day){editingScheduleDay=day;const x=scheduleForDay(day),d=WEEK_DAYS.find(z=>z.v===day);get('dayScheduleTitle').textContent=d.n;get('dayIsWorking').checked=!!x.working;get('dayDutyStart').value=x.start||'09:00';get('dayDutyEnd').value=x.end||'18:00';get('scheduleDialogTimes').classList.toggle('is-disabled',!x.working);get('dayScheduleDialog').showModal();}
+get('dayIsWorking').addEventListener('change',()=>get('scheduleDialogTimes').classList.toggle('is-disabled',!get('dayIsWorking').checked));
+get('closeDaySchedule').addEventListener('click',()=>get('dayScheduleDialog').close());get('cancelDaySchedule').addEventListener('click',()=>get('dayScheduleDialog').close());
+get('saveDaySchedule').addEventListener('click',()=>{if(editingScheduleDay===null)return;weeklySchedule[editingScheduleDay]={working:get('dayIsWorking').checked,start:get('dayDutyStart').value||'09:00',end:get('dayDutyEnd').value||'18:00'};get('dayScheduleDialog').close();renderWeeklySchedule();get('dutyStart').value=weeklySchedule[1].start;get('dutyEnd').value=weeklySchedule[1].end;rebuildAutoHolidayEntries();calculate();refreshSavedMonthEstimates();renderPayCalendar();try{localStorage.setItem('salaryBudgetPlanner',JSON.stringify(state()));}catch(e){} });
+function taxForAnnual(annual){
+ if(annual<=250000)return 0;
+ if(annual<=400000)return (annual-250000)*.15;
+ if(annual<=800000)return 22500+(annual-400000)*.20;
+ if(annual<=2000000)return 102500+(annual-800000)*.25;
+ if(annual<=8000000)return 402500+(annual-2000000)*.30;
+ return 2202500+(annual-8000000)*.35;
+}
+function estimateScenario(isRegular,otPay,nightPay,otTransport){
+ const basic=basicPay(),sss=1750,philhealth=1200,pagibig=200,rice=1167,regPay=isRegular?2000:0;
+ const holiday=holidayPayByCutoff().total||0;
+ const gross=basic+rice+regPay+otPay+nightPay+otTransport+holiday;
+ const taxable=Math.max(0,gross-sss-philhealth-pagibig);
+ const tax=taxForAnnual(taxable*12)/12;
+ return {net:gross-sss-philhealth-pagibig-tax};
+}
+function estimatedNetForOt(otHours, nightHours, otDays, isRegular){
+ const basic=basicPay(),hourly=basic/(22*8),otPay=otHours*52/12*hourly*1.25;
+ const nightPay=nightHours*hourly*.10;
+ const sss=Math.min(1750,basic*.05),philhealth=basic*.025,pagibig=basic>1500?200:basic*.02;
+ const gross=basic+otPay+nightPay;
+ const taxable=Math.max(0,basic+otPay+nightPay-sss-philhealth-pagibig);
+ const tax=taxForAnnual(taxable*12)/12;
+ return gross-sss-philhealth-pagibig-tax;
+}
+function recommendOtForTarget(target,nightHours,otDays,isRegular){
+ if(target<=0)return {hours:0,pay:estimatedNetForOt(0,nightHours,otDays,isRegular)/2,possible:true};
+ if(estimatedNetForOt(0,nightHours,otDays,isRegular)/2>=target)return {hours:0,pay:estimatedNetForOt(0,nightHours,otDays,isRegular)/2,possible:true};
+ let lo=0,hi=20;
+ if(estimatedNetForOt(hi,nightHours,otDays,isRegular)/2<target)return {hours:20,pay:estimatedNetForOt(20,nightHours,otDays,isRegular)/2,possible:false};
+ for(let i=0;i<32;i++){const mid=(lo+hi)/2;if(estimatedNetForOt(mid,nightHours,otDays,isRegular)/2>=target)hi=mid;else lo=mid;}
+ const hours=Math.ceil(hi*2)/2;
+ return {hours,pay:estimatedNetForOt(hours,nightHours,otDays,isRegular)/2,possible:true};
+}
+
+function zoneAllowance(){return ({1:125,2:175,3:300,4:350})[Number(get('residenceZone')?.value)||4]||350;}
+function syncZonePill(){const el=get('zonePill');if(el)el.textContent='Zone '+(get('residenceZone')?.value||4)+' · PHP';}
+function syncPerfectAttendanceControl(){
+ const month=get('dashboardMonth')?.value;if(!month)return;
+ const r=monthlyHistory.find(x=>x.month===month);
+ const cb=get('perfectAttendanceQualified');if(cb)cb.checked=!!r?.perfectAttendanceQualified;
+ const mid=get('midYearPayPaid'),thirteen=get('13thMonthPayPaid');
+ if(mid)mid.checked=!!r?.midYearPayPaid;if(thirteen)thirteen.checked=!!r?.thirteenthMonthPayPaid;
+}
+get('residenceZone')?.addEventListener('change',()=>{syncZonePill();monthlyHistory.forEach(recalcSavedRecord);renderMonthlyDashboard();});
+get('perfectAttendanceQualified')?.addEventListener('change',()=>{
+ const month=get('dashboardMonth')?.value;if(!month)return;
+ let r=monthlyHistory.find(x=>x.month===month);
+ if(!r){r={month,first:currentCutoffPlan('15',month),second:currentCutoffPlan('eom',month)};monthlyHistory.push(r);}
+ r.perfectAttendanceQualified=get('perfectAttendanceQualified').checked;
+ recalcSavedRecord(r);saveMonthlyHistoryData();renderMonthlyDashboard();renderMonthlyHistory();
+});
+get('dashboardMonth')?.addEventListener('change',syncPerfectAttendanceControl);
+['midYearPayPaid','13thMonthPayPaid'].forEach(id=>get(id)?.addEventListener('change',()=>{
+ const month=get('dashboardMonth')?.value;if(!month)return;
+ let r=monthlyHistory.find(x=>x.month===month);
+ if(!r){r={month,first:currentCutoffPlan('15',month),second:currentCutoffPlan('eom',month)};monthlyHistory.push(r);}
+ if(id==='midYearPayPaid')r.midYearPayPaid=get(id).checked;else r.thirteenthMonthPayPaid=get(id).checked;
+ recalcSavedRecord(r);saveMonthlyHistoryData();renderMonthlyDashboard();renderMonthlyHistory();
+}));
+syncZonePill();
+function calculate(){
+ const basic=basicPay(),isRegular=get('employmentStatus')?.value==='regular';
+ const month=get('dashboardMonth')?.value||new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Manila'}).slice(0,7);
+ let record=monthlyHistory?.find(r=>r.month===month);
+ if(record){recalcSavedRecord(record);}
+ else{
+  record={month,first:currentCutoffPlan('15',month),second:currentCutoffPlan('eom',month)};
+  recalcSavedRecord(record);
+ }
+ const d=monthlyPayrollDeductionTotals(record);
+ const gross=d.gross,net=gross-d.total;
+ const expenses=expenseDefs.reduce((sum,[id])=>sum+(Number(get(id).value)||0),0),left=net-expenses;
+ const set=(id,value)=>{const el=get(id);if(el)el.textContent=value;};
+ set('statusVal',isRegular?'Regular':'Probationary');set('basicSalaryVal',fmt(basic));set('plannerPositionLabel',get('workPosition')?.value||'Your position');
+ expenseDefs.forEach(([id])=>set(id+'Val',fmt(Number(get(id).value)||0)));
+ set('sss',fmt(d.sss));set('philhealth',fmt(d.philhealth));set('pagibig',fmt(d.pagibig));set('tax',fmt(d.tax));set('calcTaxable',fmt(d.taxable));set('calcAnnualTaxable',fmt(d.taxable*12));set('calcAnnualTax',fmt(d.tax*12));set('deductions',fmt(d.total));
+ set('otPay',fmt(d.ot));set('nightPay',fmt((Number(record.first?.nightPay)||0)+(Number(record.second?.nightPay)||0)));set('gross',fmt(gross));set('deductSummary',fmt(d.total));set('net',fmt(net));set('basicLine',fmt(basic));
+ set('heroNet',fmt(net));set('totalExpenses',fmt(expenses));set('heroExpenses',fmt(expenses));set('left',fmt(left));set('heroLeft',fmt(left));set('leftPct',net>0?((left/net)*100).toFixed(1)+'% of take-home remaining':'');
+ const benefit=get('regularBenefit');if(benefit)benefit.querySelector('strong').textContent=fmt(d.regularBenefit)+'/month';
+ const note=get('statusNote');if(note)note.textContent=isRegular?'Regular selected: estimated ₱2,000 monthly transport benefit included. Confirm eligibility with HR.':'Probationary selected: regularization transport benefit is excluded.';
+ const hero=get('heroLeft');if(hero){hero.classList.toggle('positive',left>=0);hero.classList.toggle('negative',left<0);}
+ if(get('dashboardMonth')?.value&&typeof renderMonthlyDashboard==='function'){renderMonthlyDashboard();syncPerfectAttendanceControl();}
+ if(window.__plannerAutoSaveTimer)clearTimeout(window.__plannerAutoSaveTimer);
+ window.__plannerAutoSaveTimer=setTimeout(()=>{try{localStorage.setItem('salaryBudgetPlanner',JSON.stringify(state()));const status=get('saveStatus');if(status)status.textContent='Automatically saved on this device.';}catch(e){console.warn('Planner autosave failed',e);}},350);
+ return {net,expenses,left,gross,deductions:d.total,otPay:d.ot,nightPay:(Number(record.first?.nightPay)||0)+(Number(record.second?.nightPay)||0),holiday:d.holiday};
+}
+// Interactive bill assignment: each expense belongs to exactly one payday.
+let billPickerCutoff='15';
+function renderBillPicker(which,record=null){
+ billPickerCutoff=which;const isFirst=which==='15';
+ get('billPickerTitle').textContent=isFirst?'Choose bills for First cutoff':'Choose bills for Second cutoff';
+ get('billPickerSubtitle').textContent='Check the bills to pay from this cutoff. Unchecked bills stay assigned to the other cutoff.';
+ const selectedIds=record?(record[isFirst?'first':'second']?.items||[]).map(x=>x.id):null;
+ const savedAmounts={};if(record)['first','second'].forEach(k=>(record[k]?.items||[]).forEach(it=>savedAmounts[it.id]=it.amount));
+ get('billPickerList').innerHTML=expenseDefs.map(([id,label])=>{const amount=record?((savedAmounts[id]??(Number(get(id).value)||0))):(Number(get(id).value)||0);const checked=record?selectedIds.includes(id):(get(id+'Cutoff').value==='15')===isFirst;return `<div class="picker-row"><label><input type="checkbox" data-picker-expense="${id}" ${checked?'checked':''}><span>${label.replace(/^\d+\. /,'')}</span></label><b>${fmt(amount)}</b></div>`}).join('');
+ get('billPickerList').querySelectorAll('[data-picker-expense]').forEach(ch=>ch.addEventListener('change',()=>{
+  const id=ch.dataset.pickerExpense;
+  if(record){record.first.items=record.first.items||[];record.second.items=record.second.items||[];const first=record.first.items,second=record.second.items;const source=ch.checked?(isFirst?second:first):(isFirst?first:second);const target=ch.checked?(isFirst?first:second):(isFirst?second:first);const def=expenseDefs.find(x=>x[0]===id),existing=record.first.items.concat(record.second.items).find(x=>x.id===id),amount=existing?.amount??(Number(get(id).value)||0);const idx=source.findIndex(x=>x.id===id);if(idx>=0)source.splice(idx,1);const targetIdx=target.findIndex(x=>x.id===id);if(targetIdx>=0)target.splice(targetIdx,1);target.push({id,label:def[1].replace(/^\d+\. /,''),amount});recalcSavedRecord(record);saveMonthlyHistoryData();renderMonthlyHistory();renderMonthlyDashboard();
+  }else{get(id+'Cutoff').value=ch.checked?(isFirst?'15':'eom'):(isFirst?'eom':'15');calculate();renderBillPicker(which);renderMonthlyDashboard();}
+ }));
+ get('billPickerDialog').showModal();
+}
+get('closeBillPicker').addEventListener('click',()=>{get('billPickerDialog').close();activeRecordEdit=null;});
+get('doneBillPicker').addEventListener('click',()=>{get('billPickerDialog').close();if(activeRecordEdit){const r=monthlyHistory.find(x=>x.month===activeRecordEdit.month);if(r){recalcSavedRecord(r);saveMonthlyHistoryData();renderMonthlyHistory();get('monthlyHistoryStatus').textContent=monthLabel(r.month)+' bill assignments updated.';renderMonthlyDashboard();}activeRecordEdit=null;}});
+
+// Monthly history: auto-created rolling months with expandable cutoff rows.
+let monthlyHistory=[];
+let activeRecordEdit=null;
+let expandedCutoffKey=null;
+const DAILY_ABSENCE_DIVISOR=22; // Editable planning assumption; actual payroll divisor may differ.
+function currentCutoffPlan(which,month){const is15=which==='15';let bills=0,items=[];expenseDefs.forEach(([id,label])=>{if((get(id+'Cutoff')?.value==='15')===is15){const amount=Number(get(id).value)||0;bills+=amount;items.push({id,label:label.replace(/^\d+\. /,''),amount});}});const holiday=holidayPayByCutoff(month)[is15?'p15':'eom'];return {bills,items,holiday,absenceDates:[],absenceDays:0,absenceDeduction:0,otEntries:[],otPay:0,paySuggested:basicPay()/2+1167/2-holiday*0,balance:basicPay()/2+1167/2-bills,target:bills};}
+
+function monthLabel(m){const [y,mo]=m.split('-').map(Number);return new Date(y,mo-1,1).toLocaleDateString('en-PH',{month:'long',year:'numeric'});}
+function cutoffPeriod(month,which){
+ const [y,m]=month.split('-').map(Number);
+ if(which==='first'){
+  const prev=new Date(y,m-2,1),py=prev.getFullYear(),pm=prev.getMonth()+1,last=new Date(y,m-1,0).getDate();
+  return {min:`${py}-${String(pm).padStart(2,'0')}-16`,max:`${py}-${String(pm).padStart(2,'0')}-${last}`};
+ }
+ return {min:`${month}-01`,max:`${month}-15`};
+}
+function timeMinutes(value,fallback){const [h,m]=String(value||fallback).split(':').map(Number);return (h||0)*60+(m||0);}
+function nightOverlap(start,end){
+ let total=0;for(let t=start;t<end;t++){const minute=((t%1440)+1440)%1440;if(minute>=22*60||minute<6*60)total++;}
+ return total/60;
+}
+function scheduledNightHours(date){
+ const x=date?scheduleForDate(date):scheduleForDay(1);if(!x.working)return 0;let start=timeMinutes(x.start,'09:00'),end=timeMinutes(x.end,'18:00');if(end<=start)end+=1440;
+ return Math.round(nightOverlap(start,end)*2)/2;
+}
+function nightHoursForOt(hours,date){
+ const x=date?scheduleForDate(date):scheduleForDay(1),end=timeMinutes(x.end,'18:00'),duration=Math.max(0,Number(hours)||0)*60;let finish=end;if(timeMinutes(x.end,'18:00')<=timeMinutes(x.start,'09:00'))finish+=1440;
+ return Math.round(nightOverlap(finish,finish+duration)*2)/2;
+}
+function updateNightPreview(dialog,hours){
+ const date=dialog.dataset.selectedDate;const n=nightHoursForOt(hours,date),el=dialog.querySelector('[data-dialog-nd-preview]');if(el)el.textContent='Night differential: '+n+' hours (automatic based on duty schedule)';
+}
+function detailMarkup(record,which){
+ const x=record[which],items=x.items||[],ot=x.otEntries||[],abs=x.absenceDates||[],period=cutoffPeriod(record.month,which),key=record.month+'|'+which;
+ return `<div class="record-detail"><h3>Daily attendance</h3><p class="sub">Choose a date from ${period.min} to ${period.max}. Select whether you worked. OT and night differential appear only for days marked Present.</p>
+ <div class="calendar-legend"><span><i class="legend-dot calendar-workday"></i> Workday</span><span><i class="legend-dot calendar-rest"></i> Rest day</span><span><i class="legend-dot calendar-regular"></i> Regular holiday</span><span><i class="legend-dot calendar-special"></i> Special holiday</span><span><i class="legend-dot calendar-absent"></i> Absent</span></div>
+ <div class="attendance-calendar" data-attendance-calendar="${key}" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
+ ${['S','M','T','W','T','F','S'].map(d=>`<b style="font-size:10px;text-align:center">${d}</b>`).join('')}
+ ${(()=>{let out='';const [yy,mo,dd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);const first=new Date(yy,mo-1,dd).getDay();for(let i=0;i<first;i++)out+='<span></span>';for(let dt=new Date(yy,mo-1,dd);dt<=new Date(ey,em-1,ed);dt.setDate(dt.getDate()+1)){const date=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');const isAbsent=abs.includes(date),entry=ot.find(e=>e.date===date),holiday=holidayForDate(date),dow=dt.getDay(),isWork=scheduleForDate(date).working,shade=holiday?(holiday[2]==='Regular holiday'?'calendar-regular':'calendar-special'):isWork?'calendar-workday':'calendar-rest';out+=`<button type="button" class="attendance-day ${isAbsent?'calendar-absent':shade} ${!isAbsent&&entry?'worked':''} ${entry?'has-ot':''}" data-day-pick="${key}|${date}" ${holiday?`data-holiday-detail="${date}"`:''}><b>${dt.getDate()}</b>${entry?`<small>${Number(entry.hours)||0}h OT</small>`:''}</button>`;}return out;})()}
+ </div><div class="holiday-info" data-record-holiday-info hidden></div>
+ <dialog class="attendance-dialog" data-day-dialog="${key}">
+  <div class="picker-head"><div><h3 data-dialog-date>Attendance</h3><p class="sub">Did you report to work on this date?</p></div><button type="button" data-dialog-close aria-label="Close">✕</button></div>
+  <div class="field"><label>Did you work?</label><div class="attendance-choice"><button type="button" data-work-yes aria-pressed="true">Yes, I worked</button><button type="button" data-work-no aria-pressed="false">No, absent</button></div></div>
+  <div data-dialog-ot hidden>
+   <div class="field"><div class="fieldhead"><label>Overtime hours</label><span class="val" data-dialog-ot-label>0 hours</span></div><input type="range" min="0" max="5" step="0.5" value="0" data-dialog-ot-slider></div>
+   <p class="sub" data-dialog-nd-preview>Night differential: 0 hours (automatic based on duty schedule)</p>
+   <label class="approval-toggle"><input type="checkbox" data-dialog-ot-approved> OT approved by supervisor (required for OT allowances)</label>
+   <label class="approval-toggle"><input type="checkbox" data-dialog-night-transport> Eligible for night-shift transportation subsidy (confirm with HR)</label>
+  </div>
+  <div class="btnrow"><button type="button" class="primary" data-dialog-save>OK</button></div>
+ </dialog>
+ <details class="pay-computation"><summary>Paycheck computation <span>⌄</span></summary>
+ <button type="button" class="computation-link" data-open-computation="${which}"><span>OT pay · Night differential · Weekend</span><b>${fmt(x.otPay||0)} <span class="info-mark">i</span></b></button>
+ <button type="button" class="computation-link" data-open-cutoff-summary="${which}"><span>Estimated cutoff take-home</span><b>${fmt(x.paySuggested||0)} <span class="info-mark">i</span></b></button>
+ <div class="lineitem"><span>Absence deduction</span><b>${fmt(x.absenceDeduction||0)}</b></div>
+ <div class="lineitem"><span>Target bills</span><b>${fmt(x.bills||0)}</b></div>
+ <div class="lineitem"><span>Money left / shortfall</span><b class="${(x.balance||0)<0?'negative':'positive'}">${(x.balance||0)<0?'Short by ':'Left '}${fmt(Math.abs(x.balance||0))}</b></div></details>
+ <dialog class="pay-breakdown-dialog" data-pay-breakdown="${which}"><div class="picker-head"><div><h3>OT Pay Computation</h3><p class="sub">${which==='first'?'1st':'2nd'} cutoff · ${monthLabel(record.month)}</p></div><button type="button" data-breakdown-close aria-label="Close">✕</button></div><div class="breakdown-content" data-breakdown-content="${which}"></div></dialog>
+ <dialog class="pay-breakdown-dialog" data-cutoff-summary="${which}"><div class="picker-head"><div><h3>Estimated Cutoff Take-home</h3><p class="sub">${which==='first'?'1st':'2nd'} cutoff · ${monthLabel(record.month)}</p></div><button type="button" data-breakdown-close aria-label="Close">✕</button></div><div class="breakdown-content" data-cutoff-summary-content="${which}"></div></dialog>
+ <dialog class="pay-breakdown-dialog" data-deduction-dialog="${which}"><div class="picker-head"><div><h3>Payroll Deduction Computation</h3><p class="sub">${which==='first'?'1st':'2nd'} cutoff · ${monthLabel(record.month)}</p></div><button type="button" data-breakdown-close aria-label="Close">✕</button></div><div class="breakdown-content" data-deduction-content="${which}"></div></dialog></div>`;
+}
+function recalcSavedRecord(record){
+ const basic=basicPay(),hourly=basic/(22*8),riceHalf=1167/2,regular=get('employmentStatus')?.value==='regular',regularHalf=regular?2000/2:0,zone=zoneAllowance();
+ ['first','second'].forEach(k=>{
+  const x=record[k];x.items=x.items||[];x.otEntries=x.otEntries||[];x.absenceDates=x.absenceDates||[];
+  x.bills=x.items.reduce((a,b)=>a+(Number(b.amount)||0),0);
+  x.absenceDays=x.absenceDates.length;x.absenceDeduction=x.absenceDays*(basic/DAILY_ABSENCE_DIVISOR);
+  x.target=x.bills+x.absenceDeduction;
+  let otPay=0,otDays=0,nightPay=0,otMeal=0,otTravel=0,nightTransport=0;
+  x.otEntries.forEach(e=>{
+   const h=Math.max(0,Number(e.hours)||0),night=nightHoursForOt(h,e.date),shiftNight=Number(e.shiftNight??scheduledNightHours(e.date));
+   e.night=night;e.shiftNight=shiftNight;
+   if(h>0)otDays++;
+   otPay+=h*hourly*1.25;
+   nightPay+=(night+shiftNight)*hourly*.10;
+   if(h>=3 && e.approved===true){otMeal+=60;otTravel+=zone;}
+   // Night transport is a separate HR eligibility benefit; only count dates the user confirms eligible.
+   if(e.nightTransportEligible===true)nightTransport+=zone;
+  });
+  x.otHours=x.otEntries.reduce((sum,e)=>sum+(Number(e.hours)||0),0);
+  x.otDays=otDays;x.otBasePay=otPay;x.nightPay=nightPay;x.otPay=otPay+nightPay;
+  x.otMealAllowance=otMeal;x.otTravelAllowance=otTravel;x.otTransport=otMeal+otTravel;
+  x.nightTransportAllowance=nightTransport;
+  const holiday=Number(x.holiday)||holidayPayByCutoff(record.month)[k==='first'?'p15':'eom'];x.holiday=holiday;
+  x.riceAllowance=riceHalf;x.regularBenefit=regularHalf;
+  const monthNumber=Number(String(record.month).slice(5,7));
+  x.clothingAllowance=regular&&[3,6,9,12].includes(monthNumber)?750:0; // ₱3,000/year, ₱750 per quarter.
+  x.midYearPay=regular&&record.midYearPayPaid&&k==='second'?basic*.5:0;
+  x.thirteenthMonthPay=record.thirteenthMonthPayPaid&&k==='second'?basic/12:0;
+  x.perfectAttendanceAward=0;
+ });
+ const d=monthlyPayrollDeductionTotals(record),halfBasic=basic/2;
+ const award=record.perfectAttendanceQualified?Math.max(basic/22,1200):0;
+ record.perfectAttendanceAward=award;
+ ['first','second'].forEach(k=>{
+  const x=record[k],gross=halfBasic+riceHalf+regularHalf+(Number(x.otPay)||0)+(Number(x.otTransport)||0)+(Number(x.nightTransportAllowance)||0)+(Number(x.clothingAllowance)||0)+(Number(x.holiday)||0)+(k==='second'?award:0)+(Number(x.midYearPay)||0)+(Number(x.thirteenthMonthPay)||0);
+  const deductions=k==='second'?d.total:0;
+  x.payrollDeductions=deductions;
+  x.paySuggested=Math.max(0,gross-deductions-(Number(x.absenceDeduction)||0));
+  x.balance=x.paySuggested-x.bills;
+ });
+}
+
+
+function renderMonthlyHistory(){
+ const root=get('monthlyHistoryTable');if(!root)return;
+ const sorted=monthlyHistory.filter(r=>r.saved!==false).sort((a,b)=>a.month.localeCompare(b.month));
+ const rows=sorted.map(r=>['first','second'].map((which,i)=>{
+  if((r.deletedCutoffs||[]).includes(which))return '';
+  const x=r[which]||{},label=i===0?'First':'Second';
+  const remaining=(Number(x.paySuggested)||0)-(Number(x.bills)||0);
+  const month=new Date(Number(r.month.slice(0,4)),Number(r.month.slice(5,7))-1,1).toLocaleDateString('en-PH',{month:'short',year:'numeric'});
+  return `<tr><td class="history-month-cell"><span class="history-month-label">${month}</span><button type="button" class="history-delete-cutoff" data-delete-cutoff="${r.month}|${which}" aria-label="Delete ${label} cutoff for ${month}">Delete</button></td><td><span class="history-cutoff-label ${which==='first'?'history-first':'history-second'}">${label}</span></td><td>${fmt(x.paySuggested||0)}</td><td>${fmt(x.bills||0)}</td><td class="${remaining<0?'negative':'positive'}">${fmt(remaining)}</td></tr>`;
+ }).join('')).join('');
+ if(!rows){root.innerHTML='<p class="callout">No payroll history yet.</p>';return;}
+ root.innerHTML=`<table class="payroll-history-table"><colgroup><col style="width:22%"><col style="width:17%"><col style="width:21%"><col style="width:19%"><col style="width:21%"></colgroup><thead><tr><th>Month</th><th>Cutoff</th><th>Net pay</th><th>Bills</th><th>Remaining</th></tr></thead><tbody>${rows}</tbody></table>`;
+ root.querySelectorAll('[data-delete-cutoff]').forEach(btn=>btn.addEventListener('click',()=>{
+  const [month,which]=btn.dataset.deleteCutoff.split('|'),record=monthlyHistory.find(r=>r.month===month);
+  if(!record)return;
+  const label=which==='first'?'First':'Second';
+  if(!window.confirm(`Delete ${label} cutoff from ${monthLabel(month)} payroll history? This only removes the row from Payroll History. The saved cutoff data in the planner will remain.`))return;
+  record.deletedCutoffs=Array.from(new Set([...(record.deletedCutoffs||[]),which]));
+  saveMonthlyHistoryData();
+  renderMonthlyHistory();
+ }));
+ root.querySelectorAll('tbody tr').forEach(row=>{
+  let startX=0,startY=0;
+  row.addEventListener('touchstart',e=>{const t=e.touches[0];startX=t.clientX;startY=t.clientY;},{passive:true});
+  row.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-startX,dy=t.clientY-startY;if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.25){row.classList.toggle('history-row-revealed',dx<0);}}, {passive:true});
+ });
+}
+
+function saveMonthlyHistoryData(){localStorage.setItem('salaryMonthlyHistory',JSON.stringify(monthlyHistory.filter(r=>r.saved!==false)));}
+function monthKeyAdd(m,n){const [y,mo]=m.split('-').map(Number);const d=new Date(y,mo-1+n,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function currentMonthKey(){return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Manila'}).slice(0,7);}
+function buildMonthRecord(month){
+ const previous=[...monthlyHistory].filter(r=>r.saved!==false).sort((a,b)=>a.month.localeCompare(b.month)).slice(-1)[0];
+ let first,second;
+ if(previous){
+  first={...JSON.parse(JSON.stringify(previous.first)),holiday:holidayPayByCutoff(month).p15,otEntries:[],absenceDates:[],absenceDays:0,absenceDeduction:0,otPay:0};
+  second={...JSON.parse(JSON.stringify(previous.second)),holiday:holidayPayByCutoff(month).eom,otEntries:[],absenceDates:[],absenceDays:0,absenceDeduction:0,otPay:0};
+ }else{first=currentCutoffPlan('15',month);second=currentCutoffPlan('eom',month);}
+ const record={month,first,second,savedAt:new Date().toISOString(),saved:false};
+ recalcSavedRecord(record);return record;
+}
+function addMonthRecord(month){
+ if(monthlyHistory.some(x=>x.month===month))return false;
+ const record=buildMonthRecord(month);record.saved=true;monthlyHistory.push(record);saveMonthlyHistoryData();renderMonthlyHistory();return true;
+}
+function ensureRollingMonths(){}
+function refreshSavedMonthEstimates(){monthlyHistory.forEach(r=>{if(!r.first||!r.second)return;['first','second'].forEach(k=>{const x=r[k];x.holiday=holidayPayByCutoff(r.month)[k==='first'?'p15':'eom'];});recalcSavedRecord(r);});saveMonthlyHistoryData();renderMonthlyHistory();}
+
+function ensureDashboardMonth(month){
+ if(!month)return null;
+ let record=monthlyHistory.find(r=>r.month===month);
+ if(!record){record=buildMonthRecord(month);monthlyHistory.push(record);}
+ return record||null;
+}
+function syncActiveDashboardMonthToHistory(){
+ const month=get('dashboardMonth')?.value||currentMonthKey();
+ if(!month)return;
+ const record=ensureDashboardMonth(month);
+ if(!record)return;
+ syncSelectedMonthBillAmounts(record);
+ recalcSavedRecord(record);
+ // Deliberately do not persist or publish unsaved edits to Payroll History here.
+}
+get('saveDashboardMonth')?.addEventListener('click',()=>{
+ const month=get('dashboardMonth')?.value;
+ if(!month){get('monthlyHistoryStatus').textContent='Choose a payroll month first.';return;}
+ const record=ensureDashboardMonth(month);
+ if(!record)return;
+ syncSelectedMonthBillAmounts(record);
+ recalcSavedRecord(record);
+ // Saving the selected month is an explicit re-save of both cutoff records.
+ // Restore rows previously hidden with Delete, then overwrite the same month/cutoff data.
+ record.deletedCutoffs=[];
+ record.saved=true;
+ record.savedAt=new Date().toISOString();
+ saveMonthlyHistoryData();
+ renderMonthlyHistory();
+ get('monthlyHistoryStatus').textContent=monthLabel(month)+' saved to Payroll History. Saving again will update the same month and cutoffs.';
+});
+function scheduledStatsForRange(minDate,maxDate){
+ let days=0,hours=0;
+ const [sy,sm,sd]=minDate.split('-').map(Number),[ey,em,ed]=maxDate.split('-').map(Number);
+ for(let d=new Date(sy,sm-1,sd);d<=new Date(ey,em-1,ed);d.setDate(d.getDate()+1)){
+  const date=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const shift=scheduleForDate(date);
+  if(shift.working){let start=timeMinutes(shift.start,'09:00'),end=timeMinutes(shift.end,'18:00');if(end<=start)end+=1440;days++;hours+=(end-start)/60;}
+ }
+ return {days,hours};
+}
+function recommendedAdditionalOt(record,which){
+ const x=record[which],billTarget=Number(x.bills)||0,baseNet=Number(x.paySuggested)||0,gap=billTarget-baseNet;
+ if(gap<=0)return {hours:0,extraNet:0,possible:true,gap:0};
+ const basic=basicPay(),hourly=basic/(22*8),halfBasic=basic/2;
+ const halfDeductions=(Math.min(1750,basic*.05)+basic*.025+(basic>1500?200:basic*.02))/2;
+ const holiday=Number(x.holiday)||0,existingOt=Number(x.otPay)||0,absence=Number(x.absenceDeduction)||0;
+ const netWithExtra=(hours)=>{
+  const extra=hours*hourly*1.25;
+  const taxable=Math.max(0,halfBasic+existingOt+extra+holiday-halfDeductions);
+  const tax=taxForAnnual(taxable*12)/12;
+  return Math.max(0,halfBasic+existingOt+extra+holiday-halfDeductions-tax-absence);
+ };
+ let lo=0,hi=80;
+ if(netWithExtra(hi)-baseNet<gap)return {hours:80,extraNet:netWithExtra(hi)-baseNet,possible:false,gap};
+ for(let i=0;i<36;i++){const mid=(lo+hi)/2;if(netWithExtra(mid)-baseNet>=gap)hi=mid;else lo=mid;}
+ const hours=Math.ceil(hi*2)/2;
+ return {hours,extraNet:netWithExtra(hours)-baseNet,possible:true,gap};
+}
+function syncSelectedMonthBillAmounts(record){
+ if(!record)return;
+ ['first','second'].forEach(k=>{
+  (record[k].items||[]).forEach(item=>{
+   const current=get(item.id);
+   if(current)item.amount=Number(current.value)||0;
+   const def=expenseDefs.find(d=>d[0]===item.id);
+   if(def)item.label=def[1].replace(/^\d+\. /,'');
+  });
+ });
+ recalcSavedRecord(record);saveMonthlyHistoryData();
+}
+
+
+
+function buildOtPayBreakdown(record,which){
+ const x=record[which],hourly=basicPay()/(22*8),entries=x.otEntries||[];
+ let weekdayOt=0,weekendOt=0,nightDiff=0,weekdayHours=0,weekendHours=0,nightHours=0;
+ const details=entries.map(e=>{
+  const hours=Number(e.hours)||0,date=e.date||'',d=date?new Date(date+'T12:00:00'):null,isWeekend=d&&(d.getDay()===0||d.getDay()===6);
+  const night=Number(e.night??nightHoursForOt(hours,date)),shiftNight=Number(e.shiftNight??scheduledNightHours(date));
+  const otAmount=hours*hourly*1.25,ndAmount=(night+shiftNight)*hourly*.10;
+  if(isWeekend){weekendOt+=otAmount;weekendHours+=hours;}else{weekdayOt+=otAmount;weekdayHours+=hours;}
+  nightDiff+=ndAmount;nightHours+=night+shiftNight;
+  return {date,hours,isWeekend,otAmount,ndAmount,night,shiftNight};
+ });
+ return `<div class="breakdown-formula">OT rate: hourly basic rate × 1.25. Night differential: eligible night hours × hourly basic rate × 10%. Weekend OT is shown separately for visibility and is already included in the OT total, not added twice.</div>
+ <div class="breakdown-row"><div><b>Weekday OT</b><small>${weekdayHours.toFixed(1)} hours × ${fmt(hourly)} × 1.25</small></div><strong>${fmt(weekdayOt)}</strong></div>
+ <div class="breakdown-row"><div><b>Weekend OT</b><small>${weekendHours.toFixed(1)} hours × ${fmt(hourly)} × 1.25 · Saturday/Sunday</small></div><strong>${fmt(weekendOt)}</strong></div>
+ <div class="breakdown-row"><div><b>Night differential</b><small>${nightHours.toFixed(1)} eligible hours × ${fmt(hourly)} × 10%</small></div><strong>${fmt(nightDiff)}</strong></div>
+ ${details.map(e=>`<div class="breakdown-row"><div><b>${e.date?new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'OT entry'} · ${e.isWeekend?'Weekend':'Weekday'}</b><small>${e.hours.toFixed(1)} OT hrs · ${e.night.toFixed(1)} night OT hrs + ${e.shiftNight.toFixed(1)} scheduled night hrs</small></div><strong>${fmt(e.otAmount+e.ndAmount)}</strong></div>`).join('')}
+ <div class="breakdown-total"><span>Total OT pay + night differential</span><b>${fmt(x.otPay||0)}</b></div>`;
+}
+function buildCutoffSummary(record,which){
+ const x=record[which],basic=basicPay(),halfBasic=basic/2,ot=Number(x.otPay)||0,holiday=Number(x.holiday)||0,absence=Number(x.absenceDeduction)||0;
+ const gross=halfBasic+ot+holiday,d=monthlyPayrollDeductionTotals(record),deductions=which==='second'?d.total:0;
+ const net=Number(x.paySuggested)||Math.max(0,gross-deductions-absence);
+ return `<div class="breakdown-formula">The 1st cutoff is paid without statutory deductions. All monthly statutory deductions and withholding tax are consolidated in the 2nd cutoff.</div>
+ <button type="button" class="computation-link" data-open-gross="${which}"><span>Gross pay</span><b>${fmt(gross)} <span class="info-mark">i</span></b></button>
+ ${which==='second'?`<button type="button" class="computation-link" data-open-deductions="second"><span>Payroll deductions · monthly total</span><b>− ${fmt(deductions)} <span class="info-mark">i</span></b></button>`:`<div class="computation-link"><span>Payroll deductions · charged on 2nd cutoff</span><b>${fmt(0)}</b></div>`}
+ <div class="breakdown-row"><div><b>Absence deduction</b><small>${x.absenceDays||0} absent day(s) × daily absence rate</small></div><strong>${fmt(absence)}</strong></div>
+ <div class="breakdown-total"><span>Net estimated cutoff take-home</span><b>${fmt(net)}</b></div>
+ <div class="sub">Gross − assigned deductions − absence deduction = net estimated cutoff take-home.</div>`;
+}
+function buildHolidayPremiumBreakdown(record,which){
+ const entries=holidayEntriesForMonth(record.month).filter(e=>(Number(e.date.slice(8,10))<=15?'first':'second')===which);
+ if(!entries.length)return `<div class="breakdown-formula">No qualifying holiday work entries were found for this cutoff. Check the holiday-work assumption and the weekly work schedule.</div><div class="breakdown-total"><span>Holiday premium</span><b>${fmt(0)}</b></div>`;
+ const hourly=basicPay()/(22*8);
+ let total=0;
+ const parts=entries.map(e=>{
+  const result=holidayPremiumForEntry(e),holidayName=e.name||holidayForDate(e.date)?.[1]||'Holiday';
+  total+=result.premium;
+  const multiplier=result.type==='Regular holiday'?(e.rest?2.6:2):(e.rest?1.5:1.3);
+  const premiumRate=multiplier-1;
+  return `<div class="breakdown-row"><div><b>${new Date(e.date+'T12:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric'})} · ${holidayName}</b><small>${result.type}${e.rest?' · Rest day':''}<br>${result.first.toFixed(2)} scheduled hours × ${fmt(hourly)} × ${premiumRate.toFixed(2)} premium rate<br>Night differential: ${Number(e.night||0).toFixed(2)} hrs × hourly rate × 10% × holiday factor</small></div><strong>${fmt(result.premium)}</strong></div>`;
+ }).join('');
+ return `<div class="breakdown-formula">Hours are taken from the employee's saved weekly schedule for each holiday date, not a fixed 8-hour day. Hourly rate in this estimate = monthly basic salary ÷ 22 ÷ 8. The premium shown is the additional premium above the regular monthly salary.</div>${parts}<div class="breakdown-total"><span>Holiday premium total</span><b>${fmt(total)}</b></div>`;
+}
+function buildGrossBreakdown(record,which){
+ const x=record[which],basic=basicPay(),half=basic/2,ot=Number(x.otPay)||0,holiday=Number(x.holiday)||0;
+ return `<div class="breakdown-formula">Gross pay before statutory contributions, withholding tax, and absence deduction.</div>
+ <div class="breakdown-row"><div><b>Half-month basic salary</b><small>Monthly basic salary ÷ 2</small></div><strong>${fmt(half)}</strong></div>
+ <div class="breakdown-row"><div><b>OT + night differential</b><small>From recorded weekday/weekend OT and eligible night hours</small></div><strong>${fmt(ot)}</strong></div>
+ <button type="button" class="computation-link" data-open-holiday="${which}"><span>Holiday premium</span><b>${fmt(holiday)} <span class="info-mark">i</span></b></button>
+ <div class="breakdown-total"><span>Gross pay</span><b>${fmt(half+ot+holiday)}</b></div>`;
+}
+function monthlyPayrollDeductionTotals(record){
+ const basic=basicPay(),sss=1750,philhealth=1200,pagibig=200;
+ const rice=1167,regularBenefit=get('employmentStatus')?.value==='regular'?2000:0;
+ const ot=(Number(record.first?.otPay)||0)+(Number(record.second?.otPay)||0);
+ const otTransport=(Number(record.first?.otTransport)||0)+(Number(record.second?.otTransport)||0);
+ const nightTransport=(Number(record.first?.nightTransportAllowance)||0)+(Number(record.second?.nightTransportAllowance)||0);
+ const clothing=(Number(record.first?.clothingAllowance)||0)+(Number(record.second?.clothingAllowance)||0);
+ const midYear=(Number(record.first?.midYearPay)||0)+(Number(record.second?.midYearPay)||0);
+ const thirteenth=(Number(record.first?.thirteenthMonthPay)||0)+(Number(record.second?.thirteenthMonthPay)||0);
+ const holiday=(Number(record.first?.holiday)||0)+(Number(record.second?.holiday)||0);
+ const attendance=Number(record.perfectAttendanceAward)||0;
+ const gross=basic+rice+regularBenefit+ot+otTransport+nightTransport+clothing+midYear+thirteenth+holiday+attendance;
+ const taxable=Math.max(0,gross-sss-philhealth-pagibig),tax=taxForAnnual(taxable*12)/12;
+ return {sss,philhealth,pagibig,tax,taxable,total:sss+philhealth+pagibig+tax,gross,rice,regularBenefit,ot,otTransport,nightTransport,clothing,midYear,thirteenth,holiday,attendance};
+}
+function buildPayrollDeductionsBreakdown(record,which){
+ if(which!=='second')return `<div class="breakdown-formula">Emerson setup: monthly SSS, PhilHealth, Pag-IBIG and withholding tax are consolidated in the 2nd cutoff.</div>`;
+ const d=monthlyPayrollDeductionTotals(record);
+ const rows=[
+  ['SSS',d.sss,'Fixed Emerson planning assumption'],
+  ['PhilHealth',d.philhealth,'Fixed Emerson planning assumption'],
+  ['Pag-IBIG',d.pagibig,'Fixed Emerson planning assumption'],
+  ['Monthly taxable pay',d.taxable,'Basic + rice allowance + regularization benefit + OT + OT allowances + holiday premium − statutory contributions'],
+  ['Withholding tax',d.tax,'Annualized taxable pay × 12, then divided by 12']
+ ];
+ return `<div class="breakdown-formula">All monthly statutory contributions and withholding tax are deducted once, from the 2nd cutoff only. This follows the Emerson planner assumptions.</div>${rows.map(([label,value,formula])=>`<div class="breakdown-row"><div><b>${label}</b><small>${formula}</small></div><strong>${fmt(value)}</strong></div>`).join('')}<div class="breakdown-total"><span>Total monthly payroll deductions · 2nd cutoff</span><b>${fmt(d.total)}</b></div>`;
+}
+function buildCutoffPayBreakdown(record,which){
+ const x=record[which],basic=basicPay(),halfBasic=basic/2;
+ const rice=1167/2,regularBenefit=(get('employmentStatus')?.value==='regular'?2000:0)/2;
+ const d=monthlyPayrollDeductionTotals(record),tax=which==='second'?d.tax:0;
+ const statutory=which==='second'?(d.sss+d.philhealth+d.pagibig):0;
+ const absence=Number(x.absenceDeduction)||0;
+ const gross=halfBasic+rice+regularBenefit+(Number(x.otPay)||0)+(Number(x.otTransport)||0)+(Number(x.nightTransportAllowance)||0)+(Number(x.clothingAllowance)||0)+(Number(x.holiday)||0)+(which==='second'?(Number(record.perfectAttendanceAward)||0):0)+(Number(x.midYearPay)||0)+(Number(x.thirteenthMonthPay)||0);
+ const net=Math.max(0,gross-statutory-tax-absence);
+ const rows=[
+  ['Half-month basic salary',halfBasic,'Monthly basic salary ÷ 2'],
+  ['Rice subsidy',rice,'₱1,167 monthly ÷ 2'],
+  ['Regularization transportation allowance',regularBenefit,'₱2,000 monthly ÷ 2, regular employees only'],
+  ['Recorded OT pay',Number(x.otBasePay)||0,'Recorded OT hours × hourly rate × 1.25'],
+  ['Night differential',Number(x.nightPay)||0,'10% of hourly rate for eligible work from 10 PM to 6 AM'],
+  ['OT meal allowance',Number(x.otMealAllowance)||0,'₱60 per approved OT day with at least 3 hours'],
+  ['OT transportation allowance',Number(x.otTravelAllowance)||0,'Approved OT of at least 3 hours × selected residence-zone rate'],
+  ['Night-shift transportation subsidy',Number(x.nightTransportAllowance)||0,'Eligible dates confirmed by user × selected zone rate; confirm exact HR rule'],
+  ['Clothing allowance',Number(x.clothingAllowance)||0,'₱3,000/year paid quarterly: ₱750 in Mar, Jun, Sep and Dec, regular employees only'],
+  ['Perfect attendance award',which==='second'?(Number(record.perfectAttendanceAward)||0):0,'When eligibility is confirmed: higher of one day base pay (basic ÷ 22) or ₱1,200'],
+  ['Mid-year pay',Number(x.midYearPay)||0,'50% of monthly basic salary when marked received; regular employees only'],
+  ['13th month pay',Number(x.thirteenthMonthPay)||0,'Monthly basic salary ÷ 12 when marked received'],
+  ['Holiday premium',Number(x.holiday)||0,'Emerson holiday multipliers, including rest-day and OT tiers'],
+  ['SSS',-((which==='second')?d.sss:0),'₱1,750 monthly planning assumption, deducted in 2nd cutoff'],
+  ['PhilHealth',-((which==='second')?d.philhealth:0),'₱1,200 monthly planning assumption, deducted in 2nd cutoff'],
+  ['Pag-IBIG',-((which==='second')?d.pagibig:0),'₱200 monthly planning assumption, deducted in 2nd cutoff'],
+  ['Withholding tax',-tax,'Annualized taxable pay, deducted in 2nd cutoff'],
+  ['Absence deduction',-absence,'Monthly basic salary ÷ 22 × absent days']
+ ];
+ return `<div class="breakdown-formula">Emerson benefits applied using recorded dates and the eligibility confirmations selected in the planner. Estimates only, not an official payslip.</div>${rows.map(([label,value,formula])=>`<div class="breakdown-row"><div><b>${label}</b><small>${formula}</small></div><strong class="${value<0?'negative':''}">${value<0?'− ':''}${fmt(Math.abs(value))}</strong></div>`).join('')}<div class="breakdown-total"><span>Estimated cutoff take-home</span><b>${fmt(net)}</b></div>`;
+}
+function bindDashboardDetailEvents(root){
+ root.querySelectorAll('[data-open-computation]').forEach(btn=>btn.addEventListener('click',()=>{
+  const which=btn.dataset.openComputation,record=monthlyHistory.find(x=>x.month===(get('dashboardMonth')?.value||currentMonthKey()));
+  const dialog=root.querySelector(`[data-pay-breakdown="${which}"]`),content=dialog?.querySelector('.breakdown-content');
+  if(record&&dialog&&content){content.innerHTML=buildOtPayBreakdown(record,which);dialog.showModal();}
+ }));
+ root.querySelectorAll('[data-open-cutoff-summary]').forEach(btn=>btn.addEventListener('click',()=>{
+  const which=btn.dataset.openCutoffSummary,record=monthlyHistory.find(x=>x.month===(get('dashboardMonth')?.value||currentMonthKey()));
+  const dialog=root.querySelector(`[data-cutoff-summary="${which}"]`),content=root.querySelector(`[data-cutoff-summary-content="${which}"]`);
+  if(record&&dialog&&content){
+   content.innerHTML=buildCutoffSummary(record,which);
+   content.querySelector('[data-open-gross]')?.addEventListener('click',()=>{
+    const sub=root.querySelector(`[data-deduction-dialog="${which}"]`);
+    if(sub){sub.querySelector('.picker-head h3').textContent='Gross Pay Computation';sub.querySelector('.breakdown-content').innerHTML=buildGrossBreakdown(record,which);sub.showModal();}
+   });
+   content.querySelector('[data-open-holiday]')?.addEventListener('click',()=>{
+    const sub=root.querySelector(`[data-deduction-dialog="${which}"]`);
+    if(sub){sub.querySelector('.picker-head h3').textContent='Holiday Premium Computation';sub.querySelector('.breakdown-content').innerHTML=buildHolidayPremiumBreakdown(record,which);sub.showModal();}
+   });
+   content.querySelector('[data-open-deductions]')?.addEventListener('click',()=>{
+    const sub=root.querySelector(`[data-deduction-dialog="${which}"]`);
+    if(sub){sub.querySelector('.picker-head h3').textContent='Payroll Deduction Computation';sub.querySelector('.breakdown-content').innerHTML=buildPayrollDeductionsBreakdown(record,which);sub.showModal();}
+   });
+   dialog.showModal();
+  }
+ }));
+ // Nested Gross and Payroll Deduction actions are bound when the summary dialog is populated.
+ root.querySelectorAll('[data-open-money-left]').forEach(btn=>btn.addEventListener('click',()=>{
+  const which=btn.dataset.openMoneyLeft,card=btn.closest('.cutoff-dashboard-card'),dialog=root.querySelector(`[data-money-left-dialog="${which}"]`);
+  if(dialog&&card){
+   const takehome=card.querySelector('[data-cutoff-takehome]').textContent,bills=card.querySelector('[data-dashboard-bills] b').textContent,remaining=card.querySelector('[data-cutoff-remaining]').textContent;
+   const n=Number(remaining.replace(/[^0-9.-]/g,''))||0;
+   dialog.querySelector('.breakdown-content').innerHTML=`<div class="lineitem"><span>Estimated take-home</span><b>${takehome}</b></div><div class="lineitem"><span>Monthly expenses</span><b>− ${bills}</b></div><div class="breakdown-total"><span>${n<0?'Shortfall':'Money left'}</span><b class="${n<0?'negative':'positive'}">${remaining}</b></div><p class="sub">Formula: Estimated take-home − Monthly expenses.</p>`;
+   dialog.showModal();
+  }
+ }));
+ root.querySelectorAll('[data-breakdown-close]').forEach(btn=>btn.addEventListener('click',()=>btn.closest('dialog').close()));
+ root.querySelectorAll('[data-day-pick]').forEach(btn=>btn.addEventListener('click',()=>{
+  const [month,which,date]=btn.dataset.dayPick.split('|'),dialog=root.querySelector(`[data-day-dialog="${month}|${which}"]`),record=monthlyHistory.find(x=>x.month===month),x=record?.[which];if(!dialog||!x)return;
+  dialog.dataset.selectedDate=date;dialog.querySelector('[data-dialog-date]').textContent=new Date(date+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const existing=(x.otEntries||[]).find(e=>e.date===date),absent=(x.absenceDates||[]).includes(date);
+  dialog.dataset.attendance=absent?'no':'yes';dialog.querySelector('[data-dialog-ot]').hidden=absent;dialog.querySelector('[data-work-yes]').setAttribute('aria-pressed',absent?'false':'true');dialog.querySelector('[data-work-no]').setAttribute('aria-pressed',absent?'true':'false');
+  dialog.querySelector('[data-dialog-ot-slider]').value=existing?.hours||0;dialog.querySelector('[data-dialog-ot-label]').textContent=(existing?.hours||0)+' hours';
+  const approved=dialog.querySelector('[data-dialog-ot-approved]');if(approved)approved.checked=!!existing?.approved;
+  const nightEligible=dialog.querySelector('[data-dialog-night-transport]');if(nightEligible)nightEligible.checked=!!existing?.nightTransportEligible;
+  updateNightPreview(dialog,Number(existing?.hours)||0);dialog.showModal();
+ }));
+ root.querySelectorAll('[data-holiday-detail]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const panel=btn.closest('.record-detail')?.querySelector('[data-record-holiday-info]');if(panel){const date=btn.dataset.holidayDetail;panel.innerHTML=holidayInfoMarkup(holidayForDate(date),date);panel.hidden=false;}}));
+ root.querySelectorAll('[data-work-yes]').forEach(btn=>btn.addEventListener('click',()=>{const d=btn.closest('dialog');d.dataset.attendance='yes';d.querySelector('[data-dialog-ot]').hidden=false;d.querySelector('[data-work-yes]').setAttribute('aria-pressed','true');d.querySelector('[data-work-no]').setAttribute('aria-pressed','false');}));
+ root.querySelectorAll('[data-work-no]').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const d=btn.closest('dialog');d.dataset.attendance='no';d.querySelector('[data-dialog-ot]').hidden=true;d.querySelector('[data-work-yes]').setAttribute('aria-pressed','false');btn.setAttribute('aria-pressed','true');}));
+ root.querySelectorAll('[data-dialog-close]').forEach(btn=>btn.addEventListener('click',()=>btn.closest('dialog').close()));
+ root.querySelectorAll('[data-dialog-ot-slider]').forEach(el=>el.addEventListener('input',()=>{const d=el.closest('dialog');d.querySelector('[data-dialog-ot-label]').textContent=el.value+' hours';updateNightPreview(d,Number(el.value));}));
+ root.querySelectorAll('[data-dialog-save]').forEach(btn=>btn.addEventListener('click',()=>{
+  const d=btn.closest('dialog'),date=d.dataset.selectedDate,att=d.dataset.attendance,[month,which]=d.dataset.dayDialog.split('|'),r=monthlyHistory.find(x=>x.month===month);if(!r||!date)return;
+  const x=r[which];x.otEntries=x.otEntries||[];x.absenceDates=x.absenceDates||[];x.otEntries=x.otEntries.filter(e=>e.date!==date);x.absenceDates=x.absenceDates.filter(v=>v!==date);
+  if(att==='no')x.absenceDates.push(date);else{const hours=Number(d.querySelector('[data-dialog-ot-slider]').value)||0;x.otEntries.push({date,hours,approved:!!d.querySelector('[data-dialog-ot-approved]')?.checked,nightTransportEligible:!!d.querySelector('[data-dialog-night-transport]')?.checked,night:nightHoursForOt(hours,date),shiftNight:scheduledNightHours(date)});}
+  d.close();recalcSavedRecord(r);saveMonthlyHistoryData();renderMonthlyHistory();renderMonthlyDashboard();
+ }));
+ root.querySelectorAll('[data-remove-ot]').forEach(btn=>btn.addEventListener('click',()=>{const [month,which,i]=btn.dataset.removeOt.split('|'),r=monthlyHistory.find(x=>x.month===month);if(!r)return;r[which].otEntries.splice(Number(i),1);recalcSavedRecord(r);saveMonthlyHistoryData();renderMonthlyHistory();renderMonthlyDashboard();}));
+ root.querySelectorAll('[data-remove-absence]').forEach(btn=>btn.addEventListener('click',()=>{const [month,which,i]=btn.dataset.removeAbsence.split('|'),r=monthlyHistory.find(x=>x.month===month);if(!r)return;r[which].absenceDates.splice(Number(i),1);recalcSavedRecord(r);saveMonthlyHistoryData();renderMonthlyHistory();renderMonthlyDashboard();}));
+}
+
+
+function maxAdditionalOtHoursForCutoff(record,which){
+ const period=cutoffPeriod(record.month,which);
+ const [sy,sm,sd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);
+ let scheduledHours=0;
+ for(let d=new Date(sy,sm-1,sd);d<=new Date(ey,em-1,ed);d.setDate(d.getDate()+1)){
+  const date=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const shift=scheduleForDate(date);
+  if(shift.working){let start=timeMinutes(shift.start,'09:00'),end=timeMinutes(shift.end,'18:00');if(end<=start)end+=1440;scheduledHours+=(end-start)/60;}
+ }
+ const calendarDays=Math.round((new Date(ey,em-1,ed)-new Date(sy,sm-1,sd))/86400000)+1;
+ const existingOt=(record[which].otEntries||[]).reduce((sum,e)=>sum+(Number(e.hours)||0),0);
+ return Math.max(0,60*calendarDays/7-scheduledHours-existingOt);
+}
+function netIncreaseFromAdditionalOt(record,which,hours){
+ if(hours<=0)return 0;
+ const x=record[which],basic=basicPay(),hourly=basic/(22*8),halfBasic=basic/2;
+ const halfDeductions=(Math.min(1750,basic*.05)+basic*.025+(basic>1500?200:basic*.02))/2;
+ const holiday=Number(x.holiday)||0,existingOt=Number(x.otPay)||0,absence=Number(x.absenceDeduction)||0;
+ const net=(extraHours)=>{
+  const extra=extraHours*hourly*1.25;
+  const taxable=Math.max(0,halfBasic+existingOt+extra+holiday-halfDeductions);
+  const tax=taxForAnnual(taxable*12)/12;
+  return Math.max(0,halfBasic+existingOt+extra+holiday-halfDeductions-tax-absence);
+ };
+ return Math.max(0,net(hours)-Number(x.paySuggested||0));
+}
+function maxTargetRemainingForCutoff(record,which){
+ const x=record[which],baseNet=Number(x.paySuggested)||0,bills=Number(x.bills)||0;
+ const maxHours=maxAdditionalOtHoursForCutoff(record,which);
+ return Math.max(baseNet-bills,Math.floor((baseNet+netIncreaseFromAdditionalOt(record,which,maxHours)-bills)/100)*100);
+}
+function renderMonthlyDashboard(){
+ const monthInput=get('dashboardMonth'),root=get('dashboardCutoffs');
+ if(!monthInput||!root)return;
+ const month=monthInput.value||currentMonthKey(),record=ensureDashboardMonth(month);
+ const expandedDetails=new Set([...root.querySelectorAll('details.dashboard-attendance[open]')].map(el=>el.id));
+ if(!record){root.innerHTML='<p class="sub">Choose a payroll month to begin.</p>';return;}
+ recalcSavedRecord(record);
+ syncSelectedMonthBillAmounts(record);
+ const totalNet=(Number(record.first.paySuggested)||0)+(Number(record.second.paySuggested)||0);
+ const totalBills=(Number(record.first.bills)||0)+(Number(record.second.bills)||0);
+ const left=totalNet-totalBills;
+ const setText=(id,val)=>{if(get(id))get(id).textContent=fmt(val);};
+ 
+
+
+ root.innerHTML=['first','second'].map(which=>{
+  const x=record[which],first=which==='first',baseNet=Number(x.paySuggested)||0,bills=Number(x.bills)||0;
+  const maxTarget=maxTargetRemainingForCutoff(record,which);
+  const minRemaining=baseNet-bills;
+  const stored=Number(x.targetRemaining);
+  const target=Number.isFinite(stored)?Math.max(minRemaining,Math.min(maxTarget,stored)):Math.max(0,minRemaining);
+  const targetTakeHome=bills+target;
+  const required=targetTakeHome>baseNet?recommendedAdditionalOt({...record,[which]:{...x,bills:targetTakeHome}},which):{hours:0,extraNet:0,possible:true};
+  const maxHours=maxAdditionalOtHoursForCutoff(record,which);
+  const ot={...required,hours:Math.min(required.hours,maxHours),possible:required.hours<=maxHours};
+  ot.extraNet=netIncreaseFromAdditionalOt(record,which,ot.hours);
+  const projectedTakeHome=baseNet+(ot.hours?ot.extraNet:0);
+  const actualRemaining=projectedTakeHome-bills;
+  return `<article class="cutoff-dashboard-card ${first?'cutoff-first':'cutoff-second'}" data-cutoff-card="${which}">
+   <div class="cutoff-card-heading"><h3>${first?'FIRST CUTOFF':'SECOND CUTOFF'}</h3></div>
+   <div class="cutoff-finance-grid">
+    <div class="finance-cell takehome"><small>ESTIMATED TAKE-HOME</small><b data-cutoff-takehome>${fmt(projectedTakeHome)}</b></div>
+    <button type="button" class="finance-cell bills-cell" data-dashboard-bills="${which}"><small>MONTHLY EXPENSES</small><b>${fmt(bills)}</b></button>
+    <button type="button" class="finance-cell remaining ${actualRemaining<0?'negative':''}" data-open-money-left="${which}"><small>MONEY LEFT <span class="info-mark">i</span></small><b data-cutoff-remaining>${fmt(actualRemaining)}</b></button>
+   </div>
+   <dialog class="pay-breakdown-dialog" data-money-left-dialog="${which}">
+    <div class="picker-head"><div><h3>Money Left Breakdown</h3><p class="sub">${first?'1st':'2nd'} cutoff · ${monthLabel(record.month)}</p></div><button type="button" data-breakdown-close aria-label="Close">✕</button></div>
+    <div class="breakdown-content">
+     <div class="lineitem"><span>Estimated take-home</span><b>${fmt(projectedTakeHome)}</b></div>
+     <div class="lineitem"><span>Monthly expenses</span><b>− ${fmt(bills)}</b></div>
+     <div class="lineitem breakdown-total"><span>${actualRemaining<0?'Shortfall':'Money left'}</span><b>${fmt(actualRemaining)}</b></div>
+     <p class="sub">Formula: Estimated take-home − Monthly expenses.</p>
+    </div>
+   </dialog>
+   <section class="target-panel">
+    <div class="target-panel-heading"><span>TARGET REMAINING</span><b data-target-label>${fmt(target)}</b></div>
+    <div class="target-control">
+    <input type="range" min="${minRemaining}" max="${maxTarget}" step="100" value="${target}" data-target-slider="${which}" aria-label="Target remaining for ${first?'first':'second'} cutoff">
+    <div class="target-range"><span>${fmt(minRemaining)} · No OT</span><span>${fmt(maxTarget)} · Max</span></div>
+    </div>
+    <div class="target-result-row ot-result-row"><span>Additional OT needed</span><b data-ot-hours>${ot.hours.toFixed(1)} hrs</b></div>
+   </section>
+   <div class="ot-recommendation ${ot.hours?'short':''}" data-ot-recommendation>${ot.hours===0?'Additional OT needed: 0 hrs':(ot.possible?'Additional OT needed: ':'At least additional OT needed: ')+ot.hours.toFixed(1)+' hrs'}</div>
+   <details class="dashboard-attendance" id="dashboardAttendance-${which}"><summary>Workdays, OT & absences</summary>${detailMarkup(record,which)}</details>
+  </article>`;
+ }).join('');
+ expandedDetails.forEach(id=>{const el=get(id);if(el)el.open=true;});
+ saveMonthlyHistoryData();
+ renderMonthlyHistory();
+ bindDashboardDetailEvents(root);
+ root.querySelectorAll('[data-target-slider]').forEach(slider=>{
+  let committedValue=String(slider.value),commitQueued=false;
+  const card=slider.closest('.cutoff-dashboard-card');
+  const preview=()=>{
+   const which=slider.dataset.targetSlider,x=record[which],bills=Number(x.bills)||0,target=Number(slider.value)||0;
+   card.querySelector('[data-target-label]').textContent=fmt(target);
+   card.querySelector('[data-cutoff-takehome]').textContent=fmt(bills+target);
+   card.querySelector('[data-cutoff-remaining]').textContent=fmt(target);
+   card.querySelector('[data-open-money-left]').classList.toggle('negative',target<0);
+  };
+  const commit=()=>{
+   const value=String(slider.value);
+   if(commitQueued||value===committedValue)return;
+   commitQueued=true;
+   requestAnimationFrame(()=>{
+    commitQueued=false;
+    const which=slider.dataset.targetSlider,x=record[which],bills=Number(x.bills)||0,target=Number(slider.value)||0;
+    x.targetRemaining=target;
+    const targetTakeHome=bills+target,baseNet=Number(x.paySuggested)||0;
+    const required=targetTakeHome>baseNet?recommendedAdditionalOt({...record,[which]:{...x,bills:targetTakeHome}},which):{hours:0,extraNet:0,possible:true};
+    const maxHours=maxAdditionalOtHoursForCutoff(record,which);
+    const hours=Math.min(required.hours,maxHours),extraNet=netIncreaseFromAdditionalOt(record,which,hours);
+    const projected=baseNet+(hours?extraNet:0),remaining=projected-bills;
+    card.querySelector('[data-cutoff-takehome]').textContent=fmt(projected);
+    card.querySelector('[data-cutoff-remaining]').textContent=fmt(remaining);
+    card.querySelector('[data-open-money-left]').classList.toggle('negative',remaining<0);
+    const hoursEl=card.querySelector('[data-ot-hours]');
+    if(hoursEl)hoursEl.textContent=hours.toFixed(1)+' hrs';
+    const otEl=card.querySelector('[data-ot-recommendation]');
+    otEl.textContent=hours===0?'Additional OT needed: 0 hrs':(required.possible?'Additional OT needed: ':'At least additional OT needed: ')+hours.toFixed(1)+' hrs';
+    otEl.classList.toggle('short',hours>0);
+    committedValue=String(slider.value);
+    saveMonthlyHistoryData();
+   });
+  };
+  slider.addEventListener('input',preview,{passive:true});
+  slider.addEventListener('change',()=>{preview();commit();});
+  slider.addEventListener('pointerup',()=>{preview();commit();},{passive:true});
+  slider.addEventListener('touchend',()=>{preview();commit();},{passive:true});
+  slider.addEventListener('keyup',()=>{preview();commit();});
+ });
+ root.querySelectorAll('[data-dashboard-bills]').forEach(btn=>btn.addEventListener('click',()=>{
+  const which=btn.dataset.dashboardBills;activeRecordEdit={month,which};
+  renderBillPicker(which==='first'?'15':'eom',record);
+ }));
+ root.querySelectorAll('[data-dashboard-bills]').forEach(btn=>btn.addEventListener('click',()=>{
+  const which=btn.dataset.dashboardBills;activeRecordEdit={month,which};
+  renderBillPicker(which==='first'?'15':'eom',record);
+ }));
+}
+get('dashboardMonth')?.addEventListener('input',()=>{
+ const month=get('dashboardMonth').value;
+ if(month){
+  ensureDashboardMonth(month);
+  renderMonthlyDashboard();
+  syncActiveDashboardMonthToHistory();
+ }
+});
+get('dashboardMonth')?.addEventListener('change',()=>{
+ const month=get('dashboardMonth').value;
+ if(month){
+  ensureDashboardMonth(month);
+  renderMonthlyDashboard();
+  syncActiveDashboardMonthToHistory();
+ }
+});
+
+
+let holidayWorkEntries=[];
+function holidayTypeForDate(date){for(const year of [2026,2027]){const found=(holidayData[year]||[]).find(x=>x[0]===date);if(found)return found[2];}return 'Ordinary working day';}
+function holidayPremiumForEntry(entry){
+ const hourly=basicPay()/(22*8),hours=Math.max(0,Number(entry.hours)||0),first=Math.min(hours,8),ot=Math.max(0,hours-8),night=Math.min(hours,Number(entry.night)||0),type=holidayTypeForDate(entry.date),rest=!!entry.rest;
+ let firstRate=0,otRate=0;
+ if(type==='Regular holiday'){firstRate=rest?1.6:1;otRate=rest?3.38:2.6;}
+ else if(type==='Special non-working day'||type==='Additional special non-working day'){firstRate=rest?0.5:0.3;otRate=rest?1.95:1.69;}
+ const premium=hourly*first*firstRate+hourly*ot*otRate;
+ const nightDiff=hourly*night*.10*(night<=first?firstRate:otRate);
+ return {premium:premium+nightDiff,type,firstRate,otRate,first,ot,nightDiff,hourly};
+}
+function holidayEntriesForMonth(month){
+ if(!get('assumeHolidayWorked')?.checked)return [];
+ return Object.values(holidayData).flat().filter(([date,name,type])=>{
+  if(!date||!date.startsWith(month)||!['Regular holiday','Special non-working day','Additional special non-working day'].includes(type)||!scheduleForDate(date).working)return false;
+  const rec=monthlyHistory?.find(r=>r.month===month),which=Number(date.slice(8,10))<=15?'first':'second';
+  return !(rec?.[which]?.absenceDates||[]).includes(date);
+ }).map(([date,name])=>{
+  const x=scheduleForDate(date);let start=timeMinutes(x.start,'09:00'),end=timeMinutes(x.end,'18:00');if(end<=start)end+=1440;
+  const hours=Math.max(0,(end-start)/60-(Number(get('breakMinutes')?.value)||60)/60);
+  const night=Math.min(hours,scheduledNightHours(date));
+  return {date,name,hours,night,rest:false,auto:true};
+ });
+}
+function holidayPayByCutoff(month){
+ month=month||new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Manila'}).slice(0,7);
+ let p15=0,eom=0,total=0;holidayEntriesForMonth(month).forEach(e=>{const x=holidayPremiumForEntry(e);total+=x.premium;const day=Number(e.date.slice(8,10));if(day>=16)p15+=x.premium;else eom+=x.premium;});return {p15,eom,total};
+}
+function rebuildAutoHolidayEntries(){const m=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Manila'}).slice(0,7);holidayWorkEntries=holidayEntriesForMonth(m);}
+function renderHolidayWorkEntries(){/* holiday dates are applied silently to each month and cutoff */}
+document.querySelectorAll('.workday,#holidayHoursPerDay,#holidayNightPerDay,#assumeHolidayWorked').forEach(el=>el.addEventListener('change',()=>{rebuildAutoHolidayEntries();calculate();refreshSavedMonthEstimates();}));
+const holidayData={
+2026:[['2026-01-01',"New Year's Day",'Regular holiday'],['2026-02-17','Chinese New Year','Special non-working day'],['2026-02-25','EDSA People Power Revolution Anniversary','Special working day'],['2026-04-02','Maundy Thursday','Regular holiday'],['2026-04-03','Good Friday','Regular holiday'],['2026-04-04','Black Saturday','Additional special non-working day'],['2026-04-09','Araw ng Kagitingan','Regular holiday'],['2026-05-01','Labor Day','Regular holiday'],['2026-06-12','Independence Day','Regular holiday'],['2026-08-21','Ninoy Aquino Day','Special non-working day'],['2026-08-31',"National Heroes' Day",'Regular holiday'],['2026-11-01',"All Saints' Day",'Special non-working day'],['2026-11-02',"All Souls' Day",'Additional special non-working day'],['2026-11-30','Bonifacio Day','Regular holiday'],['2026-12-08','Feast of the Immaculate Conception of Mary','Special non-working day'],['2026-12-24','Christmas Eve','Additional special non-working day'],['2026-12-25','Christmas Day','Regular holiday'],['2026-12-30','Rizal Day','Regular holiday'],['2026-12-31','Last Day of the Year','Special non-working day'],['2026-03-20','Eid’l Fitr','Regular holiday'],['2026-05-27','Eid’l Adha','Regular holiday']],
+2027:[['2027-01-01',"New Year's Day",'Regular holiday'],['2027-02-06','Chinese New Year','Additional special non-working day'],['2027-02-25','EDSA People Power Revolution Anniversary','Special working day'],['2027-03-25','Maundy Thursday','Regular holiday'],['2027-03-26','Good Friday','Regular holiday'],['2027-03-27','Black Saturday','Additional special non-working day'],['2027-04-09','Araw ng Kagitingan','Regular holiday'],['2027-05-01','Labor Day','Regular holiday'],['2027-06-12','Independence Day','Regular holiday'],['2027-08-21','Ninoy Aquino Day','Special non-working day'],['2027-08-30',"National Heroes' Day",'Regular holiday'],['2027-11-01',"All Saints' Day",'Special non-working day'],['2027-11-02',"All Souls' Day",'Additional special non-working day'],['2027-11-30','Bonifacio Day','Regular holiday'],['2027-12-08','Feast of the Immaculate Conception of Mary','Special non-working day'],['2027-12-24','Christmas Eve','Additional special non-working day'],['2027-12-25','Christmas Day','Regular holiday'],['2027-12-30','Rizal Day','Regular holiday'],['2027-12-31','Last Day of the Year','Special non-working day'],['','Eid’l Fitr','Regular holiday · date to be announced'],['','Eid’l Adha','Regular holiday · date to be announced']]
+};
+function holidayForDate(date){return Object.values(holidayData).flat().find(h=>h[0]===date)||null;}
+function holidayInfoMarkup(h,date){return h?`<b>${h[1]}</b><span>${h[2]}</span><div>${new Date(date+'T12:00:00').toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>`:`<b>No listed holiday</b><span>${date}</span>`;}
+function renderPayCalendar(){
+ const m=get('payCalendarMonth')?.value||currentMonthKey(),root=get('payCalendar');if(!root)return;
+ const [yy,mm]=m.split('-').map(Number),days=new Date(yy,mm,0).getDate(),first=new Date(yy,mm-1,1);
+ const hols=Object.values(holidayData).flat().filter(h=>h[0]&&h[0].startsWith(m)),byDay={};hols.forEach(h=>byDay[Number(h[0].slice(8,10))]=h);
+ let cells='';for(let i=0;i<first.getDay();i++)cells+='<div></div>';
+ for(let d=1;d<=days;d++){
+  const date=m+'-'+String(d).padStart(2,'0'),holiday=byDay[d],dow=new Date(yy,mm-1,d).getDay(),work=scheduleForDate(date).working;
+  let cls='calendar-workday',label='Workday';
+  if(holiday){cls=holiday[2]==='Regular holiday'?'calendar-regular':'calendar-special';label=holiday[2].includes('Regular')?'Regular holiday':'Special holiday';}
+  else if(!work){cls='calendar-rest';label='Rest day';}
+  cells+=`<button type="button" class="calendar-cell holiday-tap ${cls}" data-holiday-date="${date}" title="${date} · ${label}"><b>${d}</b><small>${label}</small></button>`;
+ }
+ root.innerHTML=`<div class="calendar-legend"><span><i class="legend-dot calendar-workday"></i> Workday</span><span><i class="legend-dot calendar-rest"></i> Rest day</span><span><i class="legend-dot calendar-regular"></i> Regular holiday</span><span><i class="legend-dot calendar-special"></i> Special holiday</span></div><div class="calendar-grid">${['S','M','T','W','T','F','S'].map(x=>`<b class="calendar-weekday">${x}</b>`).join('')}${cells}</div>`;
+ root.querySelectorAll('[data-holiday-date]').forEach(btn=>btn.addEventListener('click',()=>{const info=get('payHolidayInfo'),h=holidayForDate(btn.dataset.holidayDate);info.innerHTML=holidayInfoMarkup(h,btn.dataset.holidayDate);info.hidden=false;}));
+ const basic=basicPay(),sss=Math.min(1750,basic*.05),ph=basic*.025,pi=basic>1500?200:basic*.02,base=Math.max(0,basic-sss-ph-pi-taxForAnnual(Math.max(0,basic-sss-ph-pi)*12)/12);
+ const maxOT=3*3*4.333*(basic/(22*8))*1.25,taxMax=taxForAnnual(Math.max(0,basic+maxOT-sss-ph-pi)*12)/12;
+ get('minimumPay').textContent=fmt(base);get('maximumPay').textContent=fmt(Math.max(base,basic+maxOT-sss-ph-pi-taxMax));
+}
+get('payCalendarMonth')?.addEventListener('change',renderPayCalendar);
+try{monthlyHistory=(JSON.parse(localStorage.getItem('salaryMonthlyHistory')||'[]')||[]).map(r=>({...r,saved:true}));}catch(e){monthlyHistory=[];}
+// Existing history is loaded here; rolling months are seeded after saved planner settings are restored.
+function state(){let s={};ids.forEach(id=>s[id]=get(id).type==='checkbox'?get(id).checked:get(id).value);expenseDefs.forEach(([id])=>s[id+'Cutoff']=get(id+'Cutoff').value);s.weeklySchedule=weeklySchedule;s.workdays=[...document.querySelectorAll('.workday')].map(x=>({day:x.value,checked:x.checked}));s.holidayHoursPerDay=get('holidayHoursPerDay').value;s.holidayNightPerDay=get('holidayNightPerDay').value;s.assumeHolidayWorked=get('assumeHolidayWorked').checked;return s}
+function applyState(s){if(s.weeklySchedule&&typeof s.weeklySchedule==='object'){weeklySchedule={...weeklySchedule,...s.weeklySchedule};}else if(Array.isArray(s.workdays)){s.workdays.forEach(w=>{const old=weeklySchedule[Number(w.day)]||{};weeklySchedule[Number(w.day)]={...old,working:!!w.checked};});}ids.forEach(id=>{if(s[id]!==undefined){if(get(id).type==='checkbox')get(id).checked=!!s[id];else get(id).value=s[id]}});expenseDefs.forEach(([id])=>{if(s[id+'Cutoff'])get(id+'Cutoff').value=s[id+'Cutoff']});if(s.baseHoursWeek&&get('baseHoursWeek'))get('baseHoursWeek').value=s.baseHoursWeek;if(Array.isArray(s.workdays))s.workdays.forEach(w=>{const el=document.querySelector('.workday[value=\"'+w.day+'\"]');if(el)el.checked=!!w.checked});if(s.holidayHoursPerDay)get('holidayHoursPerDay').value=s.holidayHoursPerDay;if(s.holidayNightPerDay)get('holidayNightPerDay').value=s.holidayNightPerDay;if(s.assumeHolidayWorked!==undefined)get('assumeHolidayWorked').checked=!!s.assumeHolidayWorked;syncLegacyWorkdays();renderWeeklySchedule();get('dutyStart').value=weeklySchedule[1].start;get('dutyEnd').value=weeklySchedule[1].end;rebuildAutoHolidayEntries();calculate()}
+ids.forEach(id=>{get(id).addEventListener('input',calculate);get(id).addEventListener('change',calculate)});get('basicSalary').addEventListener('input',()=>{calculate();refreshSavedMonthEstimates();renderPayCalendar()});get('workPosition').addEventListener('input',()=>{calculate();});expenseDefs.forEach(([id])=>get(id+'Cutoff').addEventListener('change',calculate));
+get('saveBtn').addEventListener('click',()=>{try{localStorage.setItem('salaryBudgetPlanner',JSON.stringify(state()));get('saveStatus').textContent='Saved on this device. Your data stays in this browser and is not uploaded to a cloud account.'}catch(e){get('saveStatus').textContent='Could not save on this browser. Please keep a note of your settings.'}});
+get('resetBtn').addEventListener('click',()=>{const s={employmentStatus:'probationary',ot:0,night:0,otdays:0,savings:0,investment:5000,jowa:3000,house:5000,mama:10000,utilities:1500,food:6000,transport:1500,wifi:1000,personal:2000,other:1000};expenseDefs.forEach(([id])=>s[id+'Cutoff']='eom');applyState(s);get('saveStatus').textContent='Baseline restored. Press Save to keep these settings.'});
+
+try{const saved=localStorage.getItem('salaryBudgetPlanner');if(saved){applyState(JSON.parse(saved));}else {renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}}catch(e){renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}
+
+refreshSavedMonthEstimates();
+ensureRollingMonths();
+get('dashboardMonth').value=currentMonthKey();
+showDashboard();
+renderMonthlyDashboard();
+renderPayCalendar();
+
+function updatePlannerStickyOffset(){
+ const shell=document.querySelector('.sticky-shell');
+ if(shell){
+  const h=Math.ceil(shell.getBoundingClientRect().height);
+  document.documentElement.style.setProperty('--planner-sticky-offset',h+'px');
+  document.documentElement.style.setProperty('--sticky-height',h+'px');
+ }
+}
+window.addEventListener('resize',updatePlannerStickyOffset,{passive:true});
+if(window.ResizeObserver){const stickyObserver=new ResizeObserver(updatePlannerStickyOffset);const stickyShell=document.querySelector('.sticky-shell');if(stickyShell)stickyObserver.observe(stickyShell);}
+updatePlannerStickyOffset();
+requestAnimationFrame(updatePlannerStickyOffset);
+function showDashboard(){get('monthlyDashboard').hidden=false;document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tabpage').forEach(p=>p.classList.remove('active'));}
+document.querySelectorAll('.tabbtn').forEach(btn=>btn.addEventListener('click',()=>{
+ const wasActive=btn.classList.contains('active');
+ if(wasActive){showDashboard();}
+ else{get('monthlyDashboard').hidden=true;document.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.tabpage').forEach(page=>page.classList.toggle('active',page.id===btn.dataset.tab));}
+ window.scrollTo({top:0,behavior:'smooth'});
+}));
+// Separate editable benefit lists. Migrate legacy entries into Current Benefits to preserve existing data.
+const currentBenefitsRoot=get('currentBenefits'),regularBenefitsRoot=get('regularBenefits');
+function readBenefitList(key){try{return JSON.parse(localStorage.getItem(key)||'[]')||[]}catch(e){return []}}
+let currentBenefits=readBenefitList('payPlannerCurrentBenefits'),regularBenefits=readBenefitList('payPlannerRegularBenefits');
+if(!currentBenefits.length&&!regularBenefits.length){
+ try{currentBenefits=JSON.parse(localStorage.getItem('payPlannerCustomBenefits')||'[]')||[]}catch(e){currentBenefits=[]}
+}
+
+const officialCurrentBenefits=[
+ {name:'Rice allowance',amount:1167,frequency:'Monthly · prorated first payroll'},
+ {name:'OT meal allowance',amount:60,frequency:'Per approved OT day · minimum 3 hours'},
+ {name:'OT transportation allowance',amount:350,frequency:'Per approved OT day · Zone 4 default; editable by zone'},
+ {name:'Night shift differential',amount:10,frequency:'10% hourly rate · 10 PM–6 AM'},
+ {name:'Night shift transportation subsidy',amount:0,frequency:'For eligible night-shift workers · based on residence zone'},
+ {name:'13th month pay',amount:0,frequency:'Annual · track month received'},
+ {name:'Life insurance',amount:0,frequency:'24× monthly basic salary · max ₱10M'},
+ {name:'Personal accident insurance',amount:0,frequency:'24× monthly basic salary · max ₱24.5M'},
+ {name:'Health insurance / HMO',amount:175000,frequency:'Maximum benefit per illness/confinement per year'},
+ {name:'Dental benefit',amount:0,frequency:'Employee and eligible dependents'},
+ {name:'Bereavement assistance',amount:5000,frequency:'Per eligible immediate-family event'},
+ {name:'Emerson Cares',amount:0,frequency:'Employee assistance program / Support our People Fund'},
+ {name:'Government-mandated benefits',amount:0,frequency:'SSS, Pag-IBIG and PhilHealth benefits'}
+];
+const officialRegularBenefits=[
+ {name:'Transportation allowance',amount:2000,frequency:'Monthly'},
+ {name:'Clothing allowance',amount:3000,frequency:'Annual · payable quarterly'},
+ {name:'Perfect attendance award',amount:1200,frequency:'Higher of 1 day base pay or ₱1,200 · eligibility required'},
+ {name:'Mid-year pay',amount:0,frequency:'50% of monthly basic salary'},
+ {name:'Vacation leave',amount:15,frequency:'Days per fiscal year'},
+ {name:'Sick leave',amount:30,frequency:'Days per fiscal year'},
+ {name:'Bereavement leave',amount:5,frequency:'Working days'},
+ {name:'Volunteer service leave',amount:2,frequency:'Days per fiscal year'},
+ {name:'Parental bonding leave',amount:4,frequency:'Weeks paid'},
+ {name:'Emergency loan',amount:0,frequency:'One month salary · 0% interest · 1 year'},
+ {name:'Retirement benefit',amount:0,frequency:'1.1 month × years of service'},
+ {name:'Study assistance / tuition reimbursement',amount:0,frequency:'Subject to approval and eligibility'},
+ {name:'Single employee parent confinement reimbursement',amount:0,frequency:'₱10k / ₱15k / ₱20k by service years'},
+ {name:'Paternity assistance program',amount:0,frequency:'₱10k normal / ₱14k caesarian / ₱8k miscarriage / ₱4k home'}
+];
+function seedOfficialBenefits(list,seed){
+ const existing=new Set(list.map(x=>String(x.name||'').toLowerCase()));
+ seed.forEach(item=>{if(!existing.has(item.name.toLowerCase()))list.push(item);});
+}
+seedOfficialBenefits(currentBenefits,officialCurrentBenefits);
+seedOfficialBenefits(regularBenefits,officialRegularBenefits);
+function escapeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderBenefitList(root,list,key){
+ if(!root)return;
+ root.innerHTML=list.map((b,i)=>`<div class="benefit-editor-row"><div><b>${escapeText(b.name)}</b><small>${fmt(Number(b.amount)||0)}${b.frequency?' · '+escapeText(b.frequency):''}</small></div><div class="expense-actions"><button type="button" data-benefit-edit="${i}" data-benefit-key="${key}">Edit</button><button type="button" data-benefit-delete="${i}" data-benefit-key="${key}">−</button></div></div>`).join('')||'<p class="sub">No benefits added.</p>';
+ localStorage.setItem(key,JSON.stringify(list));
+}
+function renderBenefits(){renderBenefitList(currentBenefitsRoot,currentBenefits,'payPlannerCurrentBenefits');renderBenefitList(regularBenefitsRoot,regularBenefits,'payPlannerRegularBenefits');}
+function editBenefitIn(list,i){
+ const b=list[i]||{},name=prompt('Benefit name:',b.name||'');if(!name?.trim())return;
+ const raw=prompt('Amount in PHP:',String(b.amount??0));if(raw===null)return;
+ const amount=Number(raw);if(!Number.isFinite(amount)||amount<0)return;
+ const frequency=prompt('Frequency (e.g. Monthly, Annual, One-time):',b.frequency||'Monthly');if(frequency===null)return;
+ list[i]={name:name.trim(),amount,frequency:frequency.trim()};renderBenefits();
+}
+function addBenefitTo(list){const name=prompt('Benefit name:');if(!name?.trim())return;const amount=Number(prompt('Amount in PHP:','0'));if(!Number.isFinite(amount)||amount<0)return;const frequency=prompt('Frequency (e.g. Monthly, Annual, One-time):','Monthly');if(frequency===null)return;list.push({name:name.trim(),amount,frequency:frequency.trim()});renderBenefits();}
+get('addCurrentBenefit')?.addEventListener('click',()=>addBenefitTo(currentBenefits));
+get('addRegularBenefit')?.addEventListener('click',()=>addBenefitTo(regularBenefits));
+[currentBenefitsRoot,regularBenefitsRoot].forEach(root=>root?.addEventListener('click',e=>{
+ const edit=e.target.closest('[data-benefit-edit]'),del=e.target.closest('[data-benefit-delete]');if(!edit&&!del)return;
+ const list=(edit||del).dataset.benefitKey==='payPlannerCurrentBenefits'?currentBenefits:regularBenefits,i=Number((edit||del).dataset.benefitEdit??(edit||del).dataset.benefitDelete);
+ if(edit)editBenefitIn(list,i);else if(confirm('Delete this benefit?')){list.splice(i,1);renderBenefits();}
+}));
+renderBenefits();
+get('addExpense')?.addEventListener('click',()=>{const label=prompt('Expense name:');if(!label?.trim())return;const amount=Number(prompt('Monthly amount in PHP:','0'));if(!Number.isFinite(amount)||amount<0)return;const id='customExpense'+Date.now();const newDef=[id,label.trim(),amount,50000,100];expenseDefs.push(newDef);customExpenseDefs.push(newDef);localStorage.setItem('payPlannerCustomExpenseDefs',JSON.stringify(customExpenseDefs));ids.push(id);const row=document.createElement('div');row.className='expense-row';row.dataset.expenseRow=id;row.innerHTML=`<div class="fieldhead"><label for="${id}">${escapeText(label.trim())}</label><span class="val" id="${id}Val">${fmt(amount)}</span><div class="expense-actions"><button type="button" data-edit-expense="${id}">Edit</button><button type="button" data-delete-expense="${id}">−</button></div></div><input id="${id}" type="range" min="0" max="50000" step="100" value="${amount}"><div class="ends"><span>₱0</span><span>₱50,000</span></div><input type="hidden" id="${id}Cutoff" value="eom">`;expenseRoot.appendChild(row);get(id).addEventListener('input',calculate);get(id).addEventListener('change',calculate);get(id+'Cutoff').addEventListener('change',calculate);calculate();});
+expenseRoot.addEventListener('click',e=>{const edit=e.target.closest('[data-edit-expense]'),del=e.target.closest('[data-delete-expense]');if(edit){const id=edit.dataset.editExpense,def=expenseDefs.find(x=>x[0]===id),label=prompt('Expense name:',def[1].replace(/^\d+\. /,''));if(!label?.trim())return;def[1]=label.trim();const amount=Number(prompt('Monthly amount in PHP:',get(id).value));if(!Number.isFinite(amount)||amount<0)return;get(id).value=amount;get(id).max=Math.max(Number(get(id).max),amount);def[2]=amount;def[1]=label.trim();if(customExpenseDefs.some(x=>x[0]===id))localStorage.setItem('payPlannerCustomExpenseDefs',JSON.stringify(customExpenseDefs));renderExpenseLabel(id,label.trim());calculate();}if(del){const id=del.dataset.deleteExpense;if(!confirm('Remove this expense?'))return;const index=expenseDefs.findIndex(x=>x[0]===id);if(index>=0)expenseDefs.splice(index,1);customExpenseDefs=customExpenseDefs.filter(x=>x[0]!==id);localStorage.setItem('payPlannerCustomExpenseDefs',JSON.stringify(customExpenseDefs));const idIndex=ids.indexOf(id);if(idIndex>=0)ids.splice(idIndex,1);get(id)?.closest('.expense-row')?.remove();calculate();}});
+function renderExpenseLabel(id,label){const row=get(id)?.closest('.expense-row');if(row){row.querySelector('label').textContent=label;row.querySelector('.ends span:last-child').textContent=fmt(Number(get(id).max));}}
+
+function sizeStickyHeader(){const shell=document.querySelector('.sticky-shell');if(shell)document.documentElement.style.setProperty('--sticky-height',shell.offsetHeight+'px')}window.addEventListener('load',sizeStickyHeader);window.addEventListener('resize',sizeStickyHeader);if('ResizeObserver' in window){const shell=document.querySelector('.sticky-shell');if(shell)new ResizeObserver(sizeStickyHeader).observe(shell)}if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>{
+  reg.update().catch(()=>{});
+  if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});
+  reg.addEventListener('updatefound',()=>{
+    const worker=reg.installing;
+    if(worker)worker.addEventListener('statechange',()=>{
+      if(worker.state==='installed' && navigator.serviceWorker.controller){
+        worker.postMessage({type:'SKIP_WAITING'});
+      }
+    });
+  });
+}).catch(err=>console.warn('Service worker registration failed',err)));
+</script>
+
+<style>
+#cloudAuthGate{position:fixed;inset:0;z-index:99999;background:rgba(9,18,15,.94);display:flex;align-items:center;justify-content:center;padding:20px;font-family:inherit}
+#cloudAuthCard{width:min(440px,100%);background:#fff;color:#18231f;border-radius:18px;padding:24px;box-shadow:0 20px 70px #0008}
+#cloudAuthCard h2{margin:0 0 6px;font-size:23px}
+#cloudAuthCard p{color:#68746e;margin:0 0 18px}
+#cloudAuthCard label{display:block;font-size:13px;font-weight:650;margin:12px 0 5px}
+#cloudAuthCard input{width:100%;padding:12px;border:1px solid #ccd6cf;border-radius:9px;font-size:16px}
+#cloudAuthActions{display:flex;gap:9px;margin-top:16px}
+#cloudAuthActions button{flex:1;border:0;border-radius:9px;padding:12px;font-weight:700;cursor:pointer}
+#cloudSignIn{background:#176b4d;color:white}#cloudSignUp{background:#e7f4ed;color:#176b4d}
+#cloudAuthMsg{font-size:13px;min-height:20px;margin-top:12px;color:#b33b3b}
+#cloudAccountBar{display:none;position:fixed;right:12px;bottom:12px;z-index:9000;background:#12231f;color:#fff;border-radius:12px;padding:9px 12px;box-shadow:0 5px 20px #0003;font-size:12px;align-items:center;gap:9px}
+#cloudAccountBar button{border:1px solid #ffffff55;background:transparent;color:white;border-radius:7px;padding:5px 8px}
+#cloudSyncStatus{opacity:.8}
+.daily-editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 9px;padding:8px;background:#f8faf8;border-radius:10px}.daily-editor .field{margin:3px 0}.daily-editor label{font-size:11px!important}.daily-editor input[type=date],.daily-editor select,.daily-editor input[type=number]{width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;padding:7px;font:12px inherit;background:#fff;color:var(--ink)}.daily-editor [data-work-controls]{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}.daily-editor [data-save-day]{grid-column:1/-1;padding:7px 10px;font-size:11px}.pay-computation{margin-top:10px;border-top:1px solid var(--line);padding-top:7px}.pay-computation summary{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer}.pay-computation[open]{padding-bottom:5px}@media(max-width:520px){.daily-editor{grid-template-columns:1fr}.daily-editor [data-work-controls]{grid-template-columns:1fr 1fr}}
+.attendance-day{min-width:0;padding:6px 2px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px}
+.attendance-day small{font-size:8px;color:var(--muted);white-space:nowrap}
+.attendance-day.worked{border-color:#7ba88b;background:#edf7f0}.attendance-day.absent{border-color:#d49a9a;background:#fff0f0}
+.attendance-dialog{border:0;border-radius:14px;padding:16px;width:min(92vw,380px);box-shadow:0 18px 55px #0003}
+.attendance-dialog::backdrop{background:#17251fcc}
+.attendance-dialog .btnrow{display:flex;gap:8px;flex-wrap:wrap}.attendance-dialog button{font-size:12px;padding:8px 10px}
+@media(max-width:420px){.attendance-day{padding:5px 0}.attendance-day small{font-size:7px}}
+
+
+.tabpage{display:none!important}.tabpage.active{display:block!important}
+.sticky-shell{position:fixed!important;top:0!important;z-index:100!important}
+.tabbar{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-width:1100px;width:calc(100% - 28px);margin:10px auto 0;padding:0 0 10px}
+.tabbar .tabbtn{min-width:0;white-space:normal;line-height:1.2;font-size:12px;padding:10px 8px;border-radius:10px}
+@media(max-width:520px){.tabbar{gap:4px;width:calc(100% - 16px)}.tabbar .tabbtn{font-size:10px;padding:8px 4px}}
+
+#cloudAccountBar{position:static!important;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:16px auto 12px;text-align:center;width:min(1100px,calc(100% - 28px));background:transparent!important;color:var(--muted)!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding:8px 0!important;font-size:10px!important}
+#cloudAccountBar button{color:var(--ink)!important;border:1px solid var(--line)!important}
+#cloudSyncStatus{opacity:1!important}
+
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.calendar-cell{min-height:62px;border-radius:9px;padding:6px 3px;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;border:1px solid transparent}
+.calendar-cell b{font-size:13px}.calendar-cell small{font-size:8px;line-height:1.1}
+.calendar-workday{background:#e9f2ff;border-color:#b7cdee;color:#294d79}
+.calendar-rest{background:#f0f1f2;border-color:#d9dcdf;color:#69717a}
+.calendar-regular{background:#ffebeb;border-color:#edb8b8;color:#963b3b}
+.calendar-special{background:#fff3d9;border-color:#efd39a;color:#8a6217}
+.calendar-legend{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 12px;font-size:10px}
+.calendar-legend span{display:flex;align-items:center;gap:5px}
+.legend-dot{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid #0001}
+@media(max-width:520px){.calendar-cell{min-height:48px}.calendar-cell small{font-size:7px}}
+
+.remove-month{float:right;border:0;background:transparent;color:var(--red);font-size:16px;padding:0 5px;line-height:1}
+
+.estimate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.estimate-card{min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.estimate-card .tag{display:block;font-size:9px;line-height:1.25;white-space:normal}
+.estimate-card strong{display:block;font-size:17px;line-height:1.25;margin-top:5px;overflow-wrap:anywhere}
+@media(max-width:420px){.estimate-card{padding:7px}.estimate-card strong{font-size:15px}.estimate-card .tag{font-size:8px}}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.section-head .sub{margin:0;flex:1}.small-action{padding:6px 10px!important;font-size:11px!important;white-space:nowrap;border-radius:8px!important}.expense-row{position:relative;border-bottom:1px solid var(--line);padding:7px 0 9px}.expense-row .fieldhead{gap:8px}.expense-actions{display:flex;gap:5px;align-items:center}.expense-actions button{font-size:10px;padding:4px 7px}.benefit-editor-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}.benefit-editor-row small{display:block;color:var(--muted);font-size:10px}.benefit-editor-row button{font-size:10px;padding:4px 7px}.tabbar{margin:0 auto!important;padding:5px 0 7px!important}.content-main{padding-top:3px!important;padding-bottom:76px!important}.tabpage>.widepanel{margin-top:3px!important}.sticky-shell{position:sticky!important;top:0!important;z-index:1000!important;background:var(--bg)!important;box-shadow:0 3px 10px #0000000a}.calendar-legend{margin:6px 0 9px!important}.attendance-calendar{margin-top:2px}
+#cloudAccountBar{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:9500!important;display:flex;gap:8px!important;justify-content:center!important;align-items:center!important;text-align:center!important;width:100%!important;margin:0!important;padding:8px 12px calc(8px + env(safe-area-inset-bottom))!important;background:var(--card)!important;border-top:1px solid var(--line)!important;box-shadow:0 -3px 14px #00000012!important;color:var(--muted)!important;border-radius:0!important}
+@media(max-width:520px){.tabbar .tabbtn{font-size:9px!important;padding:8px 3px!important}.content-main{padding-top:4px!important}.section-head{align-items:flex-start}}
+
+</style>
+<style>
+/* v32 final layout overrides */
+.sticky-shell{position:sticky!important;top:0!important;z-index:1000!important;background:var(--bg)!important;box-shadow:0 3px 10px #0000000a}
+.tabbar{margin:0 auto!important;padding:5px 0 7px!important}
+.content-main{padding-top:3px!important;padding-bottom:76px!important}
+.tabpage>.widepanel{margin-top:3px!important}
+#cloudAccountBar{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:9500!important;display:flex;justify-content:center!important;align-items:center!important;flex-wrap:wrap!important;gap:8px!important;width:100%!important;margin:0!important;padding:8px 12px calc(8px + env(safe-area-inset-bottom))!important;background:var(--card)!important;border-top:1px solid var(--line)!important;box-shadow:0 -3px 14px #00000012!important;color:var(--muted)!important;border-radius:0!important;text-align:center!important}
+.columns{gap:8px!important}.panel{padding:10px!important}.accordion-panel details>summary{padding:9px 10px!important}.accordion-content{padding:8px 10px!important}.field{margin:6px 0!important}.field input,.field select{padding:8px!important}.compcard{padding:9px!important}.widepanel{padding:10px!important}.expense-row{padding:4px 0 5px!important}.benefit-editor-row{padding:5px 0!important}.section-head{margin:4px 0!important}.topline{padding-top:7px!important;padding-bottom:6px!important}.hero{padding-top:6px!important;padding-bottom:7px!important;gap:6px!important}
+.attendance-day.calendar-workday{background:#e9f2ff!important;border-color:#b7cdee!important;color:#294d79!important}.attendance-day.calendar-rest{background:#f0f1f2!important;border-color:#d9dcdf!important;color:#69717a!important}.attendance-day.calendar-regular{background:#ffebeb!important;border-color:#edb8b8!important;color:#963b3b!important}.attendance-day.calendar-special{background:#fff3d9!important;border-color:#efd39a!important;color:#8a6217!important}
+.holiday-info{margin:8px 0 2px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#f8faf8;font-size:11px}.holiday-info b{display:block;font-size:12px;margin-bottom:3px}.holiday-tap{cursor:pointer}
+@media(max-width:520px){.panel{padding:8px!important}.accordion-content{padding:6px 8px!important}.topline{gap:6px}.hero .metric strong{font-size:18px!important}}
+
+/* Final compact day editor: intentionally overrides earlier dialog styling */
+#dayScheduleDialog.day-schedule-dialog{
+  box-sizing:border-box!important;
+  width: min(72vw, 276px)!important;
+  max-width:276px!important;
+  min-width:0!important;
+  max-height: min(70vh, 310px)!important;
+  margin:auto!important;
+  padding:11px!important;
+  border:1px solid #dce5df!important;
+  border-radius:13px!important;
+  box-shadow:0 12px 36px rgba(0,0,0,.22)!important;
+  overflow:visible!important;
+}
+#dayScheduleDialog .picker-head{
+  align-items:center!important;
+  gap:8px!important;
+  margin:0 0 5px!important;
+}
+#dayScheduleDialog .picker-head h2{
+  font-size:16px!important;
+  line-height:1.15!important;
+  margin:0!important;
+  font-weight:750!important;
+}
+#dayScheduleDialog .picker-head .sub{
+  font-size:10px!important;
+  line-height:1.2!important;
+  margin:2px 0 0!important;
+}
+#dayScheduleDialog #closeDaySchedule{
+  width:27px!important;height:27px!important;min-width:27px!important;
+  padding:0!important;border-radius:8px!important;font-size:13px!important;
+}
+#dayScheduleDialog .schedule-working-toggle{
+  display:flex!important;align-items:center!important;
+  gap:6px!important;padding:5px 0 7px!important;
+  font-size:11px!important;line-height:1.2!important;
+}
+#dayScheduleDialog .schedule-working-toggle input{
+  width:14px!important;height:14px!important;margin:0!important;
+}
+#dayScheduleDialog .schedule-dialog-times{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:6px!important;align-items:end!important;
+}
+#dayScheduleDialog .schedule-dialog-times .field{
+  min-width:0!important;margin:0!important;
+}
+#dayScheduleDialog .schedule-dialog-times label{
+  display:block!important;font-size:10px!important;
+  line-height:1.2!important;margin:0 0 3px!important;
+}
+#dayScheduleDialog .schedule-dialog-times input{
+  box-sizing:border-box!important;width:100%!important;min-width:0!important;
+  min-height:34px!important;height:34px!important;
+  padding:5px 4px!important;font-size:12px!important;
+  text-align:center!important;border-radius:7px!important;
+}
+#dayScheduleDialog .schedule-dialog-times.is-disabled{
+  opacity:.35!important;pointer-events:none!important;
+}
+#dayScheduleDialog .btnrow{
+  display:flex!important;justify-content:flex-end!important;
+  gap:6px!important;margin:9px 0 0!important;
+}
+#dayScheduleDialog .btnrow button{
+  min-height:31px!important;height:31px!important;
+  padding:5px 9px!important;font-size:10px!important;
+  line-height:1!important;border-radius:7px!important;
+}
+#dayScheduleDialog .btnrow .primary{font-weight:700!important}
+@media(max-width:380px){
+  #dayScheduleDialog.day-schedule-dialog{width: min(76vw, 266px)!important;padding:10px!important}
+}
+
+</style>
+<style>
+
+/* Final iPhone pinned masthead + navigation and compact overview heading */
+.sticky-shell{
+ position:fixed!important;inset:0 0 auto 0!important;width:100%!important;
+ z-index:12000!important;display:flex!important;flex-direction:column!important;
+ background:var(--bg)!important;isolation:isolate!important;
+ padding-top:env(safe-area-inset-top,0px)!important;
+ transform:translateZ(0)!important;will-change:transform!important;
+ box-shadow:0 3px 12px #152d2018!important;
+}
+.sticky-shell header{flex:0 0 auto!important}
+.sticky-shell .tabbar{
+ flex:0 0 auto!important;position:relative!important;z-index:2!important;
+ margin:0 auto!important;padding:5px 8px 7px!important;
+ background:var(--bg)!important;
+}
+main.content-main{
+ padding-top:calc(var(--sticky-height, 190px) + 8px)!important;
+ scroll-padding-top:calc(var(--sticky-height, 190px) + 8px)!important;
+}
+.monthly-dashboard{padding:8px!important}
+.approved-overview-heading{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) 1px 124px!important;
+ align-items:center!important;gap:8px!important;
+ min-height:0!important;height:auto!important;
+ padding:7px 8px!important;margin:0 0 7px!important;
+}
+.approved-overview-heading .overview-title{
+ min-width:0!important;display:flex!important;align-items:center!important;gap:6px!important;
+}
+.approved-overview-heading h2{
+ margin:0!important;font-size:clamp(13px,3.8vw,16px)!important;
+ line-height:1.12!important;white-space:normal!important;
+}
+.approved-overview-heading .overview-divider{height:30px!important}
+.approved-overview-heading .dashboard-month{
+ width:124px!important;max-width:124px!important;min-width:0!important;
+ justify-self:center!important;align-self:center!important;
+ display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;gap:3px!important;
+}
+.approved-overview-heading .dashboard-month label{
+ display:block!important;width:100%!important;text-align:center!important;
+ margin:0!important;font-size:9px!important;line-height:1.1!important;
+}
+.approved-overview-heading .dashboard-month input{
+ display:block!important;width:100%!important;min-width:0!important;
+ height:32px!important;min-height:32px!important;padding:4px 5px!important;
+ text-align:center!important;font-size:12px!important;
+}
+@media(max-width:380px){
+ .approved-overview-heading{grid-template-columns:minmax(0,1fr) 1px 112px!important;gap:6px!important;padding:6px!important}
+ .approved-overview-heading .dashboard-month{width:112px!important;max-width:112px!important}
+ .approved-overview-heading h2{font-size:12px!important}
+}
+
+</style>
+<style>
+
+/* Month remains editable, but remove the surrounding selector box */
+.approved-overview-heading{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:8px!important;padding:7px 8px!important;min-height:0!important;
+}
+.approved-overview-heading .overview-divider{display:none!important}
+.approved-overview-heading .overview-title{flex:1 1 auto!important;min-width:0!important}
+.approved-overview-heading .dashboard-month{
+ flex:0 0 auto!important;width:auto!important;max-width:145px!important;min-width:0!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:center!important;gap:2px!important;background:transparent!important;
+ border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;
+}
+.approved-overview-heading .dashboard-month label{
+ display:block!important;text-align:center!important;font-size:9px!important;
+ margin:0!important;line-height:1.1!important;
+}
+.approved-overview-heading .dashboard-month input{
+ width:100%!important;min-width:0!important;height:26px!important;min-height:26px!important;
+ padding:1px 2px!important;border:0!important;border-radius:0!important;
+ border-bottom:1px solid var(--line)!important;background:transparent!important;
+ box-shadow:none!important;text-align:center!important;font-size:12px!important;
+ color:var(--ink)!important;outline-offset:2px!important;
+}
+@media(max-width:380px){
+ .approved-overview-heading h2{font-size:12px!important}
+ .approved-overview-heading .dashboard-month{max-width:120px!important}
+ .approved-overview-heading .dashboard-month input{font-size:11px!important}
+}
+
+</style>
+<style>
+
+/* Payroll history: all five columns fit on one iPhone screen */
+#monthlyHistoryTable{
+ width:100%!important;max-width:100%!important;overflow-x:hidden!important;
+}
+#monthlyHistoryTable .payroll-history-table{
+ width:100%!important;max-width:100%!important;min-width:0!important;
+ table-layout:fixed!important;border-collapse:collapse!important;
+}
+#monthlyHistoryTable .payroll-history-table th,
+#monthlyHistoryTable .payroll-history-table td{
+ box-sizing:border-box!important;width:auto!important;
+ padding:8px 2px!important;text-align:center!important;
+ white-space:normal!important;overflow-wrap:anywhere!important;
+ font-size:clamp(8px,2.55vw,11px)!important;line-height:1.2!important;
+ border-bottom:1px solid var(--line)!important;
+}
+#monthlyHistoryTable .payroll-history-table th{
+ font-size:clamp(8px,2.4vw,10px)!important;font-weight:800!important;
+}
+#monthlyHistoryTable .payroll-history-table td:first-child,
+#monthlyHistoryTable .payroll-history-table th:first-child{text-align:center!important}
+@media(max-width:380px){
+ #monthlyHistoryTable .payroll-history-table th,
+ #monthlyHistoryTable .payroll-history-table td{padding:7px 1px!important;font-size:8px!important}
+}
+
+</style>
+<style>
+
+/* Absent days use a solid red treatment, replacing all scheduled-day shading */
+.attendance-day.calendar-absent,
+.attendance-day.absent,
+.attendance-day.calendar-workday.absent,
+.attendance-day.calendar-rest.absent,
+.attendance-day.calendar-regular.absent,
+.attendance-day.calendar-special.absent{
+ background:#ffe1e1!important;
+ border:1.5px solid #d94b4b!important;
+ color:#a51f1f!important;
+ box-shadow:inset 0 0 0 1px #f4b5b5!important;
+}
+.attendance-day.calendar-absent small{color:#a51f1f!important}
+.history-delete-cutoff{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:19px!important;height:19px!important;min-width:19px!important;min-height:19px!important;
+ margin-left:4px!important;padding:0!important;border:1px solid #e2bcbc!important;
+ border-radius:50%!important;background:#fff3f3!important;color:#a52b2b!important;
+ font-size:14px!important;font-weight:800!important;line-height:1!important;
+ vertical-align:middle!important;cursor:pointer!important;
+}
+#monthlyHistoryTable .payroll-history-table td:nth-child(2){white-space:nowrap!important}
+
+</style>
+<style>
+
+/* Swipe-to-reveal delete control inside the Month column */
+#monthlyHistoryTable .history-month-cell{position:relative!important;overflow:hidden!important}
+#monthlyHistoryTable .history-month-label{display:inline-block!important;transition:transform .18s ease!important}
+#monthlyHistoryTable .history-delete-cutoff{
+ display:none!important;width:auto!important;height:24px!important;min-width:48px!important;
+ margin:0!important;padding:2px 7px!important;border-radius:6px!important;
+ font-size:10px!important;border:1px solid #d98b8b!important;background:#fff0f0!important;
+}
+#monthlyHistoryTable tr.history-row-revealed .history-delete-cutoff{display:inline-flex!important}
+#monthlyHistoryTable tr.history-row-revealed .history-month-label{display:none!important}
+#monthlyHistoryTable .payroll-history-table td:nth-child(2){white-space:normal!important}
+.benefit-group{margin-top:12px!important}
+.benefit-group+.benefit-group{padding-top:10px!important;border-top:1px solid var(--line)!important}
+
+</style>
+<div id="cloudAuthGate">
+ <div id="cloudAuthCard">
+  <h2>Pay & Budget Planner</h2>
+  <p>Sign in to sync your planner across PC and iPhone.</p>
+  <label for="cloudEmail">Email address</label>
+  <input id="cloudEmail" type="email" autocomplete="email" placeholder="you@example.com">
+  <label for="cloudPassword">Password</label>
+  <input id="cloudPassword" type="password" autocomplete="current-password" placeholder="At least 8 characters">
+  <div id="cloudAuthActions">
+   <button id="cloudSignIn" type="button">Sign in</button>
+   <button id="cloudSignUp" type="button">Create account</button>
+  </div>
+  <div id="cloudAuthMsg">Your planner data is private to your account.</div>
+ </div>
+</div>
+<div id="cloudAccountBar"><span id="cloudSyncStatus">Cloud sync ready</span><span id="cloudUserEmail"></span><button id="cloudSignOut" type="button">Sign out</button></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+ const SUPABASE_URL = "https://tkqgqwhjqidkprzqpcdc.supabase.co";
+ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jBldoZA2KNt6SkEojsDuAg_aNjlqc79";
+ const gate = document.getElementById('cloudAuthGate');
+ const msg = document.getElementById('cloudAuthMsg');
+ const syncLabel = document.getElementById('cloudSyncStatus');
+ const bar = document.getElementById('cloudAccountBar');
+ const emailLabel = document.getElementById('cloudUserEmail');
+ let client, currentUser=null, syncing=false, remoteApplying=false, syncTimer=null, channel=null;
+ const STORAGE_KEYS=['salaryBudgetPlanner','salaryMonthlyHistory','payPlannerCurrentBenefits','payPlannerRegularBenefits'];
+ const originalSet=Storage.prototype.setItem;
+ function setStatus(t){syncLabel.textContent=t;}
+ function localPayload(){
+   let planner={}, history=[];
+   try{
+     // `state()` is declared by the planner's main script and returns the
+     // current values of all sliders, selects, checkboxes and cutoff settings.
+     planner=typeof state==='function' ? state() : JSON.parse(localStorage.getItem('salaryBudgetPlanner')||'{}');
+   }catch(e){
+     console.error('Could not read live planner state',e);
+     try{planner=JSON.parse(localStorage.getItem('salaryBudgetPlanner')||'{}')}catch(_){}
+   }
+   try{history=JSON.parse(localStorage.getItem('salaryMonthlyHistory')||'[]')}catch(e){}
+   let currentBenefits=[],regularBenefits=[];
+   try{currentBenefits=JSON.parse(localStorage.getItem('payPlannerCurrentBenefits')||'[]')}catch(e){}
+   try{regularBenefits=JSON.parse(localStorage.getItem('payPlannerRegularBenefits')||'[]')}catch(e){}
+   return {planner,history,currentBenefits,regularBenefits,version:12};
+ }
+ let pendingSync=false;
+ async function pushCloud(){
+   if(!currentUser||remoteApplying)return;
+   if(syncing){pendingSync=true;return;}
+   syncing=true; setStatus('Syncing…');
+   try{
+     const payload=localPayload();
+     const writeAt=new Date().toISOString();window.__lastCloudWriteAt=writeAt;
+     const {error}=await client.from('planner_data').upsert({
+       user_id:currentUser.id, planner_state:payload, updated_at:writeAt
+     },{onConflict:'user_id'});
+     if(error)throw error;
+     setStatus('Synced');
+   }catch(e){console.error('Cloud sync failed',e);setStatus('Sync issue: '+(e.message||'check connection'));}
+   finally{
+     syncing=false;
+     if(pendingSync){pendingSync=false;clearTimeout(syncTimer);syncTimer=setTimeout(pushCloud,250);}
+   }
+ }
+ function schedulePush(){
+   if(!currentUser||remoteApplying)return;
+   clearTimeout(syncTimer);syncTimer=setTimeout(pushCloud,500);
+ }
+ window.__emersonQueueCloudSync=schedulePush;
+  window.addEventListener('online',()=>{if(currentUser){setStatus('Back online · syncing…');schedulePush();}});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden && currentUser){schedulePush();}});
+
+ // Capture real planner edits directly. This is the reliable trigger for cloud
+ // writes; localStorage remains the offline cache, not the only sync signal.
+ let directCaptureTimer=null;
+ function captureLivePlannerChange(){
+   if(!currentUser || remoteApplying)return;
+   clearTimeout(directCaptureTimer);
+   directCaptureTimer=setTimeout(()=>{
+     try{
+       if(typeof state==='function'){
+         const liveState=state();
+         originalSet.call(localStorage,'salaryBudgetPlanner',JSON.stringify(liveState));
+       }
+       setStatus('Changes detected · syncing…');
+       schedulePush();
+     }catch(e){
+       console.error('Planner change capture failed',e);
+       setStatus('Sync issue: '+(e.message||'could not capture planner changes'));
+     }
+   },450);
+ }
+ document.addEventListener('input',e=>{
+   if(e.target && e.target.matches('input,select,textarea'))captureLivePlannerChange();
+ },true);
+ document.addEventListener('change',e=>{
+   if(e.target && e.target.matches('input,select,textarea'))captureLivePlannerChange();
+ },true);
+
+ Storage.prototype.setItem=function(k,v){
+   originalSet.call(this,k,v);
+   if(STORAGE_KEYS.includes(k))schedulePush();
+ };
+ async function pullCloud(){
+   const {data,error}=await client.from('planner_data').select('planner_state,updated_at').eq('user_id',currentUser.id).maybeSingle();
+   if(error)throw error;
+   if(data && data.planner_state){
+     remoteApplying=true;
+     const p=data.planner_state;
+     try{
+       if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
+       if(Array.isArray(p.history))localStorage.setItem('salaryMonthlyHistory',JSON.stringify(p.history));
+       if(Array.isArray(p.currentBenefits))localStorage.setItem('payPlannerCurrentBenefits',JSON.stringify(p.currentBenefits));
+       if(Array.isArray(p.regularBenefits))localStorage.setItem('payPlannerRegularBenefits',JSON.stringify(p.regularBenefits));
+       setStatus('Loaded cloud data');
+     }finally{ /* remote guard released after UI hydration */ }
+     // Apply cloud data to the current UI without a full-page reload.
+     if(p.planner && typeof applyState==='function'){
+       window.__emersonApplyingRemote=true;
+       applyState(p.planner);
+     }
+     if(Array.isArray(p.history)){
+       monthlyHistory=p.history;
+       renderMonthlyHistory();
+     }
+     if(typeof renderBenefits==='function')renderBenefits();
+     if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
+     if(typeof syncZonePill==='function')syncZonePill();
+     setTimeout(()=>{
+       remoteApplying=false;
+       window.__emersonApplyingRemote=false;
+     },700);
+   }else{
+     // First sign-in: migrate existing device data into the new cloud account.
+     await pushCloud();
+     setStatus('First device migrated');
+   }
+ }
+ async function startRealtime(){
+   if(channel)await client.removeChannel(channel);
+   channel=client.channel('planner-sync-'+currentUser.id)
+    .on('postgres_changes',{event:'*',schema:'public',table:'planner_data',filter:'user_id=eq.'+currentUser.id},async payload=>{
+      const p=payload.new?.planner_state;if(!p)return;
+      const incomingAt=Date.parse(payload.new?.updated_at||'');
+      const ownAt=Date.parse(window.__lastCloudWriteAt||'');
+      if(Number.isFinite(incomingAt) && Number.isFinite(ownAt) && incomingAt===ownAt)return;
+      remoteApplying=true;
+      try{
+        if(p.planner && typeof applyState==='function'){
+          window.__emersonApplyingRemote=true;
+          applyState(p.planner);
+        }
+        if(Array.isArray(p.history)){
+          monthlyHistory=p.history;
+          localStorage.setItem('salaryMonthlyHistory',JSON.stringify(p.history));
+          renderMonthlyHistory();
+        }
+        if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
+        if(Array.isArray(p.currentBenefits))localStorage.setItem('payPlannerCurrentBenefits',JSON.stringify(p.currentBenefits));
+        if(Array.isArray(p.regularBenefits))localStorage.setItem('payPlannerRegularBenefits',JSON.stringify(p.regularBenefits));
+        if(typeof renderBenefits==='function')renderBenefits();
+        if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
+        if(typeof syncZonePill==='function')syncZonePill();
+        setStatus('Updated from another device');
+      }catch(e){
+        console.error('Could not apply remote planner update',e);
+        setStatus('Sync issue: '+(e.message||'could not apply cloud update'));
+      }finally{
+        setTimeout(()=>{
+          remoteApplying=false;
+          window.__emersonApplyingRemote=false;
+        },700);
+      }
+    }).subscribe();
+ }
+ async function enterApp(session){
+   currentUser=session.user;
+   emailLabel.textContent=session.user.email||'Signed in';
+   bar.style.display='flex';gate.style.display='none';
+   try{await pullCloud();await startRealtime();}
+   catch(e){console.error(e);gate.style.display='flex';bar.style.display='none';msg.textContent='Database setup needed: '+(e.message||'check SQL setup and RLS policies');}
+ }
+ async function init(){
+   if(!window.supabase){msg.textContent='Could not load the sign-in library. Check your internet connection.';return;}
+   client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+   const {data}=await client.auth.getSession();
+   if(data.session)await enterApp(data.session);
+   client.auth.onAuthStateChange(async(event,session)=>{
+     if(session && !currentUser)await enterApp(session);
+     if(!session){currentUser=null;bar.style.display='none';gate.style.display='flex';}
+   });
+ }
+ document.getElementById('cloudSignIn').addEventListener('click',async()=>{
+   msg.textContent='Signing in…';
+   const {error}=await client.auth.signInWithPassword({email:document.getElementById('cloudEmail').value.trim(),password:document.getElementById('cloudPassword').value});
+   msg.textContent=error?error.message:'Signed in. Loading planner…';
+ });
+ document.getElementById('cloudSignUp').addEventListener('click',async()=>{
+   msg.textContent='Creating account…';
+   const {data,error}=await client.auth.signUp({email:document.getElementById('cloudEmail').value.trim(),password:document.getElementById('cloudPassword').value});
+   msg.textContent=error?error.message:(data.session?'Account created. Loading planner…':'Account created. Check your email to confirm, then sign in.');
+ });
+ document.getElementById('cloudSignOut').addEventListener('click',async()=>{await client.auth.signOut();location.reload();});
+ init().catch(e=>{console.error(e);msg.textContent=e.message||'Unable to initialize cloud login.';});
+})();
+</script>
+
+
+<style>
+#cloudAuthGate{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg,#f4f7f4)}
+#cloudAuthCard{width:min(92vw,390px);padding:22px;border:1px solid var(--line,#dce4dc);border-radius:16px;background:var(--card,#fff);box-shadow:0 16px 45px #0002}
+#cloudAuthCard h2{margin:0 0 8px}#cloudAuthCard p{font-size:13px;color:var(--muted);margin:0 0 16px}
+#cloudAuthCard label{display:block;font-size:12px;margin:10px 0 5px}
+#cloudAuthCard input{width:100%;box-sizing:border-box;padding:11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
+#cloudAuthActions{display:flex;gap:8px;margin-top:14px}#cloudAuthActions button{flex:1;padding:10px;border-radius:9px}
+#cloudAuthMsg{font-size:12px;color:var(--muted);margin-top:12px}
+#cloudAccountBar{position:fixed!important;left:0;right:0;bottom:0;z-index:9500;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;width:100%;margin:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);text-align:center}
+</style>
+
+
+</body>
+</html>
