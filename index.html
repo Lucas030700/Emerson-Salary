@@ -929,7 +929,15 @@ input[type="range"][data-target-slider]{
 .attendance-day.has-ot b{font-weight:800}
 </style>
 
-</head>
+<style>
+.rto-days-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.rto-days-grid label{display:flex;align-items:center;gap:7px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:13px}
+.rto-days-grid input{accent-color:var(--accent)}
+.attendance-day{position:relative}
+.attendance-day.rto-day{outline:2px solid #16845b;outline-offset:-2px}
+.attendance-day.rto-day:after{content:"RTO";position:absolute;right:2px;top:2px;font-size:7px;font-weight:900;color:#fff;background:#16845b;border-radius:3px;padding:1px 3px}
+@media(max-width:380px){.rto-days-grid{gap:5px}.rto-days-grid label{padding:7px;font-size:11px}}
+</style></head>
 <body>
 <div class="sticky-shell">
 <header>
@@ -996,6 +1004,34 @@ input[type="range"][data-target-slider]{
    <div id="expenses"></div>
    <div class="section"><div class="lineitem"><span><b>Total monthly expenses</b></span><b id="totalExpenses">₱0</b></div></div>
    <p class="callout">Rent/house payment and utilities are separate. Avoid double-counting if utilities are included in rent.</p>
+    </div>
+   </details>
+  </article>
+  <article class="panel accordion-panel">
+   <details id="generalInfoDetails">
+    <summary><span class="summary-title">3 · General information</span><span class="summary-preview">Work setup · RTO schedule</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <div class="accordion-content">
+     <p class="sub">Set your usual work arrangement and how your Return-to-Office days are scheduled.</p>
+     <div class="field"><label for="workSetup">Work setup</label>
+      <select id="workSetup" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
+       <option value="wfh">Work from home</option><option value="hybrid" selected>Hybrid</option><option value="office">Full office</option>
+      </select>
+     </div>
+     <div class="field" id="rtoScheduleTypeWrap"><label for="rtoScheduleType">RTO schedule type</label>
+      <select id="rtoScheduleType" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
+       <option value="fixed">Fixed schedule</option><option value="flexible">Flexible / not fixed</option>
+      </select>
+     </div>
+     <div class="field" id="rtoFixedDaysWrap"><label>Fixed RTO days</label>
+      <div class="rto-days-grid" id="rtoDaysGrid">
+       <label><input type="checkbox" value="1" class="rto-day"> Monday</label><label><input type="checkbox" value="2" class="rto-day"> Tuesday</label>
+       <label><input type="checkbox" value="3" class="rto-day"> Wednesday</label><label><input type="checkbox" value="4" class="rto-day"> Thursday</label>
+       <label><input type="checkbox" value="5" class="rto-day"> Friday</label><label><input type="checkbox" value="6" class="rto-day"> Saturday</label>
+       <label><input type="checkbox" value="0" class="rto-day"> Sunday</label>
+      </div>
+      <p class="schedule-footnote">Selected days will be highlighted automatically in the payroll cutoff calendars.</p>
+     </div>
+     <p class="callout" id="rtoScheduleHint">Choose your fixed office days to mark them in each cutoff.</p>
     </div>
    </details>
   </article>
@@ -1264,7 +1300,7 @@ function detailMarkup(record,which){
  <div class="calendar-legend"><span><i class="legend-dot calendar-workday"></i> Workday</span><span><i class="legend-dot calendar-rest"></i> Rest day</span><span><i class="legend-dot calendar-regular"></i> Regular holiday</span><span><i class="legend-dot calendar-special"></i> Special holiday</span><span><i class="legend-dot calendar-absent"></i> Absent</span></div>
  <div class="attendance-calendar" data-attendance-calendar="${key}" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
  ${['S','M','T','W','T','F','S'].map(d=>`<b style="font-size:10px;text-align:center">${d}</b>`).join('')}
- ${(()=>{let out='';const [yy,mo,dd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);const first=new Date(yy,mo-1,dd).getDay();for(let i=0;i<first;i++)out+='<span></span>';for(let dt=new Date(yy,mo-1,dd);dt<=new Date(ey,em-1,ed);dt.setDate(dt.getDate()+1)){const date=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');const isAbsent=abs.includes(date),entry=ot.find(e=>e.date===date),holiday=holidayForDate(date),dow=dt.getDay(),isWork=scheduleForDate(date).working,shade=holiday?(holiday[2]==='Regular holiday'?'calendar-regular':'calendar-special'):isWork?'calendar-workday':'calendar-rest';const splitClass=entry?.workMode==='split'?(entry.officeBlock==='second'?'split-second':'split-first'):'';const otCode=entry&&Number(entry.hours)>0?`${Number(entry.hours)}R`:'';out+=`<button type="button" class="attendance-day ${isAbsent?'calendar-absent':shade} ${!isAbsent&&entry?'worked':''} ${entry?'has-ot':''} ${splitClass}" data-day-pick="${key}|${date}" ${holiday?`data-holiday-detail="${date}"`:''}><b>${dt.getDate()}</b>${otCode?`<small>${otCode}</small>`:''}</button>`;}return out;})()}
+ ${(()=>{let out='';const [yy,mo,dd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);const first=new Date(yy,mo-1,dd).getDay();for(let i=0;i<first;i++)out+='<span></span>';for(let dt=new Date(yy,mo-1,dd);dt<=new Date(ey,em-1,ed);dt.setDate(dt.getDate()+1)){const date=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');const isAbsent=abs.includes(date),entry=ot.find(e=>e.date===date),holiday=holidayForDate(date),dow=dt.getDay(),isWork=scheduleForDate(date).working,shade=holiday?(holiday[2]==='Regular holiday'?'calendar-regular':'calendar-special'):isWork?'calendar-workday':'calendar-rest';const splitClass=entry?.workMode==='split'?(entry.officeBlock==='second'?'split-second':'split-first'):'';const otCode=entry&&Number(entry.hours)>0?`${Number(entry.hours)}R`:'';out+=`<button type="button" class="attendance-day ${isAbsent?'calendar-absent':shade} ${!isAbsent&&entry?'worked':''} ${entry?'has-ot':''} ${splitClass} ${isRtoDate(date)?'rto-day':''}" data-day-pick="${key}|${date}" ${holiday?`data-holiday-detail="${date}"`:''}><b>${dt.getDate()}</b>${otCode?`<small>${otCode}</small>`:''}</button>`;}return out;})()}
  </div><div class="holiday-info" data-record-holiday-info hidden></div>
  <dialog class="attendance-dialog" data-day-dialog="${key}">
   <div class="picker-head"><div><h3 data-dialog-date>Attendance</h3><p class="sub">Did you report to work on this date?</p></div><button type="button" data-dialog-close aria-label="Close">✕</button></div>
@@ -1393,8 +1429,11 @@ function buildMonthRecord(month){
  recalcSavedRecord(record);return record;
 }
 function addMonthRecord(month){
- if(monthlyHistory.some(x=>x.month===month))return false;
- const record=buildMonthRecord(month);record.saved=true;monthlyHistory.push(record);saveMonthlyHistoryData();renderMonthlyHistory();return true;
+ let record=monthlyHistory.find(x=>x.month===month);
+ if(!record){record=buildMonthRecord(month);monthlyHistory.push(record);}
+ monthlyHistory=monthlyHistory.filter(x=>x.month!==month||x===record);
+ record.saved=true;record.savedAt=new Date().toISOString();recalcSavedRecord(record);
+ saveMonthlyHistoryData();renderMonthlyHistory();return true;
 }
 function ensureRollingMonths(){}
 function refreshSavedMonthEstimates(){monthlyHistory.forEach(r=>{if(!r.first||!r.second)return;['first','second'].forEach(k=>{const x=r[k];x.holiday=holidayPayByCutoff(r.month)[k==='first'?'p15':'eom'];});recalcSavedRecord(r);});saveMonthlyHistoryData();renderMonthlyHistory();}
@@ -1408,10 +1447,15 @@ function ensureDashboardMonth(month){
 function syncActiveDashboardMonthToHistory(){
  const month=get('dashboardMonth')?.value||currentMonthKey();
  if(!month)return;
- const record=ensureDashboardMonth(month);
+ let record=ensureDashboardMonth(month);
  if(!record)return;
- // Keep one history record per month; the selected month's record is the one being updated.
- monthlyHistory=monthlyHistory.filter(x=>x.month!==month||x===record);
+ // Month is the unique key: keep the active record and remove any legacy duplicates.
+ const sameMonth=monthlyHistory.filter(x=>x.month===month);
+ if(sameMonth.length>1){
+  const preferred=sameMonth.find(x=>x===record)||sameMonth[sameMonth.length-1];
+  monthlyHistory=monthlyHistory.filter(x=>x.month!==month||x===preferred);
+  record=preferred;
+ }
  syncSelectedMonthBillAmounts(record);
  recalcSavedRecord(record);
  // Deliberately do not persist or publish unsaved edits to Payroll History here.
@@ -1892,11 +1936,30 @@ function renderPayCalendar(){
 get('payCalendarMonth')?.addEventListener('change',renderPayCalendar);
 try{monthlyHistory=(JSON.parse(localStorage.getItem('salaryMonthlyHistory')||'[]')||[]).map(r=>({...r,saved:true}));}catch(e){monthlyHistory=[];}
 // Existing history is loaded here; rolling months are seeded after saved planner settings are restored.
-function state(){let s={};ids.forEach(id=>s[id]=get(id).type==='checkbox'?get(id).checked:get(id).value);expenseDefs.forEach(([id])=>s[id+'Cutoff']=get(id+'Cutoff').value);s.weeklySchedule=weeklySchedule;s.workdays=[...document.querySelectorAll('.workday')].map(x=>({day:x.value,checked:x.checked}));s.holidayHoursPerDay=get('holidayHoursPerDay').value;s.holidayNightPerDay=get('holidayNightPerDay').value;s.assumeHolidayWorked=get('assumeHolidayWorked').checked;return s}
-function applyState(s){if(s.weeklySchedule&&typeof s.weeklySchedule==='object'){weeklySchedule={...weeklySchedule,...s.weeklySchedule};}else if(Array.isArray(s.workdays)){s.workdays.forEach(w=>{const old=weeklySchedule[Number(w.day)]||{};weeklySchedule[Number(w.day)]={...old,working:!!w.checked};});}ids.forEach(id=>{if(s[id]!==undefined){if(get(id).type==='checkbox')get(id).checked=!!s[id];else get(id).value=s[id]}});expenseDefs.forEach(([id])=>{if(s[id+'Cutoff'])get(id+'Cutoff').value=s[id+'Cutoff']});if(s.baseHoursWeek&&get('baseHoursWeek'))get('baseHoursWeek').value=s.baseHoursWeek;if(Array.isArray(s.workdays))s.workdays.forEach(w=>{const el=document.querySelector('.workday[value=\"'+w.day+'\"]');if(el)el.checked=!!w.checked});if(s.holidayHoursPerDay)get('holidayHoursPerDay').value=s.holidayHoursPerDay;if(s.holidayNightPerDay)get('holidayNightPerDay').value=s.holidayNightPerDay;if(s.assumeHolidayWorked!==undefined)get('assumeHolidayWorked').checked=!!s.assumeHolidayWorked;syncLegacyWorkdays();renderWeeklySchedule();get('dutyStart').value=weeklySchedule[1].start;get('dutyEnd').value=weeklySchedule[1].end;rebuildAutoHolidayEntries();calculate()}
+function state(){let s={};ids.forEach(id=>s[id]=get(id).type==='checkbox'?get(id).checked:get(id).value);expenseDefs.forEach(([id])=>s[id+'Cutoff']=get(id+'Cutoff').value);s.weeklySchedule=weeklySchedule;s.workdays=[...document.querySelectorAll('.workday')].map(x=>({day:x.value,checked:x.checked}));s.workSetup=get('workSetup')?.value||'hybrid';s.rtoScheduleType=get('rtoScheduleType')?.value||'fixed';s.rtoDays=[...document.querySelectorAll('.rto-day:checked')].map(x=>Number(x.value));s.holidayHoursPerDay=get('holidayHoursPerDay').value;s.holidayNightPerDay=get('holidayNightPerDay').value;s.assumeHolidayWorked=get('assumeHolidayWorked').checked;return s}
+function isRtoDate(date){
+ const setup=get('workSetup')?.value||'hybrid',type=get('rtoScheduleType')?.value||'fixed';
+ if(setup==='wfh')return false;
+ if(setup==='office')return !!scheduleForDate(date).working;
+ if(type!=='fixed')return false;
+ const day=new Date(date+'T00:00:00').getDay();
+ return [...document.querySelectorAll('.rto-day:checked')].some(x=>Number(x.value)===day);
+}
+function syncRtoControls(){
+ const setup=get('workSetup')?.value||'hybrid',type=get('rtoScheduleType')?.value||'fixed';
+ if(get('rtoScheduleTypeWrap'))get('rtoScheduleTypeWrap').hidden=setup!=='hybrid';
+ if(get('rtoFixedDaysWrap'))get('rtoFixedDaysWrap').hidden=setup!=='hybrid'||type!=='fixed';
+ if(get('rtoScheduleHint'))get('rtoScheduleHint').textContent=setup==='wfh'?'WFH setup: no RTO dates will be highlighted.':setup==='office'?'Full office setup: all scheduled workdays will be highlighted as RTO.':type==='fixed'?'Selected fixed RTO days will be highlighted automatically in each payroll cutoff.':'Flexible RTO: no dates are pre-highlighted.';
+}
+function bindRtoSettings(){
+ ['workSetup','rtoScheduleType'].forEach(id=>get(id)?.addEventListener('change',()=>{syncRtoControls();renderMonthlyDashboard();scheduleAutoSave();}));
+ document.querySelectorAll('.rto-day').forEach(x=>x.addEventListener('change',()=>{renderMonthlyDashboard();scheduleAutoSave();}));
+ syncRtoControls();
+}
+function applyState(s){if(s.weeklySchedule&&typeof s.weeklySchedule==='object'){weeklySchedule={...weeklySchedule,...s.weeklySchedule};}else if(Array.isArray(s.workdays)){s.workdays.forEach(w=>{const old=weeklySchedule[Number(w.day)]||{};weeklySchedule[Number(w.day)]={...old,working:!!w.checked};});}ids.forEach(id=>{if(s[id]!==undefined){if(get(id).type==='checkbox')get(id).checked=!!s[id];else get(id).value=s[id]}});expenseDefs.forEach(([id])=>{if(s[id+'Cutoff'])get(id+'Cutoff').value=s[id+'Cutoff']});if(s.baseHoursWeek&&get('baseHoursWeek'))get('baseHoursWeek').value=s.baseHoursWeek;if(Array.isArray(s.workdays))s.workdays.forEach(w=>{const el=document.querySelector('.workday[value=\"'+w.day+'\"]');if(el)el.checked=!!w.checked});if(s.holidayHoursPerDay)get('holidayHoursPerDay').value=s.holidayHoursPerDay;if(s.holidayNightPerDay)get('holidayNightPerDay').value=s.holidayNightPerDay;if(s.assumeHolidayWorked!==undefined)get('assumeHolidayWorked').checked=!!s.assumeHolidayWorked;if(s.workSetup&&get('workSetup'))get('workSetup').value=s.workSetup;if(s.rtoScheduleType&&get('rtoScheduleType'))get('rtoScheduleType').value=s.rtoScheduleType;if(Array.isArray(s.rtoDays))document.querySelectorAll('.rto-day').forEach(x=>x.checked=s.rtoDays.includes(Number(x.value)));syncRtoControls();syncLegacyWorkdays();renderWeeklySchedule();get('dutyStart').value=weeklySchedule[1].start;get('dutyEnd').value=weeklySchedule[1].end;rebuildAutoHolidayEntries();calculate()}
 ids.forEach(id=>{get(id).addEventListener('input',calculate);get(id).addEventListener('change',calculate)});get('basicSalary').addEventListener('input',()=>{calculate();refreshSavedMonthEstimates();renderPayCalendar()});get('workPosition').addEventListener('input',()=>{calculate();});expenseDefs.forEach(([id])=>get(id+'Cutoff').addEventListener('change',calculate));
 get('saveBtn').addEventListener('click',()=>{try{localStorage.setItem('salaryBudgetPlanner',JSON.stringify(state()));get('saveStatus').textContent='Saved on this device. Your data stays in this browser and is not uploaded to a cloud account.'}catch(e){get('saveStatus').textContent='Could not save on this browser. Please keep a note of your settings.'}});
-get('resetBtn').addEventListener('click',()=>{const s={employmentStatus:'probationary',ot:0,night:0,otdays:0,savings:0,investment:5000,jowa:3000,house:5000,mama:10000,utilities:1500,food:6000,transport:1500,wifi:1000,personal:2000,other:1000};expenseDefs.forEach(([id])=>s[id+'Cutoff']='eom');applyState(s);get('saveStatus').textContent='Baseline restored. Press Save to keep these settings.'});
+get('resetBtn').addEventListener('click',()=>{const s={employmentStatus:'probationary',ot:0,night:0,otdays:0,savings:0,investment:5000,jowa:3000,house:5000,mama:10000,utilities:1500,food:6000,transport:1500,wifi:1000,personal:2000,other:1000};expenseDefs.forEach(([id])=>s[id+'Cutoff']='eom');applyState(s);bindRtoSettings();get('saveStatus').textContent='Baseline restored. Press Save to keep these settings.'});
 
 try{const saved=localStorage.getItem('salaryBudgetPlanner');if(saved){applyState(JSON.parse(saved));}else {renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}}catch(e){renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}
 
