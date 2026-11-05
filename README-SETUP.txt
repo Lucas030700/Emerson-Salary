@@ -11,7 +11,7 @@ DATA STORAGE
 - Local browser storage is used as an offline cache. Cloud data is the shared source across devices.
 
 PRIVACY
-Planner salary, benefits, expenses, and work records are not uploaded to a cloud database. If hosted online, the hosting provider serves the app files, while planner records remain in browser storage.
+When signed in, planner salary, benefits, expenses, and work records are stored in the configured Supabase project for cross-device synchronization. Browser localStorage is used as an offline cache.
 
 FILES
 - index.html: planner application
@@ -23,6 +23,11 @@ DISPLAY
 - The page uses a fixed mobile viewport and disables pinch/double-tap zoom on supported touch browsers.
 - Desktop browser zoom shortcuts may still be controlled by the browser itself.
 
+
+Version 28 sync and target slider refinement:
+- Cloud writes are queued only when planner data actually changes.
+- Routine button taps and unchanged localStorage writes no longer trigger sync.
+- Target Remaining slider retains an adjustable range even if the schedule-based OT cap is zero.
 
 Version 12 Emerson benefits integration:
 - Official upon-hiring and regularization benefit catalog preloaded.

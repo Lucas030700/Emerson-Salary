@@ -1903,7 +1903,9 @@ function netIncreaseFromAdditionalOt(record,which,hours){
 function maxTargetRemainingForCutoff(record,which){
  const x=record[which],baseNet=Number(x.paySuggested)||0,bills=Number(x.bills)||0;
  const maxHours=maxAdditionalOtHoursForCutoff(record,which);
- return Math.max(baseNet-bills,Math.floor((baseNet+netIncreaseFromAdditionalOt(record,which,maxHours)-bills)/100)*100);
+ // Keep the target slider usable even when the scheduled-hours cap calculates zero.
+ const usableHours=Math.max(20,maxHours);
+ return Math.max(baseNet-bills,Math.floor((baseNet+netIncreaseFromAdditionalOt(record,which,usableHours)-bills)/100)*100);
 }
 function renderMonthlyDashboard(){
  const monthInput=get('dashboardMonth'),root=get('dashboardCutoffs');
@@ -1928,7 +1930,7 @@ function renderMonthlyDashboard(){
   const target=Number.isFinite(stored)?Math.max(minRemaining,Math.min(maxTarget,stored)):Math.max(0,minRemaining);
   const targetTakeHome=bills+target;
   const required=targetTakeHome>baseNet?recommendedAdditionalOt({...record,[which]:{...x,bills:targetTakeHome}},which):{hours:0,extraNet:0,possible:true};
-  const maxHours=maxAdditionalOtHoursForCutoff(record,which);
+  const maxHours=Math.max(20,maxAdditionalOtHoursForCutoff(record,which));
   const ot={...required,hours:Math.min(required.hours,maxHours),possible:required.hours<=maxHours};
   ot.extraNet=netIncreaseFromAdditionalOt(record,which,ot.hours);
   const projectedTakeHome=baseNet+(ot.hours?ot.extraNet:0);
@@ -1985,7 +1987,7 @@ function renderMonthlyDashboard(){
     x.targetRemaining=target;
     const targetTakeHome=bills+target,baseNet=Number(x.paySuggested)||0;
     const required=targetTakeHome>baseNet?recommendedAdditionalOt({...record,[which]:{...x,bills:targetTakeHome}},which):{hours:0,extraNet:0,possible:true};
-    const maxHours=maxAdditionalOtHoursForCutoff(record,which);
+    const maxHours=Math.max(20,maxAdditionalOtHoursForCutoff(record,which));
     const hours=Math.min(required.hours,maxHours),extraNet=netIncreaseFromAdditionalOt(record,which,hours);
     const projected=baseNet+(hours?extraNet:0),remaining=projected-bills;
     card.querySelector('[data-cutoff-takehome]').textContent=fmt(projected);
@@ -2646,13 +2648,18 @@ main.content-main{
          const liveState=state();
          originalSet.call(localStorage,'salaryBudgetPlanner',JSON.stringify(liveState));
        }
-       setStatus('Changes detected · syncing…');
-       schedulePush();
+       // Form events can fire without changing the underlying value. Only queue
+       // a cloud write when the complete local payload differs from the last cloud copy.
+       const currentFingerprint=fingerprint(localPayload());
+       if(currentFingerprint!==lastCloudFingerprint){
+         setStatus('Changes detected · syncing…');
+         schedulePush();
+       }
      }catch(e){
        console.error('Planner change capture failed',e);
        setStatus('Sync issue: '+(e.message||'could not capture planner changes'));
      }
-   },450);
+   },350);
  }
  document.addEventListener('input',e=>{
    if(e.target && e.target.matches('input,select,textarea'))captureLivePlannerChange();
@@ -2660,13 +2667,11 @@ main.content-main{
  document.addEventListener('change',e=>{
    if(e.target && e.target.matches('input,select,textarea'))captureLivePlannerChange();
  },true);
- document.addEventListener('click',e=>{
-   if(e.target && e.target.closest('button,[role=button],.weekday-schedule-btn,[data-schedule-day]'))captureLivePlannerChange();
- },true);
-
+ // Do not treat ordinary button taps, accordion opens, or navigation as edits.
  Storage.prototype.setItem=function(k,v){
+   const next=String(v),previous=this.getItem(k);
    originalSet.call(this,k,v);
-   if(STORAGE_KEYS.includes(k))schedulePush();
+   if(STORAGE_KEYS.includes(k)&&previous!==next)schedulePush();
  };
  async function applyCloudState(p,updatedAt){
    if(!p)return;
