@@ -961,6 +961,10 @@ input[type="range"][data-target-slider]{
 .choice-selector input:checked+span{background:#e5effb;border:1.5px solid #3976b8;color:#174f91;box-shadow:inset 0 0 0 1px #3976b8}
 .choice-selector input:focus-visible+span{outline:2px solid #3976b8;outline-offset:2px}
 @media(max-width:380px){.choice-selector{gap:4px}.choice-selector span{font-size:10px;padding:6px 4px;min-height:38px}}
+.two-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.zone-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.zone-choice-grid span{min-height:58px;flex-direction:column;gap:3px}
+.zone-choice-grid span small{font-size:10px;font-weight:550;opacity:.85}
 </style><style id="rto-border-only-v20">
 /* RTO is shown by a darker border only. Keep the original workday/holiday fill. */
 .attendance-day.rto-day:not(.calendar-regular):not(.calendar-special){
@@ -1012,18 +1016,24 @@ input[type="range"][data-target-slider]{
     <div class="accordion-content">
      <p class="sub">Set your usual work arrangement and how your Return-to-Office days are scheduled.</p>
      <p class="sub">Enter your employment and salary details first, then configure your work arrangement and RTO schedule.</p>
+   <div class="field"><label for="workPosition">Work position / role</label><input id="workPosition" type="text" value="" maxlength="90" placeholder="e.g. Engineer, Analyst, Supervisor"></div>
    <div class="field"><div class="fieldhead"><label for="basicSalary">Monthly basic salary</label><span class="val" id="basicSalaryVal">₱0</span></div><input id="basicSalary" type="number" min="0" max="1000000" step="500" value="0"></div>
-
-   <div class="field"><label for="workPosition">Work position / role</label><input id="workPosition" type="text" value="" maxlength="90" placeholder="e.g. Engineer, Analyst, Supervisor"></div><p class="sub">Add the benefits offered by your employer and manage them at any time.</p>
-   <div class="field"><div class="fieldhead"><label for="employmentStatus">Employment status</label><span class="val" id="statusVal">Probi</span></div>
-    <select id="employmentStatus" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit">
-     <option value="probationary">Probationary</option><option value="regular">Regular</option>
-    </select>
+   <div class="field"><label>Employment status</label>
+    <div class="choice-selector two-choice-grid" id="employmentStatusChoices">
+     <label><input type="radio" name="employmentStatusChoice" value="probationary" checked><span>Probationary</span></label>
+     <label><input type="radio" name="employmentStatusChoice" value="regular"><span>Regular</span></label>
+    </div>
+    <select id="employmentStatus" hidden aria-hidden="true"><option value="probationary">Probationary</option><option value="regular">Regular</option></select>
    </div>
-   <div class="field"><label for="residenceZone">Residence zone for Emerson transportation allowance</label>
-    <select id="residenceZone" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
-     <option value="1">Zone 1 · 0–4 km · ₱125</option><option value="2">Zone 2 · 4–8 km · ₱175</option><option value="3">Zone 3 · 8–13 km · ₱300</option><option value="4" selected>Zone 4 · 13 km beyond · ₱350</option>
-    </select><p class="sub">Added to the ₱60 OT meal allowance for each supervisor-approved OT day of at least 3 hours. Holiday premium is calculated and shown separately. Confirm your declared zone with HR.</p>
+   <div class="field"><label>Residence zone for Emerson transportation allowance</label>
+    <div class="choice-selector zone-choice-grid" id="residenceZoneChoices">
+     <label><input type="radio" name="residenceZoneChoice" value="1"><span>Zone 1<br><small>0–4 km · ₱125</small></span></label>
+     <label><input type="radio" name="residenceZoneChoice" value="2"><span>Zone 2<br><small>4–8 km · ₱175</small></span></label>
+     <label><input type="radio" name="residenceZoneChoice" value="3"><span>Zone 3<br><small>8–13 km · ₱300</small></span></label>
+     <label><input type="radio" name="residenceZoneChoice" value="4" checked><span>Zone 4<br><small>13 km+ · ₱350</small></span></label>
+    </div>
+    <select id="residenceZone" hidden aria-hidden="true"><option value="1">Zone 1</option><option value="2">Zone 2</option><option value="3">Zone 3</option><option value="4" selected>Zone 4</option></select>
+    <p class="sub">Added to the ₱60 OT meal allowance for each supervisor-approved OT day of at least 3 hours. Holiday premium is calculated and shown separately. Confirm your declared zone with HR.</p>
    </div>
      <div class="field"><label>Work setup</label>
       <div class="choice-selector" id="workSetupChoices">
@@ -1210,6 +1220,12 @@ function recommendOtForTarget(target,nightHours,otDays,isRegular){
 
 function zoneAllowance(){return ({1:125,2:175,3:300,4:350})[Number(get('residenceZone')?.value)||4]||350;}
 function syncZonePill(){const el=get('zonePill');if(el)el.textContent='Zone '+(get('residenceZone')?.value||4)+' · PHP';}
+function syncEmploymentZoneChoices(){
+ document.querySelectorAll('input[name="employmentStatusChoice"]').forEach(x=>x.checked=x.value===get('employmentStatus').value);
+ document.querySelectorAll('input[name="residenceZoneChoice"]').forEach(x=>x.checked=x.value===get('residenceZone').value);
+}
+document.querySelectorAll('input[name="employmentStatusChoice"]').forEach(x=>x.addEventListener('change',()=>{if(x.checked){get('employmentStatus').value=x.value;get('employmentStatus').dispatchEvent(new Event('change',{bubbles:true}));}}));
+document.querySelectorAll('input[name="residenceZoneChoice"]').forEach(x=>x.addEventListener('change',()=>{if(x.checked){get('residenceZone').value=x.value;get('residenceZone').dispatchEvent(new Event('change',{bubbles:true}));}}));
 function syncPerfectAttendanceControl(){ /* Eligibility and scheduled bonus payments are calculated automatically. */ }
 get('residenceZone')?.addEventListener('change',()=>{syncZonePill();monthlyHistory.forEach(recalcSavedRecord);renderMonthlyDashboard();});
 get('dashboardMonth')?.addEventListener('change',syncPerfectAttendanceControl);
@@ -2023,12 +2039,12 @@ function bindRtoSettings(){
  document.querySelectorAll('.rto-day').forEach(x=>x.addEventListener('change',()=>{renderMonthlyDashboard();scheduleAutoSave();}));
  syncRtoControls();
 }
-function applyState(s){if(s.weeklySchedule&&typeof s.weeklySchedule==='object'){weeklySchedule={...weeklySchedule,...s.weeklySchedule};}else if(Array.isArray(s.workdays)){s.workdays.forEach(w=>{const old=weeklySchedule[Number(w.day)]||{};weeklySchedule[Number(w.day)]={...old,working:!!w.checked};});}ids.forEach(id=>{if(s[id]!==undefined){if(get(id).type==='checkbox')get(id).checked=!!s[id];else get(id).value=s[id]}});expenseDefs.forEach(([id])=>{if(s[id+'Cutoff'])get(id+'Cutoff').value=s[id+'Cutoff']});if(s.baseHoursWeek&&get('baseHoursWeek'))get('baseHoursWeek').value=s.baseHoursWeek;if(Array.isArray(s.workdays))s.workdays.forEach(w=>{const el=document.querySelector('.workday[value=\"'+w.day+'\"]');if(el)el.checked=!!w.checked});if(s.holidayHoursPerDay)get('holidayHoursPerDay').value=s.holidayHoursPerDay;if(s.holidayNightPerDay)get('holidayNightPerDay').value=s.holidayNightPerDay;if(s.assumeHolidayWorked!==undefined)get('assumeHolidayWorked').checked=!!s.assumeHolidayWorked;if(s.workSetup&&get('workSetup'))get('workSetup').value=s.workSetup;if(s.rtoScheduleType&&get('rtoScheduleType'))get('rtoScheduleType').value=s.rtoScheduleType;if(Array.isArray(s.rtoDays))document.querySelectorAll('.rto-day').forEach(x=>x.checked=s.rtoDays.includes(Number(x.value)));syncRtoControls();syncLegacyWorkdays();renderWeeklySchedule();get('dutyStart').value=weeklySchedule[1].start;get('dutyEnd').value=weeklySchedule[1].end;rebuildAutoHolidayEntries();calculate()}
+function applyState(s){if(s.weeklySchedule&&typeof s.weeklySchedule==='object'){weeklySchedule={...weeklySchedule,...s.weeklySchedule};}else if(Array.isArray(s.workdays)){s.workdays.forEach(w=>{const old=weeklySchedule[Number(w.day)]||{};weeklySchedule[Number(w.day)]={...old,working:!!w.checked};});}ids.forEach(id=>{if(s[id]!==undefined){if(get(id).type==='checkbox')get(id).checked=!!s[id];else get(id).value=s[id]}});expenseDefs.forEach(([id])=>{if(s[id+'Cutoff'])get(id+'Cutoff').value=s[id+'Cutoff']});if(s.baseHoursWeek&&get('baseHoursWeek'))get('baseHoursWeek').value=s.baseHoursWeek;if(Array.isArray(s.workdays))s.workdays.forEach(w=>{const el=document.querySelector('.workday[value=\"'+w.day+'\"]');if(el)el.checked=!!w.checked});if(s.holidayHoursPerDay)get('holidayHoursPerDay').value=s.holidayHoursPerDay;if(s.holidayNightPerDay)get('holidayNightPerDay').value=s.holidayNightPerDay;if(s.assumeHolidayWorked!==undefined)get('assumeHolidayWorked').checked=!!s.assumeHolidayWorked;if(s.workSetup&&get('workSetup'))get('workSetup').value=s.workSetup;if(s.rtoScheduleType&&get('rtoScheduleType'))get('rtoScheduleType').value=s.rtoScheduleType;if(Array.isArray(s.rtoDays))document.querySelectorAll('.rto-day').forEach(x=>x.checked=s.rtoDays.includes(Number(x.value)));syncEmploymentZoneChoices();syncRtoControls();syncLegacyWorkdays();renderWeeklySchedule();get('dutyStart').value=weeklySchedule[1].start;get('dutyEnd').value=weeklySchedule[1].end;rebuildAutoHolidayEntries();calculate()}
 ids.forEach(id=>{get(id).addEventListener('input',calculate);get(id).addEventListener('change',calculate)});get('basicSalary').addEventListener('input',()=>{calculate();refreshSavedMonthEstimates();renderPayCalendar()});get('workPosition').addEventListener('input',()=>{calculate();});expenseDefs.forEach(([id])=>get(id+'Cutoff').addEventListener('change',calculate));
 get('saveBtn').addEventListener('click',()=>{try{localStorage.setItem('salaryBudgetPlanner',JSON.stringify(state()));get('saveStatus').textContent='Saved on this device. Your data stays in this browser and is not uploaded to a cloud account.'}catch(e){get('saveStatus').textContent='Could not save on this browser. Please keep a note of your settings.'}});
 get('resetBtn').addEventListener('click',()=>{const s={employmentStatus:'probationary',ot:0,night:0,otdays:0,savings:0,investment:5000,jowa:3000,house:5000,mama:10000,utilities:1500,food:6000,transport:1500,wifi:1000,personal:2000,other:1000};expenseDefs.forEach(([id])=>s[id+'Cutoff']='eom');applyState(s);bindRtoSettings();get('saveStatus').textContent='Baseline restored. Press Save to keep these settings.'});
 
-try{const saved=localStorage.getItem('salaryBudgetPlanner');if(saved){applyState(JSON.parse(saved));}else {renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}bindRtoSettings();}catch(e){renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}
+try{const saved=localStorage.getItem('salaryBudgetPlanner');if(saved){applyState(JSON.parse(saved));}else {renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}syncEmploymentZoneChoices();bindRtoSettings();}catch(e){syncEmploymentZoneChoices();renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}
 
 refreshSavedMonthEstimates();
 ensureRollingMonths();
