@@ -1058,6 +1058,21 @@ input[type="range"][data-target-slider]{
 .attendance-day.calendar-special.rto-day { background:#fff3d9!important; border-color:#efd39a!important; color:#8a6217!important; }
 .attendance-day.rto-day small { color:inherit!important; }
 </style>
+
+<style>
+/* Refined first-time setup experience */
+.setup-overlay{position:fixed;inset:0;z-index:100001;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(ellipse at 15% 5%,#315b48 0,transparent 42%),rgba(8,18,14,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-y:auto}
+.setup-card{width:min(620px,100%);max-height:min(92vh,900px);overflow-y:auto;background:#fff;color:#17251f;border:1px solid #e5ece7;border-radius:25px;padding:clamp(20px,4vw,34px);box-shadow:0 28px 90px #0005;animation:setupRise .28s ease-out}
+@keyframes setupRise{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.setup-topline{display:flex;align-items:center;gap:10px;margin-bottom:24px}.setup-brand-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#e8f4ed;color:#176b4d;font-size:18px;font-weight:850}.setup-step-label{font-size:10px;letter-spacing:.13em;font-weight:800;color:#648073}.setup-step-count{margin-left:auto;font-size:10px;font-weight:800;color:#8b9991;letter-spacing:.08em}
+.setup-heading h2{font-size:clamp(23px,4vw,30px);letter-spacing:-.035em;line-height:1.12;margin:0 0 8px;color:#17251f}.setup-heading p{font-size:13px;line-height:1.55;color:#718078;margin:0;max-width:470px}.setup-progress{height:4px;background:#edf2ee;border-radius:99px;margin:22px 0 25px;overflow:hidden}.setup-progress span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#176b4d,#72b894);border-radius:99px}
+.setup-section-title{display:flex;gap:12px;align-items:center;margin-bottom:17px}.setup-section-title>span{width:30px;height:30px;border-radius:9px;background:#f0f6f2;color:#176b4d;display:grid;place-items:center;font-size:11px;font-weight:850}.setup-section-title b{display:block;font-size:13px;color:#25362d}.setup-section-title small{display:block;font-size:11px;color:#839088;margin-top:2px}
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px 13px}.setup-field{min-width:0}.setup-field-full{grid-column:1/-1}.setup-field label{display:block;font-size:11px;font-weight:750;color:#53645a;margin:0 0 7px}.setup-field input,.setup-field select{width:100%;height:45px;border:1px solid #dfe7e1;border-radius:11px;padding:0 12px;background:#fbfdfb;color:#203128;font-family:inherit;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s}.setup-field input:focus,.setup-field select:focus{border-color:#62a985;box-shadow:0 0 0 3px #dff1e6;background:#fff}.setup-money{position:relative}.setup-money>span{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:800;color:#176b4d}.setup-money input{padding-left:31px}.setup-note{display:flex;gap:10px;align-items:flex-start;background:#f4f8f5;border:1px solid #e8f0ea;border-radius:12px;padding:12px 13px;margin:21px 0 14px}.setup-note-icon{width:18px;height:18px;flex:0 0 18px;display:grid;place-items:center;border-radius:50%;background:#e1efe6;color:#176b4d;font-size:11px;font-weight:850}.setup-note p{font-size:11px;line-height:1.5;color:#68796f;margin:0}.setup-error{min-height:0;color:#b42318;font-size:11px;margin:0 0 8px}.setup-submit{width:100%;height:48px;display:flex;align-items:center;justify-content:center;gap:12px;border:0;border-radius:12px;background:#176b4d;color:#fff;font-size:13px;font-weight:800;box-shadow:0 6px 14px #176b4d2b;transition:transform .15s,background .15s}.setup-submit:hover{background:#12583f;transform:translateY(-1px)}.setup-submit span{font-size:18px;line-height:1}.setup-footer{text-align:center;margin-top:17px;font-size:9px;letter-spacing:.16em;font-weight:800;color:#a0aaa3}
+#cloudAccountBar{gap:7px!important}#cloudAccountBar #restartSetupBtn{border:1px solid #cbded1!important;background:#f1f7f3!important;color:#176b4d!important;font-weight:750!important}#cloudAccountBar #cloudSignOut{border:1px solid var(--line)!important;background:var(--card)!important;color:var(--ink)!important}
+@media(max-width:520px){.setup-overlay{padding:10px;align-items:center}.setup-card{padding:21px 17px;border-radius:20px;max-height:94vh}.setup-topline{margin-bottom:19px}.setup-grid{gap:12px 9px}.setup-field input,.setup-field select{height:43px;font-size:12px}.setup-heading p{font-size:12px}.setup-footer{font-size:8px}#cloudAccountBar{gap:6px!important;padding-left:7px!important;padding-right:7px!important}#cloudAccountBar #cloudSyncStatus{width:100%;text-align:center}#cloudAccountBar #cloudUserEmail{max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+@media(max-width:360px){.setup-grid{grid-template-columns:1fr}.setup-field-full{grid-column:auto}}
+</style>
+
 </head>
 <body>
 <div class="sticky-shell">
@@ -2564,8 +2579,27 @@ main.content-main{
   <div id="cloudAuthMsg">Your planner data is private to your account.</div>
  </div>
 </div>
-<div id="cloudAccountBar"><span id="cloudSyncStatus">Cloud sync ready</span><span id="cloudUserEmail"></span><button id="accountSettingsBtn" type="button">Account Settings</button><button id="cloudSignOut" type="button">Sign out</button></div>
-<div id="setupOverlay" style="display:none;position:fixed;inset:0;z-index:100001;background:rgba(9,18,15,.82);align-items:center;justify-content:center;padding:16px;overflow:auto"><div style="background:var(--card,#fff);color:var(--ink,#17251f);width:min(560px,100%);max-height:92vh;overflow:auto;border-radius:18px;padding:22px;box-shadow:0 20px 70px #0005"><h2 id="setupTitle">Let’s set up your planner</h2><p id="setupIntro">Complete your basic employment details to start using the payroll dashboard.</p><div class="field"><label for="setupRole">Work position / role</label><input id="setupRole" type="text" placeholder="e.g. Engineer, Analyst" maxlength="90"></div><div class="field"><label for="setupSalary">Monthly basic salary (₱)</label><input id="setupSalary" type="number" min="0" step="500" placeholder="0"></div><div class="field"><label for="setupEmployment">Employment status</label><select id="setupEmployment"><option value="probationary">Probationary</option><option value="regular">Regular</option></select></div><div class="field"><label for="setupZone">Residence zone</label><select id="setupZone"><option value="1">Zone 1</option><option value="2">Zone 2</option><option value="3">Zone 3</option><option value="4" selected>Zone 4</option></select></div><div class="field"><label for="setupWork">Work setup</label><select id="setupWork"><option value="wfh">Work from home</option><option value="hybrid" selected>Hybrid</option><option value="office">Full office</option></select></div><div class="field"><label for="setupRto">RTO schedule</label><select id="setupRto"><option value="fixed">Fixed schedule</option><option value="flexible">Flexible / not fixed</option></select></div><p style="font-size:12px;color:var(--muted)">You can fine-tune your weekly schedule, benefits, and monthly expenses in the planner after setup.</p><div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button id="setupSave" type="button">Save setup and continue</button></div><div id="setupError" style="color:#b42318;font-size:12px;margin-top:8px"></div></div></div>
+<div id="cloudAccountBar"><span id="cloudSyncStatus">Cloud sync ready</span><span id="cloudUserEmail"></span><button id="restartSetupBtn" type="button">Restart Setup</button><button id="cloudSignOut" type="button">Sign out</button></div>
+<div id="setupOverlay" class="setup-overlay" style="display:none">
+ <section class="setup-card" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+  <div class="setup-topline"><span class="setup-brand-mark">₱</span><span class="setup-step-label">PERSONALIZE YOUR PLANNER</span><span class="setup-step-count">01 / 01</span></div>
+  <div class="setup-heading"><h2 id="setupTitle">Let’s set up your planner</h2><p id="setupIntro">A few details will help us calculate your pay and budget more accurately.</p></div>
+  <div class="setup-progress"><span></span></div>
+  <div class="setup-section-title"><span>01</span><div><b>Employment details</b><small>Tell us about your current work arrangement.</small></div></div>
+  <div class="setup-grid">
+   <div class="setup-field setup-field-full"><label for="setupRole">Work position / role</label><input id="setupRole" type="text" placeholder="e.g. Engineer, Analyst" maxlength="90"></div>
+   <div class="setup-field"><label for="setupSalary">Monthly basic salary</label><div class="setup-money"><span>₱</span><input id="setupSalary" type="number" min="0" step="500" placeholder="0"></div></div>
+   <div class="setup-field"><label for="setupEmployment">Employment status</label><select id="setupEmployment"><option value="probationary">Probationary</option><option value="regular">Regular</option></select></div>
+   <div class="setup-field"><label for="setupZone">Residence zone</label><select id="setupZone"><option value="1">Zone 1</option><option value="2">Zone 2</option><option value="3">Zone 3</option><option value="4" selected>Zone 4</option></select></div>
+   <div class="setup-field"><label for="setupWork">Work setup</label><select id="setupWork"><option value="wfh">Work from home</option><option value="hybrid" selected>Hybrid</option><option value="office">Full office</option></select></div>
+   <div class="setup-field setup-field-full"><label for="setupRto">RTO schedule</label><select id="setupRto"><option value="fixed">Fixed schedule</option><option value="flexible">Flexible / not fixed</option></select></div>
+  </div>
+  <div class="setup-note"><span class="setup-note-icon">i</span><p>You can fine-tune your weekly schedule, benefits, and monthly expenses anytime inside the planner.</p></div>
+  <div id="setupError" class="setup-error" role="alert"></div>
+  <button id="setupSave" class="setup-submit" type="button">Save setup and continue <span>→</span></button>
+  <div class="setup-footer">YOUR PAY. YOUR PLAN. ALL IN ONE PLACE.</div>
+ </section>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (() => {
@@ -2824,11 +2858,9 @@ main.content-main{
    try{originalSet.call(localStorage,'salaryBudgetPlanner',JSON.stringify(state()));}catch(e){}
    lastCloudFingerprint=null;schedulePush();
  });
- document.getElementById('accountSettingsBtn').addEventListener('click',()=>{
-   const choice=prompt('Account Settings\n\nType RESTART to restart your planner setup.\nType CANCEL to close.');
-   if(!choice||choice.trim().toUpperCase()!=='RESTART')return;
+ document.getElementById('restartSetupBtn').addEventListener('click',()=>{
+   if(!confirm('Restart your planner setup? Your employment settings and planner preferences will be reset.'))return;
    const keep=confirm('Keep your Payroll History?\n\nOK = Keep Payroll History\nCancel = Clear Payroll History');
-   if(!confirm('Restart setup now? Your employment settings and planner preferences will be reset.'))return;
    // Reset only the initial profile inputs and planner defaults. Account remains intact.
    const defaults={workPosition:'',basicSalary:'0',employmentStatus:'probationary',residenceZone:'4',workSetup:'hybrid',rtoScheduleType:'fixed'};
    Object.entries(defaults).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
