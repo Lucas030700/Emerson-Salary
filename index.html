@@ -1049,6 +1049,15 @@ input[type="range"][data-target-slider]{
 }
 </style>
 
+
+<style id="rto-outline-match-base-v26">
+/* RTO changes outline thickness only. Preserve each day's normal fill and border color. */
+.attendance-day.rto-day { border-width:3px!important; border-style:solid!important; box-shadow:none!important; }
+.attendance-day.rto-day:not(.calendar-regular):not(.calendar-special):not(.split-first):not(.split-second) { background:#e9f2ff!important; border-color:#b7cdee!important; color:#294d79!important; }
+.attendance-day.calendar-regular.rto-day { background:#ffebeb!important; border-color:#edb8b8!important; color:#963b3b!important; }
+.attendance-day.calendar-special.rto-day { background:#fff3d9!important; border-color:#efd39a!important; color:#8a6217!important; }
+.attendance-day.rto-day small { color:inherit!important; }
+</style>
 </head>
 <body>
 <div class="sticky-shell">
@@ -2594,6 +2603,12 @@ main.content-main{
        user_id:currentUser.id, planner_state:payload, updated_at:writeAt
      },{onConflict:'user_id'});
      if(error)throw error;
+     // Push an immediate Realtime broadcast to other signed-in devices.
+     // Postgres Changes remains enabled as a secondary delivery path.
+     if(channel){
+       try{await channel.send({type:'broadcast',event:'planner-updated',payload:{planner_state:payload,updated_at:writeAt,source:'planner-client'}});}
+       catch(broadcastError){console.warn('Realtime broadcast was not delivered; database sync is still saved',broadcastError);}
+     }
      setStatus('Synced');
    }catch(e){console.error('Cloud sync failed',e);setStatus('Sync issue: '+(e.message||'check connection'));}
    finally{
@@ -2675,42 +2690,49 @@ main.content-main{
      setStatus('First device migrated');
    }
  }
+ async function applyRemotePayload(p,updatedAt){
+   if(!p)return;
+   const incomingAt=Date.parse(updatedAt||'');
+   const ownAt=Date.parse(window.__lastCloudWriteAt||'');
+   if(Number.isFinite(incomingAt) && Number.isFinite(ownAt) && incomingAt===ownAt)return;
+   remoteApplying=true;
+   try{
+     if(p.planner && typeof applyState==='function'){
+       window.__emersonApplyingRemote=true;
+       applyState(p.planner);
+     }
+     if(Array.isArray(p.history)){
+       monthlyHistory=p.history;
+       localStorage.setItem('salaryMonthlyHistory',JSON.stringify(p.history));
+       renderMonthlyHistory();
+     }
+     if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
+     if(Array.isArray(p.currentBenefits))localStorage.setItem('payPlannerCurrentBenefits',JSON.stringify(p.currentBenefits));
+     if(Array.isArray(p.regularBenefits))localStorage.setItem('payPlannerRegularBenefits',JSON.stringify(p.regularBenefits));
+     if(typeof renderBenefits==='function')renderBenefits();
+     if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
+     if(typeof syncZonePill==='function')syncZonePill();
+     setStatus('Updated from another device');
+   }catch(e){
+     console.error('Could not apply remote planner update',e);
+     setStatus('Sync issue: '+(e.message||'could not apply cloud update'));
+   }finally{
+     setTimeout(()=>{remoteApplying=false;window.__emersonApplyingRemote=false;},250);
+   }
+ }
  async function startRealtime(){
    if(channel)await client.removeChannel(channel);
    channel=client.channel('planner-sync-'+currentUser.id)
-    .on('postgres_changes',{event:'*',schema:'public',table:'planner_data',filter:'user_id=eq.'+currentUser.id},async payload=>{
-      const p=payload.new?.planner_state;if(!p)return;
-      const incomingAt=Date.parse(payload.new?.updated_at||'');
-      const ownAt=Date.parse(window.__lastCloudWriteAt||'');
-      if(Number.isFinite(incomingAt) && Number.isFinite(ownAt) && incomingAt===ownAt)return;
-      remoteApplying=true;
-      try{
-        if(p.planner && typeof applyState==='function'){
-          window.__emersonApplyingRemote=true;
-          applyState(p.planner);
-        }
-        if(Array.isArray(p.history)){
-          monthlyHistory=p.history;
-          localStorage.setItem('salaryMonthlyHistory',JSON.stringify(p.history));
-          renderMonthlyHistory();
-        }
-        if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
-        if(Array.isArray(p.currentBenefits))localStorage.setItem('payPlannerCurrentBenefits',JSON.stringify(p.currentBenefits));
-        if(Array.isArray(p.regularBenefits))localStorage.setItem('payPlannerRegularBenefits',JSON.stringify(p.regularBenefits));
-        if(typeof renderBenefits==='function')renderBenefits();
-        if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
-        if(typeof syncZonePill==='function')syncZonePill();
-        setStatus('Updated from another device');
-      }catch(e){
-        console.error('Could not apply remote planner update',e);
-        setStatus('Sync issue: '+(e.message||'could not apply cloud update'));
-      }finally{
-        setTimeout(()=>{
-          remoteApplying=false;
-          window.__emersonApplyingRemote=false;
-        },700);
-      }
-    }).subscribe();
+    .on('broadcast',{event:'planner-updated'},({payload})=>{
+      if(payload?.planner_state)applyRemotePayload(payload.planner_state,payload.updated_at);
+    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'planner_data',filter:'user_id=eq.'+currentUser.id},payload=>{
+      applyRemotePayload(payload.new?.planner_state,payload.new?.updated_at);
+    })
+    .subscribe((status)=>{
+      if(status==='SUBSCRIBED')setStatus('Live sync connected');
+      else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setStatus('Live sync reconnecting…');
+    });
  }
  async function enterApp(session){
    currentUser=session.user;

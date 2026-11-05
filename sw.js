@@ -1,4 +1,4 @@
-const CACHE='salary-planner-v25';
+const CACHE='salary-planner-v26';
 const APP_SHELL=['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install',event=>{
