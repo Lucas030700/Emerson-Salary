@@ -1016,10 +1016,10 @@ input[type="range"][data-target-slider]{
 .general-info-panel .rto-days-grid label{border:1px solid #e4ebe5!important;border-radius:9px!important;background:#fbfdfb!important;padding:8px 9px!important;font-size:11px!important;color:#4e6054!important}
 .general-info-panel .schedule-footnote{font-size:10px!important;line-height:1.4;color:#849087!important}
 .general-info-panel .callout,.benefits-panel .callout,.expenses-panel .callout{border:1px solid #e8eee9!important;background:#f7faf7!important;border-radius:11px!important;color:#6d7b72!important;font-size:10px!important;line-height:1.45!important;padding:10px 11px!important}
-.benefits-panel .work-schedule-section{margin:0 0 14px!important;padding:13px!important;border:1px solid #e5ecf0!important;border-radius:13px!important;background:linear-gradient(145deg,#f7fafc,#fff)!important}
-.benefits-panel .work-schedule-section .section-head h3{font-size:10px!important;letter-spacing:.07em;color:#5e7484!important}
-.benefits-panel .weekday-schedule-btn{border-radius:9px!important;background:#fff!important;border:1px solid #e1e9e4!important;min-height:48px!important}
-.benefits-panel .weekday-schedule-btn.is-working{background:#edf5f0!important;border-color:#c9ddcf!important}
+.general-info-panel .work-schedule-section{margin:0 0 14px!important;padding:13px!important;border:1px solid #e5ecf0!important;border-radius:13px!important;background:linear-gradient(145deg,#f7fafc,#fff)!important}
+.general-info-panel .work-schedule-section .section-head h3{font-size:10px!important;letter-spacing:.07em;color:#5e7484!important}
+.general-info-panel .weekday-schedule-btn{border-radius:9px!important;background:#fff!important;border:1px solid #e1e9e4!important;min-height:48px!important}
+.general-info-panel .weekday-schedule-btn.is-working{background:#edf5f0!important;border-color:#c9ddcf!important}
 .benefits-panel .benefit-group{margin:0 0 13px!important;padding:13px!important;border:1px solid #e8eee9!important;border-radius:13px!important;background:#fff!important}
 .benefits-panel .benefit-group .section-head{margin:0 0 7px!important;align-items:center!important}
 .benefits-panel .benefit-group h3{font-size:10px!important;letter-spacing:.07em;color:#5b6d62!important;margin:0!important}
@@ -1045,7 +1045,7 @@ input[type="range"][data-target-slider]{
  .columns>.accordion-panel .accordion-content{padding:12px!important}
  .general-info-panel .field{padding:11px!important;margin-bottom:10px!important}
  .general-info-panel .zone-choice-grid span{min-height:58px!important}
- .benefits-panel .work-schedule-section,.benefits-panel .benefit-group{padding:11px!important}
+ .general-info-panel .work-schedule-section,.benefits-panel .benefit-group{padding:11px!important}
 }
 </style>
 
@@ -1103,7 +1103,7 @@ input[type="range"][data-target-slider]{
 
  <section class="columns"><article class="panel accordion-panel general-info-panel">
    <details id="generalInfoDetails">
-    <summary><span class="summary-title">1 · General information</span><span class="summary-preview">Salary · Employment details · Work setup · RTO</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <summary><span class="summary-title">1 · General information</span><span class="summary-preview">Salary · Employment · Work setup · RTO · Weekly schedule</span><span class="chevron" aria-hidden="true">⌄</span></summary>
     <div class="accordion-content">
      <p class="sub">Your employment details, salary, and regular work arrangement.</p>
    <div class="field"><label for="workPosition">Work position / role</label><input id="workPosition" type="text" value="" maxlength="90" placeholder="e.g. Engineer, Analyst, Supervisor"></div>
@@ -1150,6 +1150,12 @@ input[type="range"][data-target-slider]{
       <p class="schedule-footnote">Selected days will be highlighted automatically in the payroll cutoff calendars.</p>
      </div>
      <p class="callout" id="rtoScheduleHint">Choose your fixed office days to mark them in each cutoff.</p>
+   <div class="section work-schedule-section">
+      <div class="section-head"><h3>Weekly work schedule</h3><span class="schedule-tag">Tap a day to edit</span></div>
+      <div class="week-schedule-grid" id="weekScheduleGrid" aria-label="Weekly work schedule"></div>
+      <p class="schedule-footnote">Set different duty hours for each day, or mark a day as a rest day.</p>
+      <input id="dutyStart" type="hidden" value="13:00"><input id="dutyEnd" type="hidden" value="22:00">
+    </div>
         </div>
    </details>
   </article>
@@ -1157,12 +1163,6 @@ input[type="range"][data-target-slider]{
    <details id="salaryDetails">
     <summary><span class="summary-title">2 · Benefits</span><span class="summary-preview">Current and regularization benefits</span><span class="chevron" aria-hidden="true">⌄</span></summary>
     <div class="accordion-content">
-   <div class="section work-schedule-section">
-      <div class="section-head"><h3>Weekly work schedule</h3><span class="schedule-tag">Tap a day to edit</span></div>
-      <div class="week-schedule-grid" id="weekScheduleGrid" aria-label="Weekly work schedule"></div>
-      <p class="schedule-footnote">Set different duty hours for each day, or mark a day as a rest day.</p>
-      <input id="dutyStart" type="hidden" value="13:00"><input id="dutyEnd" type="hidden" value="22:00">
-    </div>
    <div class="section benefit-group"><div class="section-head"><h3>Current Benefits</h3><button type="button" class="small-action" id="addCurrentBenefit">＋ Add</button></div><p class="sub">Benefits you receive under your current employment status, including probationary benefits.</p><div id="currentBenefits"></div></div>
    <div class="section benefit-group"><div class="section-head"><h3>Regularization Benefits</h3><button type="button" class="small-action" id="addRegularBenefit">＋ Add</button></div><p class="sub">Benefits that become available only after regularization.</p><div id="regularBenefits"></div></div>
    <p class="callout">Overtime and night differential are recorded by date inside each cutoff under Payroll History.</p>
@@ -1268,7 +1268,7 @@ function scheduleForDay(day){return weeklySchedule[Number(day)]||{working:false,
 function compactTime(value){const [hh,mm]=String(value||'09:00').split(':').map(Number),h=hh%12||12;return h+(mm?':'+String(mm).padStart(2,'0'):'')+(hh>=12?'p':'a');}
 function scheduleForDate(date){return scheduleForDay(new Date(date+'T00:00:00').getDay());}
 function syncLegacyWorkdays(){document.querySelectorAll('.workday').forEach(el=>el.checked=!!scheduleForDay(el.value).working);}
-function renderWeeklySchedule(){const root=get('weekScheduleGrid');if(!root)return;root.innerHTML=WEEK_DAYS.map(d=>{const x=scheduleForDay(d.v),label=x.working?`${compactTime(x.start)}–${compactTime(x.end)}`:'Rest';return `<button type="button" class="weekday-schedule-btn ${x.working?'is-working':'is-rest'}" data-schedule-day="${d.v}"><b>${d.s}</b><small>${label}</small></button>`}).join('');root.querySelectorAll('[data-schedule-day]').forEach(btn=>btn.addEventListener('click',()=>openDaySchedule(Number(btn.dataset.scheduleDay))));syncLegacyWorkdays();}
+function renderWeeklySchedule(){['weekScheduleGrid','setupWeekScheduleGrid'].forEach(id=>{const root=get(id);if(!root)return;root.innerHTML=WEEK_DAYS.map(d=>{const x=scheduleForDay(d.v),label=x.working?`${compactTime(x.start)}–${compactTime(x.end)}`:'Rest';return `<button type="button" class="weekday-schedule-btn ${x.working?'is-working':'is-rest'}" data-schedule-day="${d.v}"><b>${d.s}</b><small>${label}</small></button>`}).join('');root.querySelectorAll('[data-schedule-day]').forEach(btn=>btn.addEventListener('click',()=>openDaySchedule(Number(btn.dataset.scheduleDay))));});syncLegacyWorkdays();}
 function openDaySchedule(day){editingScheduleDay=day;const x=scheduleForDay(day),d=WEEK_DAYS.find(z=>z.v===day);get('dayScheduleTitle').textContent=d.n;get('dayIsWorking').checked=!!x.working;get('dayDutyStart').value=x.start||'09:00';get('dayDutyEnd').value=x.end||'18:00';get('scheduleDialogTimes').classList.toggle('is-disabled',!x.working);get('dayScheduleDialog').showModal();}
 get('dayIsWorking').addEventListener('change',()=>get('scheduleDialogTimes').classList.toggle('is-disabled',!get('dayIsWorking').checked));
 get('closeDaySchedule').addEventListener('click',()=>get('dayScheduleDialog').close());get('cancelDaySchedule').addEventListener('click',()=>get('dayScheduleDialog').close());
@@ -2594,7 +2594,9 @@ main.content-main{
    <div class="setup-field"><label for="setupWork">Work setup</label><select id="setupWork"><option value="wfh">Work from home</option><option value="hybrid" selected>Hybrid</option><option value="office">Full office</option></select></div>
    <div class="setup-field setup-field-full"><label for="setupRto">RTO schedule</label><select id="setupRto"><option value="fixed">Fixed schedule</option><option value="flexible">Flexible / not fixed</option></select></div>
   </div>
-  <div class="setup-note"><span class="setup-note-icon">i</span><p>You can fine-tune your weekly schedule, benefits, and monthly expenses anytime inside the planner.</p></div>
+  <div class="setup-section-title setup-schedule-title"><span>02</span><div><b>Weekly work schedule</b><small>Set your working days, rest days, and duty hours.</small></div></div>
+  <div class="setup-week-schedule"><div class="week-schedule-grid" id="setupWeekScheduleGrid" aria-label="Set weekly work schedule"></div><p class="schedule-footnote">Tap each day to set its duty hours or mark it as a rest day. At least one working day is required.</p></div>
+  <div class="setup-note"><span class="setup-note-icon">i</span><p>You can fine-tune your benefits and monthly expenses anytime inside the planner.</p></div>
   <div id="setupError" class="setup-error" role="alert"></div>
   <button id="setupSave" class="setup-submit" type="button">Save setup and continue <span>→</span></button>
   <div class="setup-footer">YOUR PAY. YOUR PLAN. ALL IN ONE PLACE.</div>
@@ -2845,12 +2847,15 @@ main.content-main{
    document.getElementById('setupZone').value=val('residenceZone','4');
    document.getElementById('setupWork').value=val('workSetup','hybrid');
    document.getElementById('setupRto').value=val('rtoScheduleType','fixed');
+   if(typeof renderWeeklySchedule==='function')renderWeeklySchedule();
    document.getElementById('setupError').textContent='';ov.style.display='flex';
  }
  document.getElementById('setupSave').addEventListener('click',()=>{
    const role=document.getElementById('setupRole').value.trim(),salary=Number(document.getElementById('setupSalary').value);
    if(!role){document.getElementById('setupError').textContent='Please enter your work position or role.';return;}
    if(!Number.isFinite(salary)||salary<=0){document.getElementById('setupError').textContent='Please enter a valid monthly basic salary greater than zero.';return;}
+   if(!WEEK_DAYS.some(d=>scheduleForDay(d.v).working)){document.getElementById('setupError').textContent='Please set at least one working day in your weekly schedule.';return;}
+   for(const d of WEEK_DAYS){const x=scheduleForDay(d.v);if(x.working&&(!x.start||!x.end||timeMinutes(x.end,'18:00')===timeMinutes(x.start,'09:00'))){document.getElementById('setupError').textContent='Please check the start and end time for each working day.';return;}}
    const assign=(id,v)=>{const el=document.getElementById(id);if(el){el.value=v;el.dispatchEvent(new Event('change',{bubbles:true}));}};
    assign('workPosition',role);assign('basicSalary',String(salary));assign('employmentStatus',document.getElementById('setupEmployment').value);assign('residenceZone',document.getElementById('setupZone').value);assign('workSetup',document.getElementById('setupWork').value);assign('rtoScheduleType',document.getElementById('setupRto').value);
    if(typeof syncEmploymentZoneChoices==='function')syncEmploymentZoneChoices();if(typeof syncRtoControls==='function')syncRtoControls();if(typeof calculate==='function')calculate();
@@ -2905,6 +2910,47 @@ main.content-main{
 #cloudAccountBar{position:fixed!important;left:0;right:0;bottom:0;z-index:9500;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;width:100%;margin:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);text-align:center}
 </style>
 
+
+
+<style id="v36-schedule-and-date-polish">
+/* Weekly schedule is now part of General Information */
+.general-info-panel .work-schedule-section{margin:12px 0 0!important;padding:14px!important;border:1px solid #dfeae2!important;border-radius:15px!important;background:linear-gradient(145deg,#f5faf6,#fff)!important}
+.general-info-panel .work-schedule-section .section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px!important}
+.general-info-panel .work-schedule-section .section-head h3{font-size:11px!important;letter-spacing:.07em;color:#526b5b!important;margin:0!important}
+.general-info-panel .weekday-schedule-btn{min-height:55px!important;border-radius:11px!important;background:#fff!important;border:1px solid #e0e9e2!important;box-shadow:0 2px 5px #183b2510!important}
+.general-info-panel .weekday-schedule-btn.is-working{background:linear-gradient(180deg,#eef7f0,#e8f3eb)!important;border-color:#c6ddcc!important;color:#245d3a!important}
+.general-info-panel .weekday-schedule-btn.is-rest{background:#f7f8f7!important;color:#87918a!important}
+.setup-week-schedule{padding:13px;border:1px solid #e1ebe3;border-radius:14px;background:linear-gradient(145deg,#f7fbf8,#fff)}
+.setup-week-schedule .week-schedule-grid{gap:6px}
+.setup-week-schedule .weekday-schedule-btn{min-height:54px;border:1px solid #dfe9e1;border-radius:10px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer}
+.setup-week-schedule .weekday-schedule-btn b{font-size:11px;color:#344b3b}
+.setup-week-schedule .weekday-schedule-btn small{font-size:9px;color:#748278}
+.setup-week-schedule .weekday-schedule-btn.is-working{background:#eaf5ed;border-color:#bcd7c4}
+.setup-week-schedule .weekday-schedule-btn.is-working small{color:#286746;font-weight:800}
+.setup-week-schedule .weekday-schedule-btn.is-rest{background:#f6f7f6}
+.setup-week-schedule .schedule-footnote{margin:8px 1px 0;font-size:10px;line-height:1.45;color:#78867d}
+.attendance-dialog{box-sizing:border-box!important;width:min(440px,calc(100vw - 28px))!important;max-width:440px!important;max-height:min(88vh,760px)!important;margin:auto!important;padding:0!important;overflow:auto!important;border:1px solid #dfe8e1!important;border-radius:22px!important;background:#fff!important;color:#203329!important;box-shadow:0 24px 70px #07170e40!important}
+.attendance-dialog::backdrop{background:rgba(10,24,16,.58)!important;backdrop-filter:blur(4px)}
+.attendance-dialog .picker-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0!important;padding:18px 19px 14px!important;border-bottom:1px solid #edf1ed!important;background:linear-gradient(120deg,#f3f8f4,#fff)!important}
+.attendance-dialog .picker-head h3{font-size:19px!important;line-height:1.2!important;font-weight:800!important;letter-spacing:-.03em!important;color:#233b2d!important;margin:0 0 4px!important}
+.attendance-dialog .picker-head .sub{font-size:11px!important;color:#77867b!important;margin:0!important}
+.attendance-dialog [data-dialog-close]{width:34px!important;height:34px!important;min-width:34px!important;border:1px solid #e0e9e2!important;border-radius:10px!important;background:#fff!important;color:#617166!important;font-size:15px!important}
+.attendance-dialog>.field,.attendance-dialog>[data-dialog-ot],.attendance-dialog>.btnrow{margin:14px 18px!important}
+.attendance-dialog .field>label{display:block;font-size:10px!important;font-weight:800!important;letter-spacing:.07em!important;text-transform:uppercase!important;color:#68796e!important;margin-bottom:8px!important}
+.attendance-dialog .attendance-choice,.attendance-dialog .workmode-options,.attendance-dialog .split-block-options{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+.attendance-dialog .attendance-choice button,.attendance-dialog .workmode-options button,.attendance-dialog .split-block-options button{min-height:43px!important;padding:9px 10px!important;border:1px solid #e0e9e2!important;border-radius:11px!important;background:#f9fbf9!important;color:#526257!important;font-size:11px!important;font-weight:750!important}
+.attendance-dialog .attendance-choice button[aria-pressed=true],.attendance-dialog .workmode-options button[aria-pressed=true],.attendance-dialog .split-block-options button[aria-pressed=true]{border-color:#79a989!important;background:#eaf4ed!important;color:#245d3a!important;box-shadow:inset 0 0 0 1px #79a989!important}
+.attendance-dialog .workmode-options{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.attendance-dialog [data-dialog-ot]{padding:13px!important;border:1px solid #e7eee8!important;border-radius:14px!important;background:#fbfdfb!important}
+.attendance-dialog [data-dialog-ot] .field{margin:0 0 13px!important}
+.attendance-dialog input[type=range]{width:100%;accent-color:#28734d}
+.attendance-dialog .sub{font-size:10px!important;line-height:1.45!important;color:#77867b!important}
+.attendance-dialog .approval-toggle{display:flex!important;align-items:flex-start!important;gap:8px!important;font-size:10px!important;line-height:1.4!important;color:#53665a!important;margin-top:12px!important}
+.attendance-dialog .approval-toggle input{accent-color:#28734d;margin-top:1px}
+.attendance-dialog>.btnrow{display:flex!important;justify-content:flex-end!important;padding:0 0 17px!important;margin-top:16px!important}
+.attendance-dialog>.btnrow button{min-height:43px!important;padding:10px 22px!important;border-radius:11px!important;font-size:12px!important;font-weight:800!important}
+@media(max-width:520px){.setup-week-schedule{padding:9px}.setup-week-schedule .week-schedule-grid{gap:3px}.setup-week-schedule .weekday-schedule-btn{min-height:48px;padding:4px 0}.setup-week-schedule .weekday-schedule-btn b{font-size:9px}.setup-week-schedule .weekday-schedule-btn small{font-size:7px}.attendance-dialog{width:calc(100vw - 22px)!important;border-radius:18px!important}.attendance-dialog .picker-head{padding:15px 15px 12px!important}.attendance-dialog>.field,.attendance-dialog>[data-dialog-ot],.attendance-dialog>.btnrow{margin-left:14px!important;margin-right:14px!important}.attendance-dialog .workmode-options{gap:5px!important}.attendance-dialog .workmode-options button{font-size:9px!important;padding:7px 4px!important}}
+</style>
 
 </body>
 </html>
