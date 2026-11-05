@@ -1008,9 +1008,23 @@ input[type="range"][data-target-slider]{
 
  <section class="columns"><article class="panel accordion-panel">
    <details id="generalInfoDetails">
-    <summary><span class="summary-title">1 · General information</span><span class="summary-preview">Work setup · RTO schedule</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <summary><span class="summary-title">1 · General information</span><span class="summary-preview">Salary · Employment details · Work setup · RTO</span><span class="chevron" aria-hidden="true">⌄</span></summary>
     <div class="accordion-content">
      <p class="sub">Set your usual work arrangement and how your Return-to-Office days are scheduled.</p>
+     <p class="sub">Enter your employment and salary details first, then configure your work arrangement and RTO schedule.</p>
+   <div class="field"><div class="fieldhead"><label for="basicSalary">Monthly basic salary</label><span class="val" id="basicSalaryVal">₱0</span></div><input id="basicSalary" type="number" min="0" max="1000000" step="500" value="0"></div>
+
+   <div class="field"><label for="workPosition">Work position / role</label><input id="workPosition" type="text" value="" maxlength="90" placeholder="e.g. Engineer, Analyst, Supervisor"></div><p class="sub">Add the benefits offered by your employer and manage them at any time.</p>
+   <div class="field"><div class="fieldhead"><label for="employmentStatus">Employment status</label><span class="val" id="statusVal">Probi</span></div>
+    <select id="employmentStatus" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit">
+     <option value="probationary">Probationary</option><option value="regular">Regular</option>
+    </select>
+   </div>
+   <div class="field"><label for="residenceZone">Residence zone for Emerson transportation allowance</label>
+    <select id="residenceZone" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
+     <option value="1">Zone 1 · 0–4 km · ₱125</option><option value="2">Zone 2 · 4–8 km · ₱175</option><option value="3">Zone 3 · 8–13 km · ₱300</option><option value="4" selected>Zone 4 · 13 km beyond · ₱350</option>
+    </select><p class="sub">Added to the ₱60 OT meal allowance for each supervisor-approved OT day of at least 3 hours. Holiday premium is calculated and shown separately. Confirm your declared zone with HR.</p>
+   </div>
      <div class="field"><label>Work setup</label>
       <div class="choice-selector" id="workSetupChoices">
        <label><input type="radio" name="workSetupChoice" value="wfh"><span>Work from home</span></label>
@@ -1041,21 +1055,8 @@ input[type="range"][data-target-slider]{
   </article>
   <article class="panel accordion-panel">
    <details id="salaryDetails">
-    <summary><span class="summary-title">2 · Benefits</span><span class="summary-preview">Editable basic salary · Probationary / Regular</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <summary><span class="summary-title">2 · Benefits</span><span class="summary-preview">Current and regularization benefits</span><span class="chevron" aria-hidden="true">⌄</span></summary>
     <div class="accordion-content">
-   <div class="field"><label for="workPosition">Work position / role</label><input id="workPosition" type="text" value="" maxlength="90" placeholder="e.g. Engineer, Analyst, Supervisor"></div><p class="sub">Set your role, salary and employment status. Add the benefits offered by your employer and manage them at any time.</p>
-   <div class="field"><div class="fieldhead"><label for="employmentStatus">Employment status</label><span class="val" id="statusVal">Probi</span></div>
-    <select id="employmentStatus" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit">
-     <option value="probationary">Probationary</option><option value="regular">Regular</option>
-    </select>
-   </div>
-   <div class="field"><label for="residenceZone">Residence zone for Emerson transportation allowance</label>
-    <select id="residenceZone" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
-     <option value="1">Zone 1 · 0–4 km · ₱125</option><option value="2">Zone 2 · 4–8 km · ₱175</option><option value="3">Zone 3 · 8–13 km · ₱300</option><option value="4" selected>Zone 4 · 13 km beyond · ₱350</option>
-    </select><p class="sub">Added to the ₱60 OT meal allowance for each supervisor-approved OT day of at least 3 hours. Holiday premium is calculated and shown separately. Confirm your declared zone with HR.</p>
-   </div>
-   <div class="field"><div class="fieldhead"><label for="basicSalary">Monthly basic salary</label><span class="val" id="basicSalaryVal">₱0</span></div><input id="basicSalary" type="number" min="0" max="1000000" step="500" value="0"></div>
-
    <div class="section work-schedule-section">
       <div class="section-head"><h3>Weekly work schedule</h3><span class="schedule-tag">Tap a day to edit</span></div>
       <div class="week-schedule-grid" id="weekScheduleGrid" aria-label="Weekly work schedule"></div>
