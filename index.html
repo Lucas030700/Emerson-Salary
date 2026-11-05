@@ -934,8 +934,8 @@ input[type="range"][data-target-slider]{
 .rto-days-grid label{display:flex;align-items:center;gap:7px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:13px}
 .rto-days-grid input{accent-color:var(--accent)}
 .attendance-day{position:relative}
-.attendance-day.rto-day{outline:2px solid #16845b;outline-offset:-2px}
-.attendance-day.rto-day:after{content:"RTO";position:absolute;right:2px;top:2px;font-size:7px;font-weight:900;color:#fff;background:#16845b;border-radius:3px;padding:1px 3px}
+.attendance-day.rto-day{outline:none!important}
+.attendance-day.rto-day:after{content:none!important;display:none!important}
 @media(max-width:380px){.rto-days-grid{gap:5px}.rto-days-grid label{padding:7px;font-size:11px}}
 </style><style id="general-info-layout-v19">
 .general-info-panel{align-self:start}
@@ -961,6 +961,23 @@ input[type="range"][data-target-slider]{
 .choice-selector input:checked+span{background:#e5effb;border:1.5px solid #3976b8;color:#174f91;box-shadow:inset 0 0 0 1px #3976b8}
 .choice-selector input:focus-visible+span{outline:2px solid #3976b8;outline-offset:2px}
 @media(max-width:380px){.choice-selector{gap:4px}.choice-selector span{font-size:10px;padding:6px 4px;min-height:38px}}
+</style><style id="rto-border-only-v20">
+/* RTO is shown by a darker border only. Keep the original workday/holiday fill. */
+.attendance-day.rto-day:not(.calendar-regular):not(.calendar-special){
+ background:#e9f2ff!important;
+ border:2px solid #356da9!important;
+ box-shadow:inset 0 0 0 1px #356da9!important;
+ color:#294d79!important;
+}
+.attendance-day.rto-day:not(.calendar-regular):not(.calendar-special) small{color:#294d79!important}
+.attendance-day.calendar-regular.rto-day,
+.attendance-day.calendar-special.rto-day{
+ background:inherit;
+ border:2px solid #9f3030!important;
+ box-shadow:inset 0 0 0 1px #9f3030!important;
+}
+.attendance-day.calendar-regular.rto-day small,
+.attendance-day.calendar-special.rto-day small{color:inherit!important}
 </style></head>
 <body>
 <div class="sticky-shell">
@@ -989,9 +1006,10 @@ input[type="range"][data-target-slider]{
 </section>
  <div class="tabpage" id="plannerTab">
 
- <section class="columns"><article class="panel general-info-panel">
-   <div class="general-info-content">
-     <div class="section-head"><h3>1 · General information</h3></div>
+ <section class="columns"><article class="panel accordion-panel">
+   <details id="generalInfoDetails">
+    <summary><span class="summary-title">1 · General information</span><span class="summary-preview">Work setup · RTO schedule</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <div class="accordion-content">
      <p class="sub">Set your usual work arrangement and how your Return-to-Office days are scheduled.</p>
      <div class="field"><label>Work setup</label>
       <div class="choice-selector" id="workSetupChoices">
@@ -1018,7 +1036,8 @@ input[type="range"][data-target-slider]{
       <p class="schedule-footnote">Selected days will be highlighted automatically in the payroll cutoff calendars.</p>
      </div>
      <p class="callout" id="rtoScheduleHint">Choose your fixed office days to mark them in each cutoff.</p>
-    </div>
+        </div>
+   </details>
   </article>
   <article class="panel accordion-panel">
    <details id="salaryDetails">
