@@ -2725,14 +2725,19 @@ main.content-main{
    }
  }
  async function checkCloudForUpdates(){
-   if(!currentUser||remoteApplying||localDirty||syncing||checkingCloud||document.hidden)return;
+   if(!currentUser||remoteApplying||localDirty||syncing||checkingCloud)return;
    checkingCloud=true;
    try{
      const {data,error}=await client.from('planner_data').select('planner_state,updated_at').eq('user_id',currentUser.id).maybeSingle();
      if(error)throw error;
      const stamp=Date.parse(data?.updated_at||'')||0;
-     if(data?.planner_state && stamp>lastSeenUpdatedAt){
-       await applyCloudState(data.planner_state,data.updated_at);
+     if(data?.planner_state){
+       const remoteFp=fingerprint(data.planner_state);
+       const hasNewerStamp=stamp>lastSeenUpdatedAt;
+       const hasDifferentData=remoteFp!==lastCloudFingerprint;
+       if(hasDifferentData && (hasNewerStamp || !stamp || stamp===lastSeenUpdatedAt)){
+         await applyCloudState(data.planner_state,data.updated_at);
+       }
      }
    }catch(e){console.warn('Cloud update check failed',e);setStatus('Reconnecting to cloud…');}
    finally{checkingCloud=false;}
@@ -2769,15 +2774,15 @@ main.content-main{
  async function startRealtime(){
    if(channel)await client.removeChannel(channel);
    channel=client.channel('planner-sync-'+currentUser.id)
-    .on('broadcast',{event:'planner-updated'},()=>checkCloudForUpdates())
-    .on('postgres_changes',{event:'*',schema:'public',table:'planner_data',filter:'user_id=eq.'+currentUser.id},()=>checkCloudForUpdates())
+    .on('broadcast',{event:'planner-updated'},()=>{lastSeenUpdatedAt=0;checkCloudForUpdates();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'planner_data',filter:'user_id=eq.'+currentUser.id},()=>{lastSeenUpdatedAt=0;checkCloudForUpdates();})
     .subscribe((status)=>{
       if(status==='SUBSCRIBED' && !localDirty && !syncing)setStatus('Live sync connected');
       else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setStatus('Live sync reconnecting…');
     });
    // Polling is a safety net if Realtime publication/broadcast is not enabled.
    if(pollHandle)clearInterval(pollHandle);
-   pollHandle=setInterval(checkCloudForUpdates,2500);
+   pollHandle=setInterval(checkCloudForUpdates,1000);
  }
  async function enterApp(session){
    currentUser=session.user;
