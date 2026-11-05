@@ -937,6 +937,30 @@ input[type="range"][data-target-slider]{
 .attendance-day.rto-day{outline:2px solid #16845b;outline-offset:-2px}
 .attendance-day.rto-day:after{content:"RTO";position:absolute;right:2px;top:2px;font-size:7px;font-weight:900;color:#fff;background:#16845b;border-radius:3px;padding:1px 3px}
 @media(max-width:380px){.rto-days-grid{gap:5px}.rto-days-grid label{padding:7px;font-size:11px}}
+</style><style id="general-info-layout-v19">
+.general-info-panel{align-self:start}
+.general-info-panel .general-info-content{padding:12px 14px}
+.general-info-panel .general-info-content>.sub{margin-top:0}
+.general-info-panel .summary-title{font-weight:800}
+.general-info-panel .summary-preview{font-size:11px;color:var(--muted)}
+.general-info-panel .chevron{display:none!important}
+.general-info-panel .field{margin:12px 0}
+.attendance-day.rto-day:not(.calendar-regular):not(.calendar-special){background:#174f91!important;border-color:#103e76!important;color:#fff!important;box-shadow:inset 0 0 0 1px #0f3c70!important}
+.attendance-day.rto-day:not(.calendar-regular):not(.calendar-special) small{color:#eaf3ff!important}
+.attendance-day.calendar-regular{background:#d94b4b!important;border-color:#a92727!important;color:#fff!important}
+.attendance-day.calendar-regular small{color:#fff0f0!important}
+.attendance-day.calendar-special{background:#b94b4b!important;border-color:#8f3030!important;color:#fff!important}
+.attendance-day.calendar-special small{color:#fff0f0!important}
+.attendance-day.calendar-regular.rto-day,.attendance-day.calendar-special.rto-day{background:#a92727!important;border-color:#741b1b!important;color:#fff!important}
+</style><style id="visible-selector-styles-v19">
+.choice-selector{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px}
+#rtoScheduleChoices{grid-template-columns:repeat(2,minmax(0,1fr))}
+.choice-selector label{display:block;min-width:0;cursor:pointer}
+.choice-selector input{position:absolute;opacity:0;pointer-events:none}
+.choice-selector span{display:flex;align-items:center;justify-content:center;min-height:40px;padding:7px 8px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:12px;font-weight:650;text-align:center;line-height:1.2}
+.choice-selector input:checked+span{background:#e5effb;border:1.5px solid #3976b8;color:#174f91;box-shadow:inset 0 0 0 1px #3976b8}
+.choice-selector input:focus-visible+span{outline:2px solid #3976b8;outline-offset:2px}
+@media(max-width:380px){.choice-selector{gap:4px}.choice-selector span{font-size:10px;padding:6px 4px;min-height:38px}}
 </style></head>
 <body>
 <div class="sticky-shell">
@@ -965,10 +989,40 @@ input[type="range"][data-target-slider]{
 </section>
  <div class="tabpage" id="plannerTab">
 
- <section class="columns">
+ <section class="columns"><article class="panel general-info-panel">
+   <div class="general-info-content">
+     <div class="section-head"><h3>1 · General information</h3></div>
+     <p class="sub">Set your usual work arrangement and how your Return-to-Office days are scheduled.</p>
+     <div class="field"><label>Work setup</label>
+      <div class="choice-selector" id="workSetupChoices">
+       <label><input type="radio" name="workSetupChoice" value="wfh"><span>Work from home</span></label>
+       <label><input type="radio" name="workSetupChoice" value="hybrid" checked><span>Hybrid</span></label>
+       <label><input type="radio" name="workSetupChoice" value="office"><span>Full office</span></label>
+      </div>
+      <select id="workSetup" hidden aria-hidden="true"><option value="wfh">Work from home</option><option value="hybrid" selected>Hybrid</option><option value="office">Full office</option></select>
+     </div>
+     <div class="field" id="rtoScheduleTypeWrap"><label>RTO schedule type</label>
+      <div class="choice-selector" id="rtoScheduleChoices">
+       <label><input type="radio" name="rtoScheduleChoice" value="fixed" checked><span>Fixed schedule</span></label>
+       <label><input type="radio" name="rtoScheduleChoice" value="flexible"><span>Flexible / not fixed</span></label>
+      </div>
+      <select id="rtoScheduleType" hidden aria-hidden="true"><option value="fixed" selected>Fixed schedule</option><option value="flexible">Flexible / not fixed</option></select>
+     </div>
+     <div class="field" id="rtoFixedDaysWrap"><label>Fixed RTO days</label>
+      <div class="rto-days-grid" id="rtoDaysGrid">
+       <label><input type="checkbox" value="1" class="rto-day"> Monday</label><label><input type="checkbox" value="2" class="rto-day"> Tuesday</label>
+       <label><input type="checkbox" value="3" class="rto-day"> Wednesday</label><label><input type="checkbox" value="4" class="rto-day"> Thursday</label>
+       <label><input type="checkbox" value="5" class="rto-day"> Friday</label><label><input type="checkbox" value="6" class="rto-day"> Saturday</label>
+       <label><input type="checkbox" value="0" class="rto-day"> Sunday</label>
+      </div>
+      <p class="schedule-footnote">Selected days will be highlighted automatically in the payroll cutoff calendars.</p>
+     </div>
+     <p class="callout" id="rtoScheduleHint">Choose your fixed office days to mark them in each cutoff.</p>
+    </div>
+  </article>
   <article class="panel accordion-panel">
    <details id="salaryDetails">
-    <summary><span class="summary-title">1 · Benefits</span><span class="summary-preview">Editable basic salary · Probationary / Regular</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <summary><span class="summary-title">2 · Benefits</span><span class="summary-preview">Editable basic salary · Probationary / Regular</span><span class="chevron" aria-hidden="true">⌄</span></summary>
     <div class="accordion-content">
    <div class="field"><label for="workPosition">Work position / role</label><input id="workPosition" type="text" value="" maxlength="90" placeholder="e.g. Engineer, Analyst, Supervisor"></div><p class="sub">Set your role, salary and employment status. Add the benefits offered by your employer and manage them at any time.</p>
    <div class="field"><div class="fieldhead"><label for="employmentStatus">Employment status</label><span class="val" id="statusVal">Probi</span></div>
@@ -998,7 +1052,7 @@ input[type="range"][data-target-slider]{
   </article>
   <article class="panel accordion-panel">
    <details id="expensesDetails">
-    <summary><span class="summary-title">2 · Monthly expenses</span><span class="summary-preview">Adjust your priority-based budget</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+    <summary><span class="summary-title">3 · Monthly expenses</span><span class="summary-preview">Adjust your priority-based budget</span><span class="chevron" aria-hidden="true">⌄</span></summary>
     <div class="accordion-content">
    <div class="section-head"><p class="sub">Ordered by your chosen budgeting priorities. Change each slider or edit the expense names.</p><button type="button" class="small-action" id="addExpense">＋ Add</button></div>
    <div id="expenses"></div>
@@ -1007,34 +1061,7 @@ input[type="range"][data-target-slider]{
     </div>
    </details>
   </article>
-  <article class="panel accordion-panel">
-   <details id="generalInfoDetails">
-    <summary><span class="summary-title">3 · General information</span><span class="summary-preview">Work setup · RTO schedule</span><span class="chevron" aria-hidden="true">⌄</span></summary>
-    <div class="accordion-content">
-     <p class="sub">Set your usual work arrangement and how your Return-to-Office days are scheduled.</p>
-     <div class="field"><label for="workSetup">Work setup</label>
-      <select id="workSetup" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
-       <option value="wfh">Work from home</option><option value="hybrid" selected>Hybrid</option><option value="office">Full office</option>
-      </select>
-     </div>
-     <div class="field" id="rtoScheduleTypeWrap"><label for="rtoScheduleType">RTO schedule type</label>
-      <select id="rtoScheduleType" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit">
-       <option value="fixed">Fixed schedule</option><option value="flexible">Flexible / not fixed</option>
-      </select>
-     </div>
-     <div class="field" id="rtoFixedDaysWrap"><label>Fixed RTO days</label>
-      <div class="rto-days-grid" id="rtoDaysGrid">
-       <label><input type="checkbox" value="1" class="rto-day"> Monday</label><label><input type="checkbox" value="2" class="rto-day"> Tuesday</label>
-       <label><input type="checkbox" value="3" class="rto-day"> Wednesday</label><label><input type="checkbox" value="4" class="rto-day"> Thursday</label>
-       <label><input type="checkbox" value="5" class="rto-day"> Friday</label><label><input type="checkbox" value="6" class="rto-day"> Saturday</label>
-       <label><input type="checkbox" value="0" class="rto-day"> Sunday</label>
-      </div>
-      <p class="schedule-footnote">Selected days will be highlighted automatically in the payroll cutoff calendars.</p>
-     </div>
-     <p class="callout" id="rtoScheduleHint">Choose your fixed office days to mark them in each cutoff.</p>
-    </div>
-   </details>
-  </article>
+  
   <article class="panel accordion-panel" id="monthlySummaryPanel" hidden>
    <details id="summaryDetails">
     <summary><span class="summary-title">3 · Monthly summary</span><span class="summary-preview">Take-home pay · Expenses · Money left</span><span class="chevron" aria-hidden="true">⌄</span></summary>
@@ -1300,7 +1327,7 @@ function detailMarkup(record,which){
  <div class="calendar-legend"><span><i class="legend-dot calendar-workday"></i> Workday</span><span><i class="legend-dot calendar-rest"></i> Rest day</span><span><i class="legend-dot calendar-regular"></i> Regular holiday</span><span><i class="legend-dot calendar-special"></i> Special holiday</span><span><i class="legend-dot calendar-absent"></i> Absent</span></div>
  <div class="attendance-calendar" data-attendance-calendar="${key}" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
  ${['S','M','T','W','T','F','S'].map(d=>`<b style="font-size:10px;text-align:center">${d}</b>`).join('')}
- ${(()=>{let out='';const [yy,mo,dd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);const first=new Date(yy,mo-1,dd).getDay();for(let i=0;i<first;i++)out+='<span></span>';for(let dt=new Date(yy,mo-1,dd);dt<=new Date(ey,em-1,ed);dt.setDate(dt.getDate()+1)){const date=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');const isAbsent=abs.includes(date),entry=ot.find(e=>e.date===date),holiday=holidayForDate(date),dow=dt.getDay(),isWork=scheduleForDate(date).working,shade=holiday?(holiday[2]==='Regular holiday'?'calendar-regular':'calendar-special'):isWork?'calendar-workday':'calendar-rest';const splitClass=entry?.workMode==='split'?(entry.officeBlock==='second'?'split-second':'split-first'):'';const otCode=entry&&Number(entry.hours)>0?`${Number(entry.hours)}R`:'';out+=`<button type="button" class="attendance-day ${isAbsent?'calendar-absent':shade} ${!isAbsent&&entry?'worked':''} ${entry?'has-ot':''} ${splitClass} ${isRtoDate(date)?'rto-day':''}" data-day-pick="${key}|${date}" ${holiday?`data-holiday-detail="${date}"`:''}><b>${dt.getDate()}</b>${otCode?`<small>${otCode}</small>`:''}</button>`;}return out;})()}
+ ${(()=>{let out='';const [yy,mo,dd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);const first=new Date(yy,mo-1,dd).getDay();for(let i=0;i<first;i++)out+='<span></span>';for(let dt=new Date(yy,mo-1,dd);dt<=new Date(ey,em-1,ed);dt.setDate(dt.getDate()+1)){const date=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');const isAbsent=abs.includes(date),entry=ot.find(e=>e.date===date),holiday=holidayForDate(date),dow=dt.getDay(),isWork=scheduleForDate(date).working,shade=holiday?(holiday[2]==='Regular holiday'?'calendar-regular':'calendar-special'):isWork?'calendar-workday':'calendar-rest';const splitClass=entry?.workMode==='split'?(entry.officeBlock==='second'?'split-second':'split-first'):'';const otCode=entry&&Number(entry.hours)>0?`${Number(entry.hours)}R`:'';out+=`<button type="button" class="attendance-day ${isAbsent?'calendar-absent':shade} ${!isAbsent&&entry?'worked':''} ${entry?'has-ot':''} ${splitClass} ${!isAbsent&&isRtoDate(date)?'rto-day':''}" data-day-pick="${key}|${date}" ${holiday?`data-holiday-detail="${date}"`:''}><b>${dt.getDate()}</b>${otCode?`<small>${otCode}</small>`:''}</button>`;}return out;})()}
  </div><div class="holiday-info" data-record-holiday-info hidden></div>
  <dialog class="attendance-dialog" data-day-dialog="${key}">
   <div class="picker-head"><div><h3 data-dialog-date>Attendance</h3><p class="sub">Did you report to work on this date?</p></div><button type="button" data-dialog-close aria-label="Close">✕</button></div>
@@ -1389,7 +1416,7 @@ function recalcSavedRecord(record){
 
 function renderMonthlyHistory(){
  const root=get('monthlyHistoryTable');if(!root)return;
- const sorted=monthlyHistory.filter(r=>r.saved!==false).sort((a,b)=>a.month.localeCompare(b.month));
+ const sorted=dedupeMonthlyHistory(monthlyHistory.filter(r=>r.saved!==false));
  const rows=sorted.map(r=>['first','second'].map((which,i)=>{
   if((r.deletedCutoffs||[]).includes(which))return '';
   const x=r[which]||{},label=i===0?'First':'Second';
@@ -1415,7 +1442,22 @@ function renderMonthlyHistory(){
  });
 }
 
-function saveMonthlyHistoryData(){localStorage.setItem('salaryMonthlyHistory',JSON.stringify(monthlyHistory.filter(r=>r.saved!==false)));}
+function dedupeMonthlyHistory(list){
+ const byMonth=new Map();
+ (Array.isArray(list)?list:[]).forEach(record=>{
+  if(!record||!/^\d{4}-\d{2}$/.test(String(record.month||'')))return;
+  const old=byMonth.get(record.month);
+  if(!old){byMonth.set(record.month,record);return;}
+  const oldTime=Date.parse(old.savedAt||'')||0,newTime=Date.parse(record.savedAt||'')||0;
+  if(newTime>=oldTime)byMonth.set(record.month,record);
+ });
+ return [...byMonth.values()].sort((a,b)=>a.month.localeCompare(b.month));
+}
+function saveMonthlyHistoryData(){
+ monthlyHistory=dedupeMonthlyHistory(monthlyHistory);
+ localStorage.setItem('salaryMonthlyHistory',JSON.stringify(monthlyHistory.filter(r=>r.saved!==false)));
+ if(typeof window.__emersonQueueCloudSync==='function')window.__emersonQueueCloudSync();
+}
 function monthKeyAdd(m,n){const [y,mo]=m.split('-').map(Number);const d=new Date(y,mo-1+n,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 function currentMonthKey(){return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Manila'}).slice(0,7);}
 function buildMonthRecord(month){
@@ -1463,9 +1505,10 @@ function syncActiveDashboardMonthToHistory(){
 get('saveDashboardMonth')?.addEventListener('click',()=>{
  const month=get('dashboardMonth')?.value;
  if(!month){get('monthlyHistoryStatus').textContent='Choose a payroll month first.';return;}
- const record=ensureDashboardMonth(month);
+ monthlyHistory=dedupeMonthlyHistory(monthlyHistory);
+ let record=ensureDashboardMonth(month);
  if(!record)return;
- // Keep one history record per month; the selected month's record is the one being updated.
+ // A payroll month is a unique record. Reuse and overwrite that exact month.
  monthlyHistory=monthlyHistory.filter(x=>x.month!==month||x===record);
  syncSelectedMonthBillAmounts(record);
  recalcSavedRecord(record);
@@ -1474,9 +1517,10 @@ get('saveDashboardMonth')?.addEventListener('click',()=>{
  record.deletedCutoffs=[];
  record.saved=true;
  record.savedAt=new Date().toISOString();
+ monthlyHistory=dedupeMonthlyHistory(monthlyHistory);
  saveMonthlyHistoryData();
  renderMonthlyHistory();
- get('monthlyHistoryStatus').textContent=monthLabel(month)+' saved to Payroll History. Saving again will update the same month and cutoffs.';
+ get('monthlyHistoryStatus').textContent=monthLabel(month)+' updated in Payroll History. This month now has one saved record.';
 });
 function scheduledStatsForRange(minDate,maxDate){
  let days=0,hours=0;
@@ -1934,7 +1978,7 @@ function renderPayCalendar(){
  get('minimumPay').textContent=fmt(base);get('maximumPay').textContent=fmt(Math.max(base,basic+maxOT-sss-ph-pi-taxMax));
 }
 get('payCalendarMonth')?.addEventListener('change',renderPayCalendar);
-try{monthlyHistory=(JSON.parse(localStorage.getItem('salaryMonthlyHistory')||'[]')||[]).map(r=>({...r,saved:true}));}catch(e){monthlyHistory=[];}
+try{monthlyHistory=dedupeMonthlyHistory((JSON.parse(localStorage.getItem('salaryMonthlyHistory')||'[]')||[]).map(r=>({...r,saved:true})));}catch(e){monthlyHistory=[];}
 // Existing history is loaded here; rolling months are seeded after saved planner settings are restored.
 function state(){let s={};ids.forEach(id=>s[id]=get(id).type==='checkbox'?get(id).checked:get(id).value);expenseDefs.forEach(([id])=>s[id+'Cutoff']=get(id+'Cutoff').value);s.weeklySchedule=weeklySchedule;s.workdays=[...document.querySelectorAll('.workday')].map(x=>({day:x.value,checked:x.checked}));s.workSetup=get('workSetup')?.value||'hybrid';s.rtoScheduleType=get('rtoScheduleType')?.value||'fixed';s.rtoDays=[...document.querySelectorAll('.rto-day:checked')].map(x=>Number(x.value));s.holidayHoursPerDay=get('holidayHoursPerDay').value;s.holidayNightPerDay=get('holidayNightPerDay').value;s.assumeHolidayWorked=get('assumeHolidayWorked').checked;return s}
 function isRtoDate(date){
@@ -1949,10 +1993,13 @@ function syncRtoControls(){
  const setup=get('workSetup')?.value||'hybrid',type=get('rtoScheduleType')?.value||'fixed';
  if(get('rtoScheduleTypeWrap'))get('rtoScheduleTypeWrap').hidden=setup!=='hybrid';
  if(get('rtoFixedDaysWrap'))get('rtoFixedDaysWrap').hidden=setup!=='hybrid'||type!=='fixed';
+ document.querySelectorAll('input[name="workSetupChoice"]').forEach(x=>x.checked=x.value===setup);
+ document.querySelectorAll('input[name="rtoScheduleChoice"]').forEach(x=>x.checked=x.value===type);
  if(get('rtoScheduleHint'))get('rtoScheduleHint').textContent=setup==='wfh'?'WFH setup: no RTO dates will be highlighted.':setup==='office'?'Full office setup: all scheduled workdays will be highlighted as RTO.':type==='fixed'?'Selected fixed RTO days will be highlighted automatically in each payroll cutoff.':'Flexible RTO: no dates are pre-highlighted.';
 }
 function bindRtoSettings(){
- ['workSetup','rtoScheduleType'].forEach(id=>get(id)?.addEventListener('change',()=>{syncRtoControls();renderMonthlyDashboard();scheduleAutoSave();}));
+ document.querySelectorAll('input[name="workSetupChoice"]').forEach(x=>x.addEventListener('change',()=>{get('workSetup').value=x.value;syncRtoControls();renderMonthlyDashboard();scheduleAutoSave();}));
+ document.querySelectorAll('input[name="rtoScheduleChoice"]').forEach(x=>x.addEventListener('change',()=>{get('rtoScheduleType').value=x.value;syncRtoControls();renderMonthlyDashboard();scheduleAutoSave();}));
  document.querySelectorAll('.rto-day').forEach(x=>x.addEventListener('change',()=>{renderMonthlyDashboard();scheduleAutoSave();}));
  syncRtoControls();
 }
@@ -1961,7 +2008,7 @@ ids.forEach(id=>{get(id).addEventListener('input',calculate);get(id).addEventLis
 get('saveBtn').addEventListener('click',()=>{try{localStorage.setItem('salaryBudgetPlanner',JSON.stringify(state()));get('saveStatus').textContent='Saved on this device. Your data stays in this browser and is not uploaded to a cloud account.'}catch(e){get('saveStatus').textContent='Could not save on this browser. Please keep a note of your settings.'}});
 get('resetBtn').addEventListener('click',()=>{const s={employmentStatus:'probationary',ot:0,night:0,otdays:0,savings:0,investment:5000,jowa:3000,house:5000,mama:10000,utilities:1500,food:6000,transport:1500,wifi:1000,personal:2000,other:1000};expenseDefs.forEach(([id])=>s[id+'Cutoff']='eom');applyState(s);bindRtoSettings();get('saveStatus').textContent='Baseline restored. Press Save to keep these settings.'});
 
-try{const saved=localStorage.getItem('salaryBudgetPlanner');if(saved){applyState(JSON.parse(saved));}else {renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}}catch(e){renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}
+try{const saved=localStorage.getItem('salaryBudgetPlanner');if(saved){applyState(JSON.parse(saved));}else {renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}bindRtoSettings();}catch(e){renderWeeklySchedule();rebuildAutoHolidayEntries();calculate()}
 
 refreshSavedMonthEstimates();
 ensureRollingMonths();
