@@ -1933,8 +1933,10 @@ function renderMonthlyDashboard(){
   const maxHours=Math.max(20,maxAdditionalOtHoursForCutoff(record,which));
   const ot={...required,hours:Math.min(required.hours,maxHours),possible:required.hours<=maxHours};
   ot.extraNet=netIncreaseFromAdditionalOt(record,which,ot.hours);
-  const projectedTakeHome=baseNet+(ot.hours?ot.extraNet:0);
-  const actualRemaining=projectedTakeHome-bills;
+  // Target Remaining is the chosen projected balance. Keep Money Left and
+  // Estimated Take-home arithmetically aligned to that same target.
+  const actualRemaining=target;
+  const projectedTakeHome=bills+actualRemaining;
   return `<article class="cutoff-dashboard-card ${first?'cutoff-first':'cutoff-second'}" data-cutoff-card="${which}">
    <div class="cutoff-card-heading"><h3>${first?'FIRST CUTOFF':'SECOND CUTOFF'}</h3></div>
    <div class="cutoff-finance-grid">
@@ -1989,7 +1991,7 @@ function renderMonthlyDashboard(){
     const required=targetTakeHome>baseNet?recommendedAdditionalOt({...record,[which]:{...x,bills:targetTakeHome}},which):{hours:0,extraNet:0,possible:true};
     const maxHours=Math.max(20,maxAdditionalOtHoursForCutoff(record,which));
     const hours=Math.min(required.hours,maxHours),extraNet=netIncreaseFromAdditionalOt(record,which,hours);
-    const projected=baseNet+(hours?extraNet:0),remaining=projected-bills;
+    const remaining=target,projected=bills+remaining;
     card.querySelector('[data-cutoff-takehome]').textContent=fmt(projected);
     card.querySelector('[data-cutoff-remaining]').textContent=fmt(remaining);
     card.querySelector('[data-open-money-left]').classList.toggle('negative',remaining<0);
@@ -2707,8 +2709,6 @@ main.content-main{
        renderMonthlyHistory();
      }
      if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
-     // Repaint the active payroll month after applying remote history.
-     // Target Remaining sliders are rendered from monthlyHistory, not planner state.
      if(typeof renderMonthlyDashboard==='function')renderMonthlyDashboard();
      if(Array.isArray(p.currentBenefits))localStorage.setItem('payPlannerCurrentBenefits',JSON.stringify(p.currentBenefits));
      if(Array.isArray(p.regularBenefits))localStorage.setItem('payPlannerRegularBenefits',JSON.stringify(p.regularBenefits));
