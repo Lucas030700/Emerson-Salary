@@ -2707,6 +2707,9 @@ main.content-main{
        renderMonthlyHistory();
      }
      if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
+     // Repaint the active payroll month after applying remote history.
+     // Target Remaining sliders are rendered from monthlyHistory, not planner state.
+     if(typeof renderMonthlyDashboard==='function')renderMonthlyDashboard();
      if(Array.isArray(p.currentBenefits))localStorage.setItem('payPlannerCurrentBenefits',JSON.stringify(p.currentBenefits));
      if(Array.isArray(p.regularBenefits))localStorage.setItem('payPlannerRegularBenefits',JSON.stringify(p.regularBenefits));
      if(typeof renderBenefits==='function')renderBenefits();
