@@ -1,13 +1,14 @@
 SALARY & BUDGET PLANNER
-Company-agnostic, local-only build. No login. No cloud database.
+Emerson Salary & Budget Planner with Supabase account login and cloud synchronization.
 
 DATA STORAGE
 - Planner settings: browser localStorage key salaryBudgetPlanner
 - Work & Pay Records: browser localStorage key salaryMonthlyHistory
-- Data stays in the browser/device where it was entered.
-- No login, authentication, Supabase, cloud sync, or remote database is used.
-- Use the same browser and device to access saved data.
-- Clearing browser site data or using private/incognito mode may remove or prevent persistence.
+- Sign in using the same account on every device.
+- Planner settings, payroll history, and benefit selections are stored in the Supabase planner_data table.
+- Realtime notifications deliver changes quickly; a 2.5-second database check is also used as a fallback.
+- Keep the Supabase project active and retain the planner_data table and its row-level security policies.
+- Local browser storage is used as an offline cache. Cloud data is the shared source across devices.
 
 PRIVACY
 Planner salary, benefits, expenses, and work records are not uploaded to a cloud database. If hosted online, the hosting provider serves the app files, while planner records remain in browser storage.
@@ -45,3 +46,11 @@ Version 16 work arrangement update:
 - Split shift divides the 8 working hours into 4 hours WFH and 4 hours office with a 1-hour break between blocks; choose whether the office block is first or second.
 - ₱350 night transportation allowance is automatically added for full-office or split-shift days when the office exit is from 10:00 PM through 6:00 AM. It does not apply to WFH days.
 - OT remains recordable on any worked day regardless of WFH/office/split-shift arrangement.
+
+
+Version 27 synchronization update:
+- Avoids cloud writes when the actual planner data has not changed.
+- Applies only newer cloud versions and ignores stale/duplicate notifications.
+- Realtime Broadcast and Postgres Changes trigger immediate checks; a 2.5-second polling fallback detects updates even if Realtime publication is not configured.
+- Remote updates do not echo back as new local edits.
+- When there are unsaved local edits, an incoming remote update is not allowed to overwrite them mid-save.

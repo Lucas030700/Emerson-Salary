@@ -2572,6 +2572,7 @@ main.content-main{
  const bar = document.getElementById('cloudAccountBar');
  const emailLabel = document.getElementById('cloudUserEmail');
  let client, currentUser=null, syncing=false, remoteApplying=false, syncTimer=null, channel=null;
+ let lastCloudFingerprint=null, lastSeenUpdatedAt=0, localDirty=false, pollHandle=null;
  const STORAGE_KEYS=['salaryBudgetPlanner','salaryMonthlyHistory','payPlannerCurrentBenefits','payPlannerRegularBenefits'];
  const originalSet=Storage.prototype.setItem;
  function setStatus(t){syncLabel.textContent=t;}
@@ -2592,24 +2593,31 @@ main.content-main{
    return {planner,history,currentBenefits,regularBenefits,version:12};
  }
  let pendingSync=false;
+ function fingerprint(payload){return JSON.stringify(payload);}
  async function pushCloud(){
    if(!currentUser||remoteApplying)return;
    if(syncing){pendingSync=true;return;}
-   syncing=true; setStatus('Syncing…');
+   syncing=true;
    try{
      const payload=localPayload();
-     const writeAt=new Date().toISOString();window.__lastCloudWriteAt=writeAt;
+     const fp=fingerprint(payload);
+     // Do not write or notify other devices unless the actual planner data changed.
+     if(fp===lastCloudFingerprint){localDirty=false;return;}
+     setStatus('Saving changes…');
+     const writeAt=new Date().toISOString();
      const {error}=await client.from('planner_data').upsert({
        user_id:currentUser.id, planner_state:payload, updated_at:writeAt
      },{onConflict:'user_id'});
      if(error)throw error;
-     // Push an immediate Realtime broadcast to other signed-in devices.
-     // Postgres Changes remains enabled as a secondary delivery path.
+     lastCloudFingerprint=fp;
+     lastSeenUpdatedAt=Date.parse(writeAt)||Date.now();
+     localDirty=false;
+     // Broadcast is an acceleration path. Database polling below is the fallback.
      if(channel){
-       try{await channel.send({type:'broadcast',event:'planner-updated',payload:{planner_state:payload,updated_at:writeAt,source:'planner-client'}});}
-       catch(broadcastError){console.warn('Realtime broadcast was not delivered; database sync is still saved',broadcastError);}
+       try{await channel.send({type:'broadcast',event:'planner-updated',payload:{updated_at:writeAt}});}
+       catch(broadcastError){console.warn('Realtime broadcast unavailable; polling will deliver the update',broadcastError);}
      }
-     setStatus('Synced');
+     setStatus('Saved to cloud');
    }catch(e){console.error('Cloud sync failed',e);setStatus('Sync issue: '+(e.message||'check connection'));}
    finally{
      syncing=false;
@@ -2618,11 +2626,13 @@ main.content-main{
  }
  function schedulePush(){
    if(!currentUser||remoteApplying)return;
-   clearTimeout(syncTimer);syncTimer=setTimeout(pushCloud,500);
+   localDirty=true;
+   clearTimeout(syncTimer);syncTimer=setTimeout(pushCloud,450);
  }
  window.__emersonQueueCloudSync=schedulePush;
   window.addEventListener('online',()=>{if(currentUser){setStatus('Back online · syncing…');schedulePush();}});
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden && currentUser){schedulePush();}});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden && currentUser){checkCloudForUpdates();}});
+  window.addEventListener('focus',()=>{if(currentUser)checkCloudForUpdates();});
 
  // Capture real planner edits directly. This is the reliable trigger for cloud
  // writes; localStorage remains the offline cache, not the only sync signal.
@@ -2650,51 +2660,20 @@ main.content-main{
  document.addEventListener('change',e=>{
    if(e.target && e.target.matches('input,select,textarea'))captureLivePlannerChange();
  },true);
+ document.addEventListener('click',e=>{
+   if(e.target && e.target.closest('button,[role=button],.weekday-schedule-btn,[data-schedule-day]'))captureLivePlannerChange();
+ },true);
 
  Storage.prototype.setItem=function(k,v){
    originalSet.call(this,k,v);
    if(STORAGE_KEYS.includes(k))schedulePush();
  };
- async function pullCloud(){
-   const {data,error}=await client.from('planner_data').select('planner_state,updated_at').eq('user_id',currentUser.id).maybeSingle();
-   if(error)throw error;
-   if(data && data.planner_state){
-     remoteApplying=true;
-     const p=data.planner_state;
-     try{
-       if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
-       if(Array.isArray(p.history))localStorage.setItem('salaryMonthlyHistory',JSON.stringify(p.history));
-       if(Array.isArray(p.currentBenefits))localStorage.setItem('payPlannerCurrentBenefits',JSON.stringify(p.currentBenefits));
-       if(Array.isArray(p.regularBenefits))localStorage.setItem('payPlannerRegularBenefits',JSON.stringify(p.regularBenefits));
-       setStatus('Loaded cloud data');
-     }finally{ /* remote guard released after UI hydration */ }
-     // Apply cloud data to the current UI without a full-page reload.
-     if(p.planner && typeof applyState==='function'){
-       window.__emersonApplyingRemote=true;
-       applyState(p.planner);
-     }
-     if(Array.isArray(p.history)){
-       monthlyHistory=p.history;
-       renderMonthlyHistory();
-     }
-     if(typeof renderBenefits==='function')renderBenefits();
-     if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
-     if(typeof syncZonePill==='function')syncZonePill();
-     setTimeout(()=>{
-       remoteApplying=false;
-       window.__emersonApplyingRemote=false;
-     },700);
-   }else{
-     // First sign-in: migrate existing device data into the new cloud account.
-     await pushCloud();
-     setStatus('First device migrated');
-   }
- }
- async function applyRemotePayload(p,updatedAt){
+ async function applyCloudState(p,updatedAt){
    if(!p)return;
-   const incomingAt=Date.parse(updatedAt||'');
-   const ownAt=Date.parse(window.__lastCloudWriteAt||'');
-   if(Number.isFinite(incomingAt) && Number.isFinite(ownAt) && incomingAt===ownAt)return;
+   const stamp=Date.parse(updatedAt||'')||0;
+   if(stamp && stamp<=lastSeenUpdatedAt)return;
+   // Never replace a device's unsaved edits with an older/in-flight remote copy.
+   if(localDirty||syncing)return;
    remoteApplying=true;
    try{
      if(p.planner && typeof applyState==='function'){
@@ -2712,27 +2691,70 @@ main.content-main{
      if(typeof renderBenefits==='function')renderBenefits();
      if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
      if(typeof syncZonePill==='function')syncZonePill();
+     lastCloudFingerprint=fingerprint(p);
+     lastSeenUpdatedAt=stamp||Date.now();
+     localDirty=false;
      setStatus('Updated from another device');
    }catch(e){
      console.error('Could not apply remote planner update',e);
      setStatus('Sync issue: '+(e.message||'could not apply cloud update'));
    }finally{
-     setTimeout(()=>{remoteApplying=false;window.__emersonApplyingRemote=false;},250);
+     remoteApplying=false;
+     window.__emersonApplyingRemote=false;
+   }
+ }
+ async function checkCloudForUpdates(){
+   if(!currentUser||remoteApplying||localDirty||syncing||document.hidden)return;
+   try{
+     const {data,error}=await client.from('planner_data').select('planner_state,updated_at').eq('user_id',currentUser.id).maybeSingle();
+     if(error)throw error;
+     const stamp=Date.parse(data?.updated_at||'')||0;
+     if(data?.planner_state && stamp>lastSeenUpdatedAt){
+       await applyCloudState(data.planner_state,data.updated_at);
+     }
+   }catch(e){console.warn('Cloud update check failed',e);setStatus('Reconnecting to cloud…');}
+ }
+ async function pullCloud(){
+   const {data,error}=await client.from('planner_data').select('planner_state,updated_at').eq('user_id',currentUser.id).maybeSingle();
+   if(error)throw error;
+   if(data && data.planner_state){
+     const p=data.planner_state;
+     remoteApplying=true;
+     try{
+       if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
+       if(Array.isArray(p.history))localStorage.setItem('salaryMonthlyHistory',JSON.stringify(p.history));
+       if(Array.isArray(p.currentBenefits))localStorage.setItem('payPlannerCurrentBenefits',JSON.stringify(p.currentBenefits));
+       if(Array.isArray(p.regularBenefits))localStorage.setItem('payPlannerRegularBenefits',JSON.stringify(p.regularBenefits));
+       if(p.planner && typeof applyState==='function'){
+         window.__emersonApplyingRemote=true;applyState(p.planner);
+       }
+       if(Array.isArray(p.history)){monthlyHistory=p.history;renderMonthlyHistory();}
+       if(typeof renderBenefits==='function')renderBenefits();
+       if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
+       if(typeof syncZonePill==='function')syncZonePill();
+       lastCloudFingerprint=fingerprint(p);
+       lastSeenUpdatedAt=Date.parse(data.updated_at||'')||0;
+       localDirty=false;
+       setStatus('Cloud data loaded');
+     }finally{remoteApplying=false;window.__emersonApplyingRemote=false;}
+   }else{
+     // First device initializes the account from its existing local planner.
+     lastCloudFingerprint=null;
+     await pushCloud();
    }
  }
  async function startRealtime(){
    if(channel)await client.removeChannel(channel);
    channel=client.channel('planner-sync-'+currentUser.id)
-    .on('broadcast',{event:'planner-updated'},({payload})=>{
-      if(payload?.planner_state)applyRemotePayload(payload.planner_state,payload.updated_at);
-    })
-    .on('postgres_changes',{event:'*',schema:'public',table:'planner_data',filter:'user_id=eq.'+currentUser.id},payload=>{
-      applyRemotePayload(payload.new?.planner_state,payload.new?.updated_at);
-    })
+    .on('broadcast',{event:'planner-updated'},()=>checkCloudForUpdates())
+    .on('postgres_changes',{event:'*',schema:'public',table:'planner_data',filter:'user_id=eq.'+currentUser.id},()=>checkCloudForUpdates())
     .subscribe((status)=>{
       if(status==='SUBSCRIBED')setStatus('Live sync connected');
       else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setStatus('Live sync reconnecting…');
     });
+   // Polling is a safety net if Realtime publication/broadcast is not enabled.
+   if(pollHandle)clearInterval(pollHandle);
+   pollHandle=setInterval(checkCloudForUpdates,2500);
  }
  async function enterApp(session){
    currentUser=session.user;
