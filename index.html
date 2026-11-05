@@ -2573,7 +2573,7 @@ main.content-main{
  const syncLabel = document.getElementById('cloudSyncStatus');
  const bar = document.getElementById('cloudAccountBar');
  const emailLabel = document.getElementById('cloudUserEmail');
- let client, currentUser=null, syncing=false, remoteApplying=false, syncTimer=null, channel=null;
+ let client, currentUser=null, syncing=false, remoteApplying=false, checkingCloud=false, syncTimer=null, channel=null;
  let lastCloudFingerprint=null, lastSeenUpdatedAt=0, localDirty=false, pollHandle=null;
  const STORAGE_KEYS=['salaryBudgetPlanner','salaryMonthlyHistory','payPlannerCurrentBenefits','payPlannerRegularBenefits'];
  const originalSet=Storage.prototype.setItem;
@@ -2595,7 +2595,18 @@ main.content-main{
    return {planner,history,currentBenefits,regularBenefits,version:12};
  }
  let pendingSync=false;
- function fingerprint(payload){return JSON.stringify(payload);}
+ // Canonical fingerprint prevents equivalent data with different key order
+ // from causing false edits and device-to-device sync ping-pong.
+ function stableValue(value){
+   if(Array.isArray(value))return value.map(stableValue);
+   if(value&&typeof value==='object'){
+     const out={};
+     Object.keys(value).sort().forEach(k=>{out[k]=stableValue(value[k]);});
+     return out;
+   }
+   return value;
+ }
+ function fingerprint(payload){return JSON.stringify(stableValue(payload));}
  async function pushCloud(){
    if(!currentUser||remoteApplying)return;
    if(syncing){pendingSync=true;return;}
@@ -2671,7 +2682,12 @@ main.content-main{
  Storage.prototype.setItem=function(k,v){
    const next=String(v),previous=this.getItem(k);
    originalSet.call(this,k,v);
-   if(STORAGE_KEYS.includes(k)&&previous!==next)schedulePush();
+   if(STORAGE_KEYS.includes(k)&&previous!==next){
+     // Ignore local autosave/render writes unless the actual planner payload changed.
+     try{
+       if(currentUser&&!remoteApplying&&fingerprint(localPayload())!==lastCloudFingerprint)schedulePush();
+     }catch(_){}
+   }
  };
  async function applyCloudState(p,updatedAt){
    if(!p)return;
@@ -2696,7 +2712,7 @@ main.content-main{
      if(typeof renderBenefits==='function')renderBenefits();
      if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
      if(typeof syncZonePill==='function')syncZonePill();
-     lastCloudFingerprint=fingerprint(p);
+     lastCloudFingerprint=fingerprint(localPayload());
      lastSeenUpdatedAt=stamp||Date.now();
      localDirty=false;
      setStatus('Updated from another device');
@@ -2709,7 +2725,8 @@ main.content-main{
    }
  }
  async function checkCloudForUpdates(){
-   if(!currentUser||remoteApplying||localDirty||syncing||document.hidden)return;
+   if(!currentUser||remoteApplying||localDirty||syncing||checkingCloud||document.hidden)return;
+   checkingCloud=true;
    try{
      const {data,error}=await client.from('planner_data').select('planner_state,updated_at').eq('user_id',currentUser.id).maybeSingle();
      if(error)throw error;
@@ -2718,6 +2735,7 @@ main.content-main{
        await applyCloudState(data.planner_state,data.updated_at);
      }
    }catch(e){console.warn('Cloud update check failed',e);setStatus('Reconnecting to cloud…');}
+   finally{checkingCloud=false;}
  }
  async function pullCloud(){
    const {data,error}=await client.from('planner_data').select('planner_state,updated_at').eq('user_id',currentUser.id).maybeSingle();
@@ -2737,7 +2755,7 @@ main.content-main{
        if(typeof renderBenefits==='function')renderBenefits();
        if(typeof syncPerfectAttendanceControl==='function')syncPerfectAttendanceControl();
        if(typeof syncZonePill==='function')syncZonePill();
-       lastCloudFingerprint=fingerprint(p);
+       lastCloudFingerprint=fingerprint(localPayload());
        lastSeenUpdatedAt=Date.parse(data.updated_at||'')||0;
        localDirty=false;
        setStatus('Cloud data loaded');
@@ -2754,7 +2772,7 @@ main.content-main{
     .on('broadcast',{event:'planner-updated'},()=>checkCloudForUpdates())
     .on('postgres_changes',{event:'*',schema:'public',table:'planner_data',filter:'user_id=eq.'+currentUser.id},()=>checkCloudForUpdates())
     .subscribe((status)=>{
-      if(status==='SUBSCRIBED')setStatus('Live sync connected');
+      if(status==='SUBSCRIBED' && !localDirty && !syncing)setStatus('Live sync connected');
       else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setStatus('Live sync reconnecting…');
     });
    // Polling is a safety net if Realtime publication/broadcast is not enabled.
