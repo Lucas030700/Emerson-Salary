@@ -917,6 +917,18 @@ input[type="range"][data-target-slider]{
 .attendance-dialog [data-dialog-split-options]{padding:7px 9px;margin:5px 0;border:1px solid var(--line);border-radius:9px;background:var(--card)}
 .attendance-day small{display:block;line-height:1.15;white-space:normal}
 </style>
+
+<style id="inline-workmode-calendar-revision">
+.workmode-options,.split-block-options{display:flex;gap:6px;flex-wrap:wrap}
+.workmode-options button,.split-block-options button{flex:1;min-width:0;padding:9px 7px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font-size:11px;font-weight:650;transition:background .18s,border-color .18s,transform .18s}
+.workmode-options button[aria-pressed="true"],.split-block-options button[aria-pressed="true"]{background:var(--soft,#eaf3ed);border-color:#6c9d7d;color:var(--ink);box-shadow:inset 0 0 0 1px #6c9d7d}
+[data-dialog-split-options]{overflow:hidden;transition:opacity .18s,transform .18s}
+.attendance-day.split-first{background:linear-gradient(135deg,transparent 0 48%,#6f9b7b 49% 52%,transparent 53%),linear-gradient(90deg,#dcebe0 0 50%,#edf2ee 50% 100%)!important;border-color:#8eae98!important;color:#254c34!important}
+.attendance-day.split-second{background:linear-gradient(135deg,transparent 0 48%,#6f9b7b 49% 52%,transparent 53%),linear-gradient(90deg,#edf2ee 0 50%,#dcebe0 50% 100%)!important;border-color:#8eae98!important;color:#254c34!important}
+.attendance-day.has-ot small{font-family:ui-monospace,Consolas,monospace;font-weight:900!important;font-style:italic!important;letter-spacing:-.3px;color:#a34a19!important}
+.attendance-day.has-ot b{font-weight:800}
+</style>
+
 </head>
 <body>
 <div class="sticky-shell">
@@ -1211,6 +1223,12 @@ function qualifiesNightTransport(entry){
  const exit=officeExitTimeForEntry(entry);if(!exit)return false;
  const mins=timeMinutes(exit,'00:00');return mins>=22*60||mins<=6*60;
 }
+function syncWorkModeButtons(dialog){
+ const mode=dialog.querySelector('[data-dialog-workmode]')?.value||'wfh',block=dialog.querySelector('[data-dialog-office-block]')?.value||'first';
+ dialog.querySelectorAll('[data-workmode-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.workmodeChoice===mode)));
+ dialog.querySelectorAll('[data-office-block-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.officeBlockChoice===block)));
+ const split=dialog.querySelector('[data-dialog-split-options]');if(split)split.hidden=mode!=='split';
+}
 function updateWorkModePreview(dialog){
  const date=dialog.dataset.selectedDate,mode=dialog.querySelector('[data-dialog-workmode]')?.value||'wfh';
  const split=dialog.querySelector('[data-dialog-split-options]'),preview=dialog.querySelector('[data-dialog-workmode-preview]');
@@ -1246,15 +1264,17 @@ function detailMarkup(record,which){
  <div class="calendar-legend"><span><i class="legend-dot calendar-workday"></i> Workday</span><span><i class="legend-dot calendar-rest"></i> Rest day</span><span><i class="legend-dot calendar-regular"></i> Regular holiday</span><span><i class="legend-dot calendar-special"></i> Special holiday</span><span><i class="legend-dot calendar-absent"></i> Absent</span></div>
  <div class="attendance-calendar" data-attendance-calendar="${key}" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
  ${['S','M','T','W','T','F','S'].map(d=>`<b style="font-size:10px;text-align:center">${d}</b>`).join('')}
- ${(()=>{let out='';const [yy,mo,dd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);const first=new Date(yy,mo-1,dd).getDay();for(let i=0;i<first;i++)out+='<span></span>';for(let dt=new Date(yy,mo-1,dd);dt<=new Date(ey,em-1,ed);dt.setDate(dt.getDate()+1)){const date=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');const isAbsent=abs.includes(date),entry=ot.find(e=>e.date===date),holiday=holidayForDate(date),dow=dt.getDay(),isWork=scheduleForDate(date).working,shade=holiday?(holiday[2]==='Regular holiday'?'calendar-regular':'calendar-special'):isWork?'calendar-workday':'calendar-rest';out+=`<button type="button" class="attendance-day ${isAbsent?'calendar-absent':shade} ${!isAbsent&&entry?'worked':''} ${entry?'has-ot':''}" data-day-pick="${key}|${date}" ${holiday?`data-holiday-detail="${date}"`:''}><b>${dt.getDate()}</b>${entry?`<small>${entry.workMode==='split'?'Split':entry.workMode==='office'?'Office':'WFH'}${Number(entry.hours)>0?' · '+Number(entry.hours)+'h OT':''}</small>`:''}</button>`;}return out;})()}
+ ${(()=>{let out='';const [yy,mo,dd]=period.min.split('-').map(Number),[ey,em,ed]=period.max.split('-').map(Number);const first=new Date(yy,mo-1,dd).getDay();for(let i=0;i<first;i++)out+='<span></span>';for(let dt=new Date(yy,mo-1,dd);dt<=new Date(ey,em-1,ed);dt.setDate(dt.getDate()+1)){const date=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');const isAbsent=abs.includes(date),entry=ot.find(e=>e.date===date),holiday=holidayForDate(date),dow=dt.getDay(),isWork=scheduleForDate(date).working,shade=holiday?(holiday[2]==='Regular holiday'?'calendar-regular':'calendar-special'):isWork?'calendar-workday':'calendar-rest';const splitClass=entry?.workMode==='split'?(entry.officeBlock==='second'?'split-second':'split-first'):'';const otCode=entry&&Number(entry.hours)>0?`${Number(entry.hours)}R`:'';out+=`<button type="button" class="attendance-day ${isAbsent?'calendar-absent':shade} ${!isAbsent&&entry?'worked':''} ${entry?'has-ot':''} ${splitClass}" data-day-pick="${key}|${date}" ${holiday?`data-holiday-detail="${date}"`:''}><b>${dt.getDate()}</b>${otCode?`<small>${otCode}</small>`:''}</button>`;}return out;})()}
  </div><div class="holiday-info" data-record-holiday-info hidden></div>
  <dialog class="attendance-dialog" data-day-dialog="${key}">
   <div class="picker-head"><div><h3 data-dialog-date>Attendance</h3><p class="sub">Did you report to work on this date?</p></div><button type="button" data-dialog-close aria-label="Close">✕</button></div>
   <div class="field"><label>Did you work?</label><div class="attendance-choice"><button type="button" data-work-yes aria-pressed="true">Yes, I worked</button><button type="button" data-work-no aria-pressed="false">No, absent</button></div></div>
   <div data-dialog-ot hidden>
-   <div class="field"><label>Work arrangement</label><select data-dialog-workmode style="width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"><option value="wfh">Work from home</option><option value="office">Full office shift</option><option value="split">Split shift · 4h office + 1h break + 4h WFH</option></select></div>
+   <div class="field"><label>Work arrangement</label><div class="workmode-options" role="group" aria-label="Work arrangement">
+    <button type="button" data-workmode-choice="wfh" aria-pressed="true">WFH</button><button type="button" data-workmode-choice="office" aria-pressed="false">Full Office Shift</button><button type="button" data-workmode-choice="split" aria-pressed="false">Split Shift</button>
+   </div><select data-dialog-workmode hidden aria-hidden="true" tabindex="-1"><option value="wfh">Work from home</option><option value="office">Full office shift</option><option value="split">Split shift</option></select></div>
    <div data-dialog-split-options hidden>
-    <div class="field"><label>Which 4-hour block are you in the office?</label><select data-dialog-office-block style="width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"><option value="first">First block · office first</option><option value="second">Second block · office second</option></select></div>
+    <div class="field"><label>Office block</label><div class="split-block-options" role="group" aria-label="Office block"><button type="button" data-office-block-choice="first" aria-pressed="true">First Block</button><button type="button" data-office-block-choice="second" aria-pressed="false">Second Block</button></div><select data-dialog-office-block hidden aria-hidden="true" tabindex="-1"><option value="first">First block</option><option value="second">Second block</option></select></div>
    </div>
    <p class="sub" data-dialog-workmode-preview>WFH day · no office exit transport allowance.</p>
    <div class="field"><div class="fieldhead"><label>Overtime hours</label><span class="val" data-dialog-ot-label>0 hours</span></div><input type="range" min="0" max="5" step="0.5" value="0" data-dialog-ot-slider></div>
@@ -1390,6 +1410,8 @@ function syncActiveDashboardMonthToHistory(){
  if(!month)return;
  const record=ensureDashboardMonth(month);
  if(!record)return;
+ // Keep one history record per month; the selected month's record is the one being updated.
+ monthlyHistory=monthlyHistory.filter(x=>x.month!==month||x===record);
  syncSelectedMonthBillAmounts(record);
  recalcSavedRecord(record);
  // Deliberately do not persist or publish unsaved edits to Payroll History here.
@@ -1399,6 +1421,8 @@ get('saveDashboardMonth')?.addEventListener('click',()=>{
  if(!month){get('monthlyHistoryStatus').textContent='Choose a payroll month first.';return;}
  const record=ensureDashboardMonth(month);
  if(!record)return;
+ // Keep one history record per month; the selected month's record is the one being updated.
+ monthlyHistory=monthlyHistory.filter(x=>x.month!==month||x===record);
  syncSelectedMonthBillAmounts(record);
  recalcSavedRecord(record);
  // Saving the selected month is an explicit re-save of both cutoff records.
@@ -1630,14 +1654,15 @@ function bindDashboardDetailEvents(root){
   const approved=dialog.querySelector('[data-dialog-ot-approved]');if(approved)approved.checked=!!existing?.approved;
   const mode=dialog.querySelector('[data-dialog-workmode]');if(mode)mode.value=existing?.workMode||'wfh';
   const block=dialog.querySelector('[data-dialog-office-block]');if(block)block.value=existing?.officeBlock||'first';
-  updateWorkModePreview(dialog);updateNightPreview(dialog,Number(existing?.hours)||0);dialog.showModal();
+  syncWorkModeButtons(dialog);updateWorkModePreview(dialog);updateNightPreview(dialog,Number(existing?.hours)||0);dialog.showModal();
  }));
  root.querySelectorAll('[data-holiday-detail]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const panel=btn.closest('.record-detail')?.querySelector('[data-record-holiday-info]');if(panel){const date=btn.dataset.holidayDetail;panel.innerHTML=holidayInfoMarkup(holidayForDate(date),date);panel.hidden=false;}}));
  root.querySelectorAll('[data-work-yes]').forEach(btn=>btn.addEventListener('click',()=>{const d=btn.closest('dialog');d.dataset.attendance='yes';d.querySelector('[data-dialog-ot]').hidden=false;d.querySelector('[data-work-yes]').setAttribute('aria-pressed','true');d.querySelector('[data-work-no]').setAttribute('aria-pressed','false');}));
  root.querySelectorAll('[data-work-no]').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const d=btn.closest('dialog');d.dataset.attendance='no';d.querySelector('[data-dialog-ot]').hidden=true;d.querySelector('[data-work-yes]').setAttribute('aria-pressed','false');btn.setAttribute('aria-pressed','true');}));
  root.querySelectorAll('[data-dialog-close]').forEach(btn=>btn.addEventListener('click',()=>btn.closest('dialog').close()));
  root.querySelectorAll('[data-dialog-ot-slider]').forEach(el=>el.addEventListener('input',()=>{const d=el.closest('dialog');d.querySelector('[data-dialog-ot-label]').textContent=el.value+' hours';updateNightPreview(d,Number(el.value));}));
- root.querySelectorAll('[data-dialog-workmode],[data-dialog-office-block]').forEach(el=>el.addEventListener('change',()=>updateWorkModePreview(el.closest('dialog'))));
+ root.querySelectorAll('[data-workmode-choice]').forEach(btn=>btn.addEventListener('click',()=>{const d=btn.closest('dialog'),sel=d.querySelector('[data-dialog-workmode]');sel.value=btn.dataset.workmodeChoice;syncWorkModeButtons(d);updateWorkModePreview(d);}));
+ root.querySelectorAll('[data-office-block-choice]').forEach(btn=>btn.addEventListener('click',()=>{const d=btn.closest('dialog');d.querySelector('[data-dialog-office-block]').value=btn.dataset.officeBlockChoice;syncWorkModeButtons(d);updateWorkModePreview(d);}));
  root.querySelectorAll('[data-dialog-save]').forEach(btn=>btn.addEventListener('click',()=>{
   const d=btn.closest('dialog'),date=d.dataset.selectedDate,att=d.dataset.attendance,[month,which]=d.dataset.dayDialog.split('|'),r=monthlyHistory.find(x=>x.month===month);if(!r||!date)return;
   const x=r[which];x.otEntries=x.otEntries||[];x.absenceDates=x.absenceDates||[];x.otEntries=x.otEntries.filter(e=>e.date!==date);x.absenceDates=x.absenceDates.filter(v=>v!==date);
