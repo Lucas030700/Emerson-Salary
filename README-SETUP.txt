@@ -37,3 +37,11 @@ Version 14 update: For each supervisor-approved OT day of at least 3 hours, the 
 
 
 Version 15 update: Removed manual Perfect Attendance, Mid-Year Pay received, and 13th Month Pay received checkboxes. Perfect attendance is now automatically awarded only when every scheduled workday across the payroll cycle is recorded as worked and there are no absences. Mid-year pay is automatically included in June for regular employees. 13th month pay is automatically included in December.
+
+
+Version 16 work arrangement update:
+- Default Emerson midshift is 1:00 PM–10:00 PM, a 9-hour span including a 1-hour break, for 8 working hours.
+- Attendance day selector supports WFH, full office, and split shift.
+- Split shift divides the 8 working hours into 4 hours WFH and 4 hours office with a 1-hour break between blocks; choose whether the office block is first or second.
+- ₱350 night transportation allowance is automatically added for full-office or split-shift days when the office exit is from 10:00 PM through 6:00 AM. It does not apply to WFH days.
+- OT remains recordable on any worked day regardless of WFH/office/split-shift arrangement.
