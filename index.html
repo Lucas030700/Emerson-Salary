@@ -2564,7 +2564,8 @@ main.content-main{
   <div id="cloudAuthMsg">Your planner data is private to your account.</div>
  </div>
 </div>
-<div id="cloudAccountBar"><span id="cloudSyncStatus">Cloud sync ready</span><span id="cloudUserEmail"></span><button id="cloudSignOut" type="button">Sign out</button></div>
+<div id="cloudAccountBar"><span id="cloudSyncStatus">Cloud sync ready</span><span id="cloudUserEmail"></span><button id="accountSettingsBtn" type="button">Account Settings</button><button id="cloudSignOut" type="button">Sign out</button></div>
+<div id="setupOverlay" style="display:none;position:fixed;inset:0;z-index:100001;background:rgba(9,18,15,.82);align-items:center;justify-content:center;padding:16px;overflow:auto"><div style="background:var(--card,#fff);color:var(--ink,#17251f);width:min(560px,100%);max-height:92vh;overflow:auto;border-radius:18px;padding:22px;box-shadow:0 20px 70px #0005"><h2 id="setupTitle">Let’s set up your planner</h2><p id="setupIntro">Complete your basic employment details to start using the payroll dashboard.</p><div class="field"><label for="setupRole">Work position / role</label><input id="setupRole" type="text" placeholder="e.g. Engineer, Analyst" maxlength="90"></div><div class="field"><label for="setupSalary">Monthly basic salary (₱)</label><input id="setupSalary" type="number" min="0" step="500" placeholder="0"></div><div class="field"><label for="setupEmployment">Employment status</label><select id="setupEmployment"><option value="probationary">Probationary</option><option value="regular">Regular</option></select></div><div class="field"><label for="setupZone">Residence zone</label><select id="setupZone"><option value="1">Zone 1</option><option value="2">Zone 2</option><option value="3">Zone 3</option><option value="4" selected>Zone 4</option></select></div><div class="field"><label for="setupWork">Work setup</label><select id="setupWork"><option value="wfh">Work from home</option><option value="hybrid" selected>Hybrid</option><option value="office">Full office</option></select></div><div class="field"><label for="setupRto">RTO schedule</label><select id="setupRto"><option value="fixed">Fixed schedule</option><option value="flexible">Flexible / not fixed</option></select></div><p style="font-size:12px;color:var(--muted)">You can fine-tune your weekly schedule, benefits, and monthly expenses in the planner after setup.</p><div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button id="setupSave" type="button">Save setup and continue</button></div><div id="setupError" style="color:#b42318;font-size:12px;margin-top:8px"></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (() => {
@@ -2576,7 +2577,7 @@ main.content-main{
  const bar = document.getElementById('cloudAccountBar');
  const emailLabel = document.getElementById('cloudUserEmail');
  let client, currentUser=null, syncing=false, remoteApplying=false, checkingCloud=false, syncTimer=null, channel=null;
- let lastCloudFingerprint=null, lastSeenUpdatedAt=0, localDirty=false, pollHandle=null;
+ let lastCloudFingerprint=null, lastSeenUpdatedAt=0, localDirty=false, pollHandle=null, setupCompleted=true, isFirstAccount=false;
  const STORAGE_KEYS=['salaryBudgetPlanner','salaryMonthlyHistory','payPlannerCurrentBenefits','payPlannerRegularBenefits'];
  const originalSet=Storage.prototype.setItem;
  function setStatus(t){syncLabel.textContent=t;}
@@ -2594,7 +2595,7 @@ main.content-main{
    let currentBenefits=[],regularBenefits=[];
    try{currentBenefits=JSON.parse(localStorage.getItem('payPlannerCurrentBenefits')||'[]')}catch(e){}
    try{regularBenefits=JSON.parse(localStorage.getItem('payPlannerRegularBenefits')||'[]')}catch(e){}
-   return {planner,history,currentBenefits,regularBenefits,version:12};
+   return {planner,history,currentBenefits,regularBenefits,setupCompleted,version:13};
  }
  let pendingSync=false;
  // Canonical fingerprint prevents equivalent data with different key order
@@ -2693,6 +2694,7 @@ main.content-main{
  };
  async function applyCloudState(p,updatedAt){
    if(!p)return;
+   if(p.setupCompleted===true)setupCompleted=true;
    const stamp=Date.parse(updatedAt||'')||0;
    if(stamp && stamp<=lastSeenUpdatedAt)return;
    // Never replace a device's unsaved edits with an older/in-flight remote copy.
@@ -2750,6 +2752,9 @@ main.content-main{
    if(error)throw error;
    if(data && data.planner_state){
      const p=data.planner_state;
+     // Existing accounts are grandfathered in, even if created before onboarding existed.
+     setupCompleted=true;
+     if(p.setupCompleted!==true){p.setupCompleted=true;setTimeout(schedulePush,500);}
      remoteApplying=true;
      try{
        if(p.planner)localStorage.setItem('salaryBudgetPlanner',JSON.stringify(p.planner));
@@ -2769,9 +2774,10 @@ main.content-main{
        setStatus('Cloud data loaded');
      }finally{remoteApplying=false;window.__emersonApplyingRemote=false;}
    }else{
-     // First device initializes the account from its existing local planner.
+     // A missing cloud row identifies a genuinely new account.
+     isFirstAccount=true;setupCompleted=false;
      lastCloudFingerprint=null;
-     await pushCloud();
+     showSetup(false);
    }
  }
  async function startRealtime(){
@@ -2791,9 +2797,45 @@ main.content-main{
    currentUser=session.user;
    emailLabel.textContent=session.user.email||'Signed in';
    bar.style.display='flex';gate.style.display='none';
-   try{await pullCloud();await startRealtime();}
+   try{await pullCloud();await startRealtime();if(!setupCompleted)showSetup(false);}
    catch(e){console.error(e);gate.style.display='flex';bar.style.display='none';msg.textContent='Database setup needed: '+(e.message||'check SQL setup and RLS policies');}
  }
+ function showSetup(restart){
+   const ov=document.getElementById('setupOverlay');
+   document.getElementById('setupTitle').textContent=restart?'Restart planner setup':'Let’s set up your planner';
+   document.getElementById('setupIntro').textContent=restart?'Review and save your basic employment details again.':'Complete your basic employment details to start using the payroll dashboard.';
+   const val=(id, fallback='')=>document.getElementById(id)?.value||fallback;
+   document.getElementById('setupRole').value=val('workPosition');
+   document.getElementById('setupSalary').value=val('basicSalary','0');
+   document.getElementById('setupEmployment').value=val('employmentStatus','probationary');
+   document.getElementById('setupZone').value=val('residenceZone','4');
+   document.getElementById('setupWork').value=val('workSetup','hybrid');
+   document.getElementById('setupRto').value=val('rtoScheduleType','fixed');
+   document.getElementById('setupError').textContent='';ov.style.display='flex';
+ }
+ document.getElementById('setupSave').addEventListener('click',()=>{
+   const role=document.getElementById('setupRole').value.trim(),salary=Number(document.getElementById('setupSalary').value);
+   if(!role){document.getElementById('setupError').textContent='Please enter your work position or role.';return;}
+   if(!Number.isFinite(salary)||salary<=0){document.getElementById('setupError').textContent='Please enter a valid monthly basic salary greater than zero.';return;}
+   const assign=(id,v)=>{const el=document.getElementById(id);if(el){el.value=v;el.dispatchEvent(new Event('change',{bubbles:true}));}};
+   assign('workPosition',role);assign('basicSalary',String(salary));assign('employmentStatus',document.getElementById('setupEmployment').value);assign('residenceZone',document.getElementById('setupZone').value);assign('workSetup',document.getElementById('setupWork').value);assign('rtoScheduleType',document.getElementById('setupRto').value);
+   if(typeof syncEmploymentZoneChoices==='function')syncEmploymentZoneChoices();if(typeof syncRtoControls==='function')syncRtoControls();if(typeof calculate==='function')calculate();
+   setupCompleted=true;document.getElementById('setupOverlay').style.display='none';
+   try{originalSet.call(localStorage,'salaryBudgetPlanner',JSON.stringify(state()));}catch(e){}
+   lastCloudFingerprint=null;schedulePush();
+ });
+ document.getElementById('accountSettingsBtn').addEventListener('click',()=>{
+   const choice=prompt('Account Settings\n\nType RESTART to restart your planner setup.\nType CANCEL to close.');
+   if(!choice||choice.trim().toUpperCase()!=='RESTART')return;
+   const keep=confirm('Keep your Payroll History?\n\nOK = Keep Payroll History\nCancel = Clear Payroll History');
+   if(!confirm('Restart setup now? Your employment settings and planner preferences will be reset.'))return;
+   // Reset only the initial profile inputs and planner defaults. Account remains intact.
+   const defaults={workPosition:'',basicSalary:'0',employmentStatus:'probationary',residenceZone:'4',workSetup:'hybrid',rtoScheduleType:'fixed'};
+   Object.entries(defaults).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
+   if(!keep){monthlyHistory=[];localStorage.setItem('salaryMonthlyHistory','[]');if(typeof renderMonthlyHistory==='function')renderMonthlyHistory();}
+   if(typeof syncEmploymentZoneChoices==='function')syncEmploymentZoneChoices();if(typeof syncRtoControls==='function')syncRtoControls();if(typeof calculate==='function')calculate();
+   setupCompleted=false;lastCloudFingerprint=null;showSetup(true);
+ });
  async function init(){
    if(!window.supabase){msg.textContent='Could not load the sign-in library. Check your internet connection.';return;}
    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
